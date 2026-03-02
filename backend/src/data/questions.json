@@ -1,0 +1,542 @@
+[
+    {
+        "id": 1,
+        "question": "I enjoy solving complex mathematical problems or logic puzzles.",
+        "category": "logic",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "question": "I love painting, drawing, or designing visual content.",
+        "category": "creativity",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "question": "I am curious about how machines, computers, or software work.",
+        "category": "technical",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "question": "I enjoy helping people and working in teams to solve social issues.",
+        "category": "social",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "question": "I like to analyze data to find trends or patterns.",
+        "category": "logic",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 6,
+        "question": "I frequently brainstorm new and innovative ideas for projects.",
+        "category": "creativity",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 7,
+        "question": "I find learning programming languages or coding interesting.",
+        "category": "technical",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 8,
+        "question": "I am good at mediating conflicts and understanding others' feelings.",
+        "category": "social",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 9,
+        "question": "I make decisions based on facts and objective evidence rather than intuition.",
+        "category": "logic",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 10,
+        "question": "I enjoy writing stories, composing music, or creating films.",
+        "category": "creativity",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 11,
+        "question": "I am fascinated by new gadgets, electronics, and digital tools.",
+        "category": "technical",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 12,
+        "question": "I prefer jobs where I can teach, mentor, or advise people.",
+        "category": "social",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 13,
+        "question": "I am skilled at planning and organizing tasks logically before starting.",
+        "category": "logic",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 14,
+        "question": "I am drawn to professions that allow self-expression and out-of-the-box thinking.",
+        "category": "creativity",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 15,
+        "question": "I excel at building physical models or assembling mechanical parts.",
+        "category": "technical",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 16,
+        "question": "I often take the lead in group discussions to ensure everyone is heard.",
+        "category": "social",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 17,
+        "question": "I excel at finding inconsistencies or errors in arguments.",
+        "category": "logic",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 18,
+        "question": "I frequently appreciate the aesthetics of architecture, fashion, or photography.",
+        "category": "creativity",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 19,
+        "question": "I enjoy troubleshooting tech issues when my devices act up.",
+        "category": "technical",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 20,
+        "question": "I find satisfaction in volunteering for community service or charity.",
+        "category": "social",
+        "options": [
+            {
+                "text": "Strongly Agree",
+                "score": 1.0
+            },
+            {
+                "text": "Agree",
+                "score": 0.7
+            },
+            {
+                "text": "Neutral",
+                "score": 0.5
+            },
+            {
+                "text": "Disagree",
+                "score": 0.2
+            },
+            {
+                "text": "Strongly Disagree",
+                "score": 0.0
+            }
+        ]
+    }
+]

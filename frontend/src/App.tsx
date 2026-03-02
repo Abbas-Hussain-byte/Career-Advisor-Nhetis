@@ -1,37 +1,62 @@
-import React from 'react'
-import { Routes, Route, Link, NavLink } from 'react-router-dom'
-import Dashboard from './components/Dashboard'
-import CareerMap from './components/CareerMap'
-import CollegeList from './components/CollegeList'
-import AssessForm from './components/AssessForm'
-import Alerts from './components/Alerts'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { OfflineProvider } from './context/OfflineContext';
 
-export default function App() {
-  return (
-    <div className="container-fluid">
-      <div className="row">
-        <nav className="col-md-2 d-none d-md-block bg-white border-end min-vh-100">
-          <div className="p-3">
-            <h5 className="mb-3">NHETIS <span className="text-muted">Demo</span></h5>
-            <ul className="nav nav-pills flex-column gap-1">
-              <li className="nav-item"><NavLink className="nav-link" to="/">Dashboard</NavLink></li>
-              <li className="nav-item"><NavLink className="nav-link" to="/career-map">Career Map</NavLink></li>
-              <li className="nav-item"><NavLink className="nav-link" to="/colleges">Govt Colleges</NavLink></li>
-              <li className="nav-item"><NavLink className="nav-link" to="/assess">Aptitude & Interests</NavLink></li>
-              <li className="nav-item"><NavLink className="nav-link" to="/alerts">Admissions & Scholarships</NavLink></li>
-            </ul>
-          </div>
-        </nav>
-        <main className="col-md-10 ms-sm-auto px-4 py-4">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/career-map" element={<CareerMap />} />
-            <Route path="/colleges" element={<CollegeList />} />
-            <Route path="/assess" element={<AssessForm />} />
-            <Route path="/alerts" element={<Alerts />} />
-          </Routes>
-        </main>
+// Pages
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import CareerExplorer from './pages/CareerExplorer';
+import Colleges from './pages/Colleges';
+import Profile from './pages/Profile';
+
+const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="spinner mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading...</p>
+        </div>
       </div>
-    </div>
-  )
+    );
+  }
+  return user ? children : <Navigate to="/login" replace />;
+};
+
+const PublicRoute = ({ children }: { children: JSX.Element }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return user ? <Navigate to="/dashboard" replace /> : children;
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <OfflineProvider>
+        <Router>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+
+            {/* Protected Routes */}
+            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/careers" element={<PrivateRoute><CareerExplorer /></PrivateRoute>} />
+            <Route path="/colleges" element={<PrivateRoute><Colleges /></PrivateRoute>} />
+            <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+
+            {/* Catch-all */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </OfflineProvider>
+    </AuthProvider>
+  );
 }
+
+export default App;

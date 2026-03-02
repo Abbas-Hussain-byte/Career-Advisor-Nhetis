@@ -1,0 +1,32 @@
+import axios from 'axios';
+
+const API = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+});
+
+API.interceptors.request.use((req) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        req.headers.Authorization = `Bearer ${token}`;
+    }
+    return req;
+});
+
+// Auth
+export const login = (formData: any) => API.post('/users/login', formData);
+export const register = (formData: any) => API.post('/users', formData);
+export const fetchProfile = () => API.get('/users/profile');
+export const updateProfile = (data: any) => API.put('/users/profile', data);
+
+// Careers
+export const getCareers = (params?: any) => API.get('/careers', { params });
+export const getRecommendations = (data: any) => API.post('/careers/recommend', data);
+export const seedDatabase = () => API.post('/careers/seed');
+
+// Colleges
+export const getColleges = (params?: any) => API.get('/colleges', { params });
+
+// Aptitude
+export const getQuestions = () => API.get('/aptitude');
+
+export default API;

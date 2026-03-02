@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+    --primary: #0A2540;
+    --secondary: #00D4FF;
+    --accent: #635BFF;
+    --success: #32D74B;
+    --warning: #FFD60A;
+    --error: #FF453A;
+    --bg: #F6F9FC;
+    --surface: #FFFFFF;
+    --text: #1A1F2C;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* Glassmorphism card */
+.glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(10, 37, 64, 0.1);
+}
+
+/* Gradient text */
+.gradient-text {
+    background: linear-gradient(135deg, #0A2540 0%, #00D4FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-text-accent {
+    background: linear-gradient(135deg, #635BFF 0%, #00D4FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Hero gradient background */
+.hero-bg {
+    background: linear-gradient(135deg, #0A2540 0%, #1a3d66 40%, #0d3058 100%);
+}
+
+/* Animated gradient background */
+.animated-bg {
+    background: linear-gradient(-45deg, #0A2540, #1a3d66, #00517a, #0A2540);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Card hover effect */
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(10, 37, 64, 0.15);
+}
+
+/* Leaflet fix */
+.leaflet-container {
+    z-index: 0;
+    border-radius: 1rem;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f6f9fc;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #0A2540;
+    border-radius: 3px;
+}
+
+/* Loading spinner */
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(0, 212, 255, 0.3);
+    border-top-color: #00D4FF;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Progress bar */
+.progress-bar {
+    transition: width 0.5s ease;
+}
+
+/* Offline banner */
+.offline-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #FF453A;
+    color: white;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    z-index: 9999;
+    font-size: 0.875rem;
+    font-weight: 500;
+}

@@ -1,44 +1,70 @@
-# NHETIS Demo – Personal Career & Education Advisor (Free Tools)
+# NHETIS Career Advisor - Production-Grade Hackathon Solution
 
-A 1–2 day hackathon-ready demo implementing core features:
-- Aptitude & interest-based course recommendations
-- Course → skills → career mapping (dynamic charts)
-- Location-based government college programs
-- Admissions/Scholarship Alerts
-- Simple RAG-style curated dataset (JSON) for trusted outputs
+**Status:** Implementation Ready (MERN Stack)
+**Objective:** One-Stop Personalized Career & Education Advisor for Government College Enrollment Improvement.
 
-## Tech (Free)
-- **Backend:** Node.js + Express (no DB required for demo; JSON files)
-- **Frontend:** React + Vite + Bootstrap (Creative Tim-like layout), Recharts for charts
-- **Auth:** (Optional later) Firebase/Clerk free tiers
-- **LLM:** (Optional later) Groq/OpenRouter free tiers; fallback to rules engine
+## 🚀 Key Features
 
-## Run locally
-Terminal 1 (backend):
+1.  **Microservice-Style Modular Monolith**: Scalable backend architecture.
+2.  **AI Recommendation Engine**: Hybrid Rule-Based + Cosine Similarity Vector Matching (No Paid APIs).
+3.  **Geo-Spatial College Discovery**: Find nearby government colleges using MongoDB `2dsphere` index.
+4.  **Offline-First**: Designed for PWA with Service Workers and Local Caching.
+5.  **Role-Based Access Control**: Secure Student and Admin portals.
+
+## 📂 Project Structure
+
+```
+Career-Advisor-Nhetis/
+├── backend/                 # Node.js + Express
+│   ├── src/
+│   │   ├── config/          # DB & Env Config
+│   │   ├── controllers/     # Logic (User, Career, College)
+│   │   ├── middleware/      # Auth, Error Handling
+│   │   ├── models/          # Mongoose Schemas (GeoJSON enabled)
+│   │   ├── routes/          # API Definitions
+│   │   ├── services/        # Business Logic
+│   │   └── server.js        # Entry Point
+│   └── data/                # Seed Data (JSON)
+│
+├── frontend/                # React + Vite
+│   ├── src/
+│   │   ├── api/             # Axios Instances
+│   │   ├── components/      # Reusable UI
+│   │   ├── context/         # Global State (Auth, Offline)
+│   │   ├── pages/           # Views
+│   │   └── App.tsx          # Main Router
+│   └── public/              # Static Assets
+└── ARCHITECTURE_PLAN.md     # Detailed System Blueprint
+```
+
+## 🛠️ Setup & Installation
+
+### Prerequisites
+- Node.js (v16+)
+- MongoDB Atlas Account (Free Tier) or Local MongoDB
+
+### 1. Backend Setup
 ```bash
 cd backend
-npm i
-npm run start
-# http://localhost:5050
+npm install
+npm run dev
 ```
+*Note: Create a `.env` file in `backend/` with `MONGO_URI` and `JWT_SECRET`.*
 
-Terminal 2 (frontend):
+### 2. Frontend Setup
 ```bash
 cd frontend
-npm i
+npm install
 npm run dev
-# http://localhost:5173
 ```
 
-## Configure
-Frontend can point to backend via env:
-- Create `frontend/.env` with `VITE_API_URL=http://localhost:5050`
+### 3. Database Seeding
+POST request to `http://localhost:5000/api/careers/seed` to populate initial data.
 
-## Deploy (free)
-- Backend: Render.com free web service or Railway free tier
-- Frontend: Vercel or Netlify
+## 🏗️ Architecture & APIs
 
-## Notes
-- Data is sample. Replace JSONs in `backend/data` with verified government & accreditation sources when available.
-- For multilingual, add i18n JSONs and toggle UI labels.
-- Add PWA for offline (Workbox) if time permits.
+- **Auth**: JWT based (`/api/users/login`, `/api/users/profile`)
+- **Recommendation**: `/api/careers/recommend` (Accepts Quiz Scores & Interests)
+- **Colleges**: `/api/colleges?lat=...&lng=...` (Geo-spatial search)
+
+See `ARCHITECTURE_PLAN.md` for the full schematic.
