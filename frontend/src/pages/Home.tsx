@@ -6,7 +6,7 @@ const features = [
     {
         icon: '🧠',
         title: 'AI Aptitude Assessment',
-        desc: 'Take our 5-question psychometric quiz to discover your strengths across logic, creativity, technical, and social dimensions.',
+        desc: 'Take our 10-question psychometric quiz to discover your strengths across logic, creativity, technical, and social dimensions.',
     },
     {
         icon: '🗺️',
@@ -27,8 +27,8 @@ const features = [
 
 const stats = [
     { value: '10+', label: 'Career Paths' },
-    { value: '8+', label: 'Gov. Colleges' },
-    { value: '5', label: 'Quiz Questions' },
+    { value: '8', label: 'Gov. Colleges' },
+    { value: '10', label: 'Quiz Questions' },
     { value: '100%', label: 'Free to Use' },
 ];
 
@@ -159,7 +159,7 @@ export default function Home() {
                     <div className="grid md:grid-cols-3 gap-8">
                         {[
                             { step: '01', title: 'Register Free', desc: 'Create your account using your phone number — no email required.' },
-                            { step: '02', title: 'Take the Assessment', desc: 'Answer 5 quick questions about your interests, strengths, and goals.' },
+                            { step: '02', title: 'Take the Assessment', desc: 'Answer 10 questions about your interests, strengths, and goals.' },
                             { step: '03', title: 'Get Recommendations', desc: 'Receive personalized career paths, nearby colleges, and roadmaps instantly.' },
                         ].map((item, i) => (
                             <motion.div

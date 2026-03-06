@@ -13,7 +13,7 @@ const INTEREST_OPTIONS = [
 const STREAM_OPTIONS = ['Science-PCM', 'Science-PCB', 'Commerce', 'Arts / Humanities', 'Vocational'];
 
 export default function Profile() {
-    const { user, loginUser, logoutUser } = useAuth();
+    const { user, logoutUser, refreshUser } = useAuth();
     const [form, setForm] = useState({
         name: user?.name || '',
         email: user?.email || '',
@@ -51,6 +51,7 @@ export default function Profile() {
                 academicScore: form.academicScore ? Number(form.academicScore) : undefined,
                 interests: form.interests,
             });
+            await refreshUser(); // Sync updated profile into AuthContext immediately
             setSuccess(true);
             setTimeout(() => setSuccess(false), 3000);
         } catch (err: any) {

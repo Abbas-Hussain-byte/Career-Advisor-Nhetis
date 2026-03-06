@@ -70,6 +70,8 @@ export default function Dashboard() {
             const { data } = await API.post('/careers/recommend', {
                 quizScores: scores,
                 interests: user?.profile?.interests || [],
+                stream: user?.profile?.stream || '',
+                academicScore: user?.profile?.academicScore || null,
                 location: locationData,
             });
             setRecommendations(data);
@@ -79,15 +81,6 @@ export default function Dashboard() {
             setView('home');
         } finally {
             setLoadingResults(false);
-        }
-    };
-
-    const seedData = async () => {
-        try {
-            const { data } = await API.post('/careers/seed');
-            alert(data.message);
-        } catch (e) {
-            console.error(e);
         }
     };
 
@@ -217,15 +210,6 @@ export default function Dashboard() {
                 </motion.div>
             )}
 
-            {/* Seed data button for demo */}
-            <div className="mt-6 text-center">
-                <button
-                    onClick={seedData}
-                    className="text-xs text-gray-400 hover:text-gray-600 underline"
-                >
-                    Seed demo data (run once)
-                </button>
-            </div>
         </div>
     );
 

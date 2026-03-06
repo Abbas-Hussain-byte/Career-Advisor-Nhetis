@@ -8,6 +8,7 @@ const CollegeSchema = new mongoose.Schema({
         type: { type: String, default: 'Point' },
         coordinates: [Number] // [longitude, latitude]
     },
+    address: String,   // Full address string, e.g. "Masab Tank, Hyderabad, Telangana"
     state: String,
     district: String,
     website: String,

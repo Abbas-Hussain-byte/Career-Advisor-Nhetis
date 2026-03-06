@@ -1,59 +1,123 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 
-// Fix default Leaflet marker icon (Vite bundler issue)
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
+interface College {
+    name: string;
+    state?: string;
+    type?: string;
+    address?: string;
+    programs?: string[];
+    location?: { coordinates: [number, number] };
+}
 
-const CollegeMap = ({ colleges }: { colleges: any[] }) => {
+const CollegeMap = ({ colleges }: { colleges: College[] }) => {
+    const mapRef = useRef<HTMLDivElement>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mapInstanceRef = useRef<any>(null);
+
     const validColleges = colleges.filter(
-        c => c.location?.coordinates?.length === 2
+        (c) => c.location?.coordinates?.length === 2
     );
 
-    const center: [number, number] =
-        validColleges.length > 0
-            ? [validColleges[0].location.coordinates[1], validColleges[0].location.coordinates[0]]
-            : [20.5937, 78.9629]; // India center
+    useEffect(() => {
+        if (!mapRef.current || validColleges.length === 0) return;
+
+        // Dynamically import leaflet to avoid SSR issues
+        import('leaflet').then((L) => {
+            // Prevent double init
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.remove();
+                mapInstanceRef.current = null;
+            }
+
+            // Fix default marker icons for Vite bundler
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            delete (L.Icon.Default.prototype as any)._getIconUrl;
+            L.Icon.Default.mergeOptions({
+                iconRetinaUrl:
+                    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+                iconUrl:
+                    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+                shadowUrl:
+                    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            });
+
+            // Create map centered on India
+            const map = L.map(mapRef.current!, {
+                center: [20.5937, 78.9629],
+                zoom: 5,
+                scrollWheelZoom: false,
+            });
+
+            mapInstanceRef.current = map;
+
+            // Add OpenStreetMap tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution:
+                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }).addTo(map);
+
+            // Add markers for each college
+            const bounds: [number, number][] = [];
+            validColleges.forEach((college) => {
+                const lat = college.location!.coordinates[1];
+                const lng = college.location!.coordinates[0];
+                bounds.push([lat, lng]);
+
+                const popupContent = `
+                    <div style="min-width:160px;font-family:sans-serif;">
+                        <strong style="color:#0A2540;display:block;margin-bottom:4px;font-size:14px;">${college.name}</strong>
+                        <span style="color:#666;font-size:12px;">${college.state || ''} · ${college.type || ''}</span>
+                        ${college.address ? `<p style="font-size:12px;margin:4px 0 0;color:#555;">📍 ${college.address}</p>` : ''}
+                        ${college.programs && college.programs.length > 0
+                        ? `<p style="font-size:12px;margin:4px 0 0;color:#555;">${college.programs.slice(0, 3).join(', ')}${college.programs.length > 3 ? '...' : ''}</p>`
+                        : ''
+                    }
+                    </div>
+                `;
+
+                L.marker([lat, lng])
+                    .addTo(map)
+                    .bindPopup(popupContent);
+            });
+
+            // Auto-fit bounds to show all markers
+            if (bounds.length === 1) {
+                map.setView(bounds[0], 12);
+            } else if (bounds.length > 1) {
+                map.fitBounds(bounds as L.LatLngBoundsExpression, {
+                    padding: [40, 40],
+                });
+            }
+        });
+
+        // Cleanup on unmount
+        return () => {
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.remove();
+                mapInstanceRef.current = null;
+            }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [colleges.length]);
+
+    if (validColleges.length === 0) {
+        return (
+            <div
+                className="rounded-2xl border border-white/20 bg-gray-50 flex items-center justify-center text-gray-400 text-sm"
+                style={{ height: '420px' }}
+            >
+                No college location data available.
+            </div>
+        );
+    }
 
     return (
-        <div className="rounded-2xl overflow-hidden shadow-xl border border-white/20" style={{ height: '400px' }}>
-            <MapContainer
-                center={center}
-                zoom={validColleges.length === 1 ? 12 : 5}
-                scrollWheelZoom={false}
-                style={{ height: '100%', width: '100%' }}
-            >
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {validColleges.map((college, idx) => (
-                    <Marker
-                        key={idx}
-                        position={[college.location.coordinates[1], college.location.coordinates[0]]}
-                    >
-                        <Popup>
-                            <div className="text-sm min-w-[140px]">
-                                <strong className="text-[#0A2540] block mb-1">{college.name}</strong>
-                                <span className="text-gray-500 text-xs">{college.state} · {college.type}</span>
-                                {college.programs?.length > 0 && (
-                                    <p className="text-xs mt-1 text-gray-600">
-                                        {college.programs.slice(0, 3).join(', ')}
-                                        {college.programs.length > 3 ? '...' : ''}
-                                    </p>
-                                )}
-                            </div>
-                        </Popup>
-                    </Marker>
-                ))}
-            </MapContainer>
-        </div>
+        <div
+            ref={mapRef}
+            className="rounded-2xl overflow-hidden shadow-xl border border-gray-200"
+            style={{ height: '420px', width: '100%', zIndex: 1 }}
+        />
     );
 };
 

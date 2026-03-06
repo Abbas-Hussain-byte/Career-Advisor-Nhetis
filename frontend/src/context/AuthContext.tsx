@@ -6,6 +6,7 @@ interface AuthContextType {
     loading: boolean;
     loginUser: (data: any) => Promise<void>;
     registerUser: (data: any) => Promise<void>;
+    refreshUser: () => Promise<void>;
     logoutUser: () => void;
 }
 
@@ -42,13 +43,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(data);
     };
 
+    // Refreshes user state from backend — call after profile updates
+    const refreshUser = async () => {
+        try {
+            const { data } = await fetchProfile();
+            setUser(data);
+        } catch {
+            // If token is invalid, log out gracefully
+            localStorage.removeItem('token');
+            setUser(null);
+        }
+    };
+
     const logoutUser = () => {
         localStorage.removeItem('token');
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, loginUser, registerUser, logoutUser }}>
+        <AuthContext.Provider value={{ user, loading, loginUser, registerUser, refreshUser, logoutUser }}>
             {children}
         </AuthContext.Provider>
     );

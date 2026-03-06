@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import API from '../api';
@@ -7,6 +7,12 @@ import CollegeMap from '../components/CollegeMap';
 
 export default function Colleges() {
     const { user, logoutUser } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logoutUser();
+        navigate('/');
+    };
     const [colleges, setColleges] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
@@ -74,7 +80,7 @@ export default function Colleges() {
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="hidden md:block text-sm text-gray-300">{user?.name}</span>
-                        <button onClick={logoutUser} className="bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-white/20 transition">Logout</button>
+                        <button onClick={handleLogout} className="bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-white/20 transition">Logout</button>
                     </div>
                 </div>
             </nav>
@@ -119,8 +125,8 @@ export default function Colleges() {
                     <button
                         onClick={handleLocationSearch}
                         className={`flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-xl transition ${useLocation
-                                ? 'bg-[#00D4FF]/20 text-[#0A2540] border-2 border-[#00D4FF]'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-[#00D4FF]/20 text-[#0A2540] border-2 border-[#00D4FF]'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                     >
                         📍 {useLocation ? 'Using your location (100km radius)' : 'Use My Location'}

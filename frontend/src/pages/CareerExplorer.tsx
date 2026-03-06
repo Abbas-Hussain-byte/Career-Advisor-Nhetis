@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import API from '../api';
@@ -20,6 +20,12 @@ const streamColors: Record<string, string> = {
 
 export default function CareerExplorer() {
     const { user, logoutUser } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logoutUser();
+        navigate('/');
+    };
     const [careers, setCareers] = useState<any[]>([]);
     const [filtered, setFiltered] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -69,7 +75,7 @@ export default function CareerExplorer() {
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="hidden md:block text-sm text-gray-300">{user?.name}</span>
-                        <button onClick={logoutUser} className="bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-white/20 transition">Logout</button>
+                        <button onClick={handleLogout} className="bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-white/20 transition">Logout</button>
                     </div>
                 </div>
             </nav>
@@ -95,8 +101,8 @@ export default function CareerExplorer() {
                                 key={cat}
                                 onClick={() => setCategory(cat)}
                                 className={`px-4 py-2 rounded-xl text-sm font-medium transition ${category === cat
-                                        ? 'bg-[#0A2540] text-white'
-                                        : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-[#0A2540]'
+                                    ? 'bg-[#0A2540] text-white'
+                                    : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-[#0A2540]'
                                     }`}
                             >
                                 {cat}
