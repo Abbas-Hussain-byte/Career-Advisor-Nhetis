@@ -13,25 +13,38 @@ const generateToken = (id) => {
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, phone, password, role, grade } = req.body;
+    const { name, phone, password, grade } = req.body;
+    // Treat empty email string as undefined so sparse index works
+    const email = req.body.email?.trim() || undefined;
 
-    if (!name || !phone || !password) {
+    if (!name?.trim() || !phone?.trim() || !password) {
         res.status(400);
         throw new Error('Name, phone, and password are required');
     }
 
-    const userExists = await User.findOne({ phone });
+    const cleanPhone = phone.trim().replace(/\D/g, ''); // strip non-digits
+    if (cleanPhone.length !== 10) {
+        res.status(400);
+        throw new Error('Phone number must be exactly 10 digits');
+    }
+
+    if (password.length < 6) {
+        res.status(400);
+        throw new Error('Password must be at least 6 characters');
+    }
+
+    const userExists = await User.findOne({ phone: cleanPhone });
     if (userExists) {
         res.status(400);
-        throw new Error('User with this phone number already exists');
+        throw new Error('An account with this phone number already exists. Please log in instead.');
     }
 
     const user = await User.create({
-        name,
+        name: name.trim(),
         email,
-        phone,
+        phone: cleanPhone,
         password,
-        role: role || 'student',
+        role: 'student',
         profile: { grade: grade || '12' },
     });
 
@@ -43,6 +56,7 @@ const registerUser = asyncHandler(async (req, res) => {
             email: user.email,
             role: user.role,
             profile: user.profile,
+            assessment: user.assessment,
             token: generateToken(user._id),
         });
     } else {
@@ -72,6 +86,7 @@ const authUser = asyncHandler(async (req, res) => {
             email: user.email,
             role: user.role,
             profile: user.profile,
+            assessment: user.assessment,
             token: generateToken(user._id),
         });
     } else {
@@ -94,6 +109,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
             email: user.email,
             role: user.role,
             profile: user.profile,
+            assessment: user.assessment,
         });
     } else {
         res.status(404);
@@ -130,6 +146,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
             email: updatedUser.email,
             role: updatedUser.role,
             profile: updatedUser.profile,
+            assessment: updatedUser.assessment,
             token: generateToken(updatedUser._id),
         });
     } else {
@@ -138,4 +155,22 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { registerUser, authUser, getUserProfile, updateUserProfile };
+// @desc    Save assessment results (quiz vector + top career matches) to user profile
+// @route   PUT /api/users/assessment
+// @access  Private
+const saveAssessment = asyncHandler(async (req, res) => {
+    const { vector, results } = req.body;
+    if (!vector || !results) {
+        res.status(400);
+        throw new Error('vector and results are required');
+    }
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        { assessment: { vector, results, takenAt: new Date() } },
+        { new: true }
+    );
+    if (!user) { res.status(404); throw new Error('User not found'); }
+    res.json({ message: 'Assessment saved', assessment: user.assessment });
+});
+
+module.exports = { registerUser, authUser, getUserProfile, updateUserProfile, saveAssessment };

@@ -1,541 +1,701 @@
 [
     {
         "id": 1,
-        "question": "I enjoy solving complex mathematical problems or logic puzzles.",
-        "category": "logic",
+        "question": "Your school is organising a science fair. Which role excites you most?",
+        "category": "technical",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Build and program a working robot or device",
                 "score": 1.0
             },
             {
-                "text": "Agree",
+                "text": "Conduct a biology or chemistry experiment",
                 "score": 0.7
             },
             {
-                "text": "Neutral",
-                "score": 0.5
+                "text": "Design the booth layout and visual displays",
+                "score": 0.3
             },
             {
-                "text": "Disagree",
+                "text": "Present and explain our project to judges",
+                "score": 0.1
+            },
+            {
+                "text": "Coordinate the whole team and logistics",
                 "score": 0.2
-            },
-            {
-                "text": "Strongly Disagree",
-                "score": 0.0
             }
         ]
     },
     {
         "id": 2,
-        "question": "I love painting, drawing, or designing visual content.",
-        "category": "creativity",
+        "question": "You need to earn money during summer. Which option appeals to you most?",
+        "category": "social",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Teach younger students maths or science",
                 "score": 1.0
             },
             {
-                "text": "Agree",
-                "score": 0.7
+                "text": "Build an app or website for a local shop",
+                "score": 0.1
             },
             {
-                "text": "Neutral",
-                "score": 0.5
-            },
-            {
-                "text": "Disagree",
+                "text": "Freelance graphic design or art commissions",
                 "score": 0.2
             },
             {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "Sell handmade crafts or run a small business",
+                "score": 0.7
+            },
+            {
+                "text": "Help at a clinic or hospital as a volunteer",
+                "score": 0.9
             }
         ]
     },
     {
         "id": 3,
-        "question": "I am curious about how machines, computers, or software work.",
+        "question": "You discover a bug in your friend's code that crashes their app. You:",
         "category": "technical",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Dive in immediately and debug it line by line",
                 "score": 1.0
             },
             {
-                "text": "Agree",
+                "text": "Google the error and suggest fixes",
                 "score": 0.7
             },
             {
-                "text": "Neutral",
-                "score": 0.5
+                "text": "Help them think through the logic verbally",
+                "score": 0.4
             },
             {
-                "text": "Disagree",
+                "text": "Suggest they ask a more technical friend",
+                "score": 0.1
+            },
+            {
+                "text": "Tell them to restart and rewrite the problematic section",
                 "score": 0.2
-            },
-            {
-                "text": "Strongly Disagree",
-                "score": 0.0
             }
         ]
     },
     {
         "id": 4,
-        "question": "I enjoy helping people and working in teams to solve social issues.",
-        "category": "social",
+        "question": "You're given free time to create anything you want. You choose to:",
+        "category": "creativity",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Write a short story, poem or song",
                 "score": 1.0
             },
             {
-                "text": "Agree",
-                "score": 0.7
+                "text": "Design a logo or digital artwork",
+                "score": 0.9
             },
             {
-                "text": "Neutral",
+                "text": "Build a small game or app prototype",
                 "score": 0.5
             },
             {
-                "text": "Disagree",
-                "score": 0.2
+                "text": "Sketch architectural plans for a building idea",
+                "score": 0.7
             },
             {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "Analyse data from a topic I'm curious about",
+                "score": 0.2
             }
         ]
     },
     {
         "id": 5,
-        "question": "I like to analyze data to find trends or patterns.",
-        "category": "logic",
+        "question": "A friend is going through a tough time emotionally. You naturally:",
+        "category": "social",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Listen patiently and offer support without judgment",
                 "score": 1.0
             },
             {
-                "text": "Agree",
+                "text": "Give them practical advice on what to do",
+                "score": 0.6
+            },
+            {
+                "text": "Connect them with someone better suited to help",
                 "score": 0.7
             },
             {
-                "text": "Neutral",
-                "score": 0.5
+                "text": "Distract them with fun activities",
+                "score": 0.4
             },
             {
-                "text": "Disagree",
-                "score": 0.2
-            },
-            {
-                "text": "Strongly Disagree",
+                "text": "Feel unsure — I prefer logical problems to emotional ones",
                 "score": 0.0
             }
         ]
     },
     {
         "id": 6,
-        "question": "I frequently brainstorm new and innovative ideas for projects.",
-        "category": "creativity",
+        "question": "You're researching a topic for an essay. Which approach do you enjoy?",
+        "category": "logic",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Dig into data, statistics, and research papers",
                 "score": 1.0
             },
             {
-                "text": "Agree",
-                "score": 0.7
-            },
-            {
-                "text": "Neutral",
+                "text": "Watch documentaries and build a visual understanding",
                 "score": 0.5
             },
             {
-                "text": "Disagree",
-                "score": 0.2
+                "text": "Interview people who have direct experience",
+                "score": 0.6
             },
             {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "Find creative angles that others haven't explored",
+                "score": 0.7
+            },
+            {
+                "text": "Look for the quickest reliable summary I can find",
+                "score": 0.2
             }
         ]
     },
     {
         "id": 7,
-        "question": "I find learning programming languages or coding interesting.",
+        "question": "If you could spend a year mastering one skill, it would be:",
         "category": "technical",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Machine learning and AI programming",
                 "score": 1.0
             },
             {
-                "text": "Agree",
+                "text": "Surgery and advanced medical procedures",
                 "score": 0.7
             },
             {
-                "text": "Neutral",
-                "score": 0.5
+                "text": "Oil painting or digital illustration",
+                "score": 0.3
             },
             {
-                "text": "Disagree",
+                "text": "Public speaking and debate",
                 "score": 0.2
             },
             {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "Structural engineering and bridge design",
+                "score": 0.8
             }
         ]
     },
     {
         "id": 8,
-        "question": "I am good at mediating conflicts and understanding others' feelings.",
-        "category": "social",
+        "question": "In a group project, which role do you naturally fall into?",
+        "category": "leadership",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "The leader who sets the direction and delegates",
                 "score": 1.0
             },
             {
-                "text": "Agree",
-                "score": 0.7
+                "text": "The researcher who gathers all the data",
+                "score": 0.6
             },
             {
-                "text": "Neutral",
+                "text": "The creative who designs and presents ideas",
                 "score": 0.5
             },
             {
-                "text": "Disagree",
-                "score": 0.2
+                "text": "The problem-solver who fixes things when they go wrong",
+                "score": 0.7
             },
             {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "The mediator who keeps everyone working together",
+                "score": 0.8
             }
         ]
     },
     {
         "id": 9,
-        "question": "I make decisions based on facts and objective evidence rather than intuition.",
-        "category": "logic",
+        "question": "You can shadow a professional for a day. Which would you pick?",
+        "category": "technical",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "A software engineer at a tech startup",
                 "score": 1.0
             },
             {
-                "text": "Agree",
-                "score": 0.7
+                "text": "A surgeon performing operations",
+                "score": 0.8
             },
             {
-                "text": "Neutral",
+                "text": "A newspaper journalist covering breaking news",
                 "score": 0.5
             },
             {
-                "text": "Disagree",
-                "score": 0.2
+                "text": "A civil engineer supervising a bridge construction",
+                "score": 0.7
             },
             {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "A judge hearing a court case",
+                "score": 0.3
             }
         ]
     },
     {
         "id": 10,
-        "question": "I enjoy writing stories, composing music, or creating films.",
-        "category": "creativity",
+        "question": "Which of these problems would you most want to solve?",
+        "category": "logic",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
-                "score": 1.0
+                "text": "Climate change using better energy technology",
+                "score": 0.8
             },
             {
-                "text": "Agree",
+                "text": "Cancer — find a cure through medical research",
+                "score": 0.9
+            },
+            {
+                "text": "Poverty — improve economic opportunities in villages",
                 "score": 0.7
             },
             {
-                "text": "Neutral",
+                "text": "Misinformation — make news more accurate and trustworthy",
                 "score": 0.5
             },
             {
-                "text": "Disagree",
-                "score": 0.2
-            },
-            {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "Mental health — make therapy accessible to students",
+                "score": 1.0
             }
         ]
     },
     {
         "id": 11,
-        "question": "I am fascinated by new gadgets, electronics, and digital tools.",
-        "category": "technical",
+        "question": "You receive a complex maths problem. Your first reaction is:",
+        "category": "logic",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Excited — I love a good mental challenge",
                 "score": 1.0
             },
             {
-                "text": "Agree",
-                "score": 0.7
+                "text": "Calm — I'll work through it step by step",
+                "score": 0.8
             },
             {
-                "text": "Neutral",
+                "text": "Neutral — depends on the type of problem",
                 "score": 0.5
             },
             {
-                "text": "Disagree",
+                "text": "Slightly uneasy — I prefer words over numbers",
                 "score": 0.2
             },
             {
-                "text": "Strongly Disagree",
+                "text": "Frustrated — maths is not my strength",
                 "score": 0.0
             }
         ]
     },
     {
         "id": 12,
-        "question": "I prefer jobs where I can teach, mentor, or advise people.",
-        "category": "social",
+        "question": "A startup offers you an internship. Which role is most interesting?",
+        "category": "creativity",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "UI/UX Designer — make the product look and feel great",
                 "score": 1.0
             },
             {
-                "text": "Agree",
+                "text": "Backend Developer — build the server and database logic",
+                "score": 0.6
+            },
+            {
+                "text": "Growth Marketer — grow the user base through campaigns",
                 "score": 0.7
             },
             {
-                "text": "Neutral",
+                "text": "Data Analyst — find what the data says about users",
                 "score": 0.5
             },
             {
-                "text": "Disagree",
-                "score": 0.2
-            },
-            {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "Operations — keep the business running smoothly",
+                "score": 0.4
             }
         ]
     },
     {
         "id": 13,
-        "question": "I am skilled at planning and organizing tasks logically before starting.",
-        "category": "logic",
+        "question": "A patient at a hospital is scared before surgery. If you were the doctor, you would:",
+        "category": "social",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Take time to explain everything clearly and calm them down",
                 "score": 1.0
             },
             {
-                "text": "Agree",
-                "score": 0.7
+                "text": "Focus on the procedure — emotions can wait",
+                "score": 0.1
             },
             {
-                "text": "Neutral",
-                "score": 0.5
+                "text": "Ask a counsellor or nurse to speak with them",
+                "score": 0.6
             },
             {
-                "text": "Disagree",
-                "score": 0.2
+                "text": "Give them a brief reassurance and move on",
+                "score": 0.4
             },
             {
-                "text": "Strongly Disagree",
+                "text": "Medicine is technical — I wouldn't be a doctor",
                 "score": 0.0
             }
         ]
     },
     {
         "id": 14,
-        "question": "I am drawn to professions that allow self-expression and out-of-the-box thinking.",
+        "question": "You have to give a 5-minute presentation. How do you prepare?",
         "category": "creativity",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
-                "score": 1.0
+                "text": "Design beautiful slides with infographics and visuals",
+                "score": 0.9
             },
             {
-                "text": "Agree",
+                "text": "Write a detailed script and rehearse it many times",
+                "score": 0.6
+            },
+            {
+                "text": "Gather compelling data and structure my argument logically",
                 "score": 0.7
             },
             {
-                "text": "Neutral",
+                "text": "Tell a personal story that connects with the audience",
+                "score": 1.0
+            },
+            {
+                "text": "Keep it minimal and speak freely from memory",
                 "score": 0.5
-            },
-            {
-                "text": "Disagree",
-                "score": 0.2
-            },
-            {
-                "text": "Strongly Disagree",
-                "score": 0.0
             }
         ]
     },
     {
         "id": 15,
-        "question": "I excel at building physical models or assembling mechanical parts.",
-        "category": "technical",
+        "question": "Which subject do you spend extra time studying even when not required?",
+        "category": "logic",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Physics or Mathematics",
                 "score": 1.0
             },
             {
-                "text": "Agree",
-                "score": 0.7
+                "text": "Biology or Chemistry",
+                "score": 0.9
             },
             {
-                "text": "Neutral",
+                "text": "History or Political Science",
                 "score": 0.5
             },
             {
-                "text": "Disagree",
-                "score": 0.2
+                "text": "Drawing, Music or Literature",
+                "score": 0.3
             },
             {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "Economics or Business Studies",
+                "score": 0.6
             }
         ]
     },
     {
         "id": 16,
-        "question": "I often take the lead in group discussions to ensure everyone is heard.",
-        "category": "social",
+        "question": "Which part of building a mobile app would you most enjoy?",
+        "category": "technical",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Writing clean, efficient code for the backend",
                 "score": 1.0
             },
             {
-                "text": "Agree",
+                "text": "Designing smooth, beautiful user interfaces",
                 "score": 0.7
             },
             {
-                "text": "Neutral",
+                "text": "Writing compelling product descriptions and marketing copy",
+                "score": 0.3
+            },
+            {
+                "text": "Testing the app and finding bugs",
+                "score": 0.8
+            },
+            {
+                "text": "Pitching it to investors and building a business plan",
                 "score": 0.5
-            },
-            {
-                "text": "Disagree",
-                "score": 0.2
-            },
-            {
-                "text": "Strongly Disagree",
-                "score": 0.0
             }
         ]
     },
     {
         "id": 17,
-        "question": "I excel at finding inconsistencies or errors in arguments.",
-        "category": "logic",
+        "question": "You are watching the news. Which story captures your attention the most?",
+        "category": "social",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
-                "score": 1.0
+                "text": "A breakthrough in cancer treatment",
+                "score": 0.8
             },
             {
-                "text": "Agree",
-                "score": 0.7
+                "text": "A new AI tool changing the software industry",
+                "score": 0.9
             },
             {
-                "text": "Neutral",
+                "text": "A conflict requiring diplomatic negotiations",
+                "score": 0.6
+            },
+            {
+                "text": "A new architecture award for a stunning building",
                 "score": 0.5
             },
             {
-                "text": "Disagree",
-                "score": 0.2
-            },
-            {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "A student who started a social enterprise to help farmers",
+                "score": 1.0
             }
         ]
     },
     {
         "id": 18,
-        "question": "I frequently appreciate the aesthetics of architecture, fashion, or photography.",
-        "category": "creativity",
+        "question": "Your ideal work environment in 10 years is:",
+        "category": "leadership",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "A tech company solving hard engineering problems",
+                "score": 0.9
+            },
+            {
+                "text": "A hospital or research lab saving lives",
+                "score": 0.8
+            },
+            {
+                "text": "My own business where I make the decisions",
                 "score": 1.0
             },
             {
-                "text": "Agree",
+                "text": "A creative agency or studio making art and media",
                 "score": 0.7
             },
             {
-                "text": "Neutral",
-                "score": 0.5
-            },
-            {
-                "text": "Disagree",
-                "score": 0.2
-            },
-            {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "A government or policy role shaping society",
+                "score": 0.6
             }
         ]
     },
     {
         "id": 19,
-        "question": "I enjoy troubleshooting tech issues when my devices act up.",
-        "category": "technical",
+        "question": "If you had ₹10 lakhs to invest, you would most likely:",
+        "category": "logic",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
+                "text": "Analyse the stock market and invest in diversified funds",
                 "score": 1.0
             },
             {
-                "text": "Agree",
-                "score": 0.7
+                "text": "Start a small business or product idea",
+                "score": 0.8
             },
             {
-                "text": "Neutral",
+                "text": "Fund a friend's startup that I believe in",
+                "score": 0.6
+            },
+            {
+                "text": "Buy land or real estate",
                 "score": 0.5
             },
             {
-                "text": "Disagree",
-                "score": 0.2
-            },
-            {
-                "text": "Strongly Disagree",
-                "score": 0.0
+                "text": "Donate a portion and keep rest in a fixed deposit",
+                "score": 0.3
             }
         ]
     },
     {
         "id": 20,
-        "question": "I find satisfaction in volunteering for community service or charity.",
-        "category": "social",
+        "question": "As a child, what did you love to do most?",
+        "category": "creativity",
+        "type": "scenario",
         "options": [
             {
-                "text": "Strongly Agree",
-                "score": 1.0
+                "text": "Take apart gadgets and put them back together",
+                "score": 0.9
             },
             {
-                "text": "Agree",
+                "text": "Draw, paint, or make crafts",
+                "score": 0.8
+            },
+            {
+                "text": "Read books about history, science or stories",
+                "score": 0.6
+            },
+            {
+                "text": "Play sports or organise games with friends",
                 "score": 0.7
             },
             {
-                "text": "Neutral",
+                "text": "Ask endless questions about how everything works",
+                "score": 1.0
+            }
+        ]
+    },
+    {
+        "id": 21,
+        "question": "Which challenge would you be most proud to solve professionally?",
+        "category": "technical",
+        "type": "scenario",
+        "options": [
+            {
+                "text": "Design a satellite that improves internet access in rural India",
+                "score": 1.0
+            },
+            {
+                "text": "Develop a vaccine for a new infectious disease",
+                "score": 0.8
+            },
+            {
+                "text": "Write a novel that becomes a bestseller",
                 "score": 0.5
             },
             {
-                "text": "Disagree",
-                "score": 0.2
+                "text": "Build roads and infrastructure for a new city",
+                "score": 0.7
             },
             {
-                "text": "Strongly Disagree",
+                "text": "Win a court case that sets an important legal precedent",
+                "score": 0.4
+            }
+        ]
+    },
+    {
+        "id": 22,
+        "question": "You have to choose a college specialisation. What pulls you most?",
+        "category": "logic",
+        "type": "scenario",
+        "options": [
+            {
+                "text": "Computer Science — software, AI, and data systems",
+                "score": 1.0
+            },
+            {
+                "text": "MBBS — medicine and patient care",
+                "score": 0.9
+            },
+            {
+                "text": "Architecture — designing buildings and spaces",
+                "score": 0.7
+            },
+            {
+                "text": "Law — understanding rights, justice and policy",
+                "score": 0.5
+            },
+            {
+                "text": "Economics — understanding markets and human behaviour",
+                "score": 0.6
+            }
+        ]
+    },
+    {
+        "id": 23,
+        "question": "You find a mistake in a company's published financial report. You:",
+        "category": "logic",
+        "type": "scenario",
+        "options": [
+            {
+                "text": "Verify it thoroughly with multiple sources before acting",
+                "score": 1.0
+            },
+            {
+                "text": "Report it to a senior or authority right away",
+                "score": 0.8
+            },
+            {
+                "text": "Calculate the impact it would have on investors",
+                "score": 0.9
+            },
+            {
+                "text": "Post about it on social media to get attention",
+                "score": 0.3
+            },
+            {
+                "text": "Assume someone else will catch it and move on",
                 "score": 0.0
+            }
+        ]
+    },
+    {
+        "id": 24,
+        "question": "You are assigned to lead a new team project at work. Your first step is:",
+        "category": "leadership",
+        "type": "scenario",
+        "options": [
+            {
+                "text": "Call a meeting to understand everyone's strengths and set clear goals",
+                "score": 1.0
+            },
+            {
+                "text": "Draw up a detailed project plan and timeline",
+                "score": 0.8
+            },
+            {
+                "text": "Start working immediately and figure out the team later",
+                "score": 0.4
+            },
+            {
+                "text": "Look at the budget and resources first",
+                "score": 0.6
+            },
+            {
+                "text": "Ask what the previous team tried and why it didn't work",
+                "score": 0.7
+            }
+        ]
+    },
+    {
+        "id": 25,
+        "question": "You're most satisfied when you finish a day of work where you:",
+        "category": "social",
+        "type": "scenario",
+        "options": [
+            {
+                "text": "Helped someone solve a personal or emotional problem",
+                "score": 1.0
+            },
+            {
+                "text": "Built or coded something that actually works",
+                "score": 0.9
+            },
+            {
+                "text": "Made a creative piece that people reacted to strongly",
+                "score": 0.8
+            },
+            {
+                "text": "Analysed data and found a non-obvious insight",
+                "score": 0.7
+            },
+            {
+                "text": "Closed a deal or grew the business measurably",
+                "score": 0.6
             }
         ]
     }

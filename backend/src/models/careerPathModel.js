@@ -20,7 +20,14 @@ const CareerPathSchema = new mongoose.Schema({
         creativity: { type: Number, default: 0 },
         technical: { type: Number, default: 0 },
         social: { type: Number, default: 0 }
-    }
+    },
+    // ── Market data (updated by scrapers/careerDataUpdater.js) ─────────────
+    jobDemand: Number,      // estimated annual openings in India
+    growthRate: Number,      // YoY % growth rate
+    topRecruiters: [String],    // top companies hiring for this role
+    requiredExam: String,      // entrance exams / certifications needed
+    medianExp: String,      // median experience for mid-level role
+    lastUpdated: Date,        // when scraper last updated this record
 });
 
 module.exports = mongoose.model('CareerPath', CareerPathSchema);

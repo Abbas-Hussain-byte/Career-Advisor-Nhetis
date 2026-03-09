@@ -71,6 +71,7 @@ export default function Profile() {
                         <Link to="/dashboard" className="hover:text-[#00D4FF] transition">Dashboard</Link>
                         <Link to="/careers" className="hover:text-[#00D4FF] transition">Careers</Link>
                         <Link to="/colleges" className="hover:text-[#00D4FF] transition">Colleges</Link>
+                        <Link to="/insights" className="hover:text-[#00D4FF] transition">Insights</Link>
                         <Link to="/profile" className="text-[#00D4FF] font-semibold">Profile</Link>
                     </div>
                     <div className="flex items-center gap-3">

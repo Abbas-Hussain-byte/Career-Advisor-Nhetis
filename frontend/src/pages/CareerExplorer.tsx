@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -21,6 +21,8 @@ const streamColors: Record<string, string> = {
 export default function CareerExplorer() {
     const { user, logoutUser } = useAuth();
     const navigate = useNavigate();
+    const profile = user?.profile || {};
+    const assessment = user?.assessment;
 
     const handleLogout = () => {
         logoutUser();
@@ -32,6 +34,37 @@ export default function CareerExplorer() {
     const [category, setCategory] = useState('All');
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<any | null>(null);
+
+    // ── Personalised recommendations for this student ──
+    const recommended = useMemo(() => {
+        if (!careers.length) return [];
+        // If quiz taken, use those results
+        if (assessment?.results?.length) {
+            const titles = new Set((assessment.results || []).map((r: any) => r.careerTitle));
+            return careers.filter(c => titles.has(c.title)).slice(0, 4);
+        }
+        // Else filter by stream + interests
+        const streamMap: Record<string, string[]> = {
+            'Science-PCM': ['Technology', 'Engineering'],
+            'Science-PCB': ['Medical', 'Agriculture'],
+            'Commerce': ['Commerce', 'Business'],
+            'Arts / Humanities': ['Arts & Design', 'Media', 'Education', 'Law'],
+            'Vocational': ['Engineering', 'Agriculture'],
+        };
+        const cats = new Set<string>(streamMap[profile.stream] || []);
+        (profile.interests || []).forEach((interest: string) => {
+            const catMap: Record<string, string[]> = {
+                Technology: ['Technology'], Science: ['Technology', 'Medical'],
+                Medicine: ['Medical'], Arts: ['Arts & Design'], Design: ['Arts & Design'],
+                Business: ['Business', 'Commerce'], Commerce: ['Commerce'],
+                Agriculture: ['Agriculture'], Education: ['Education'],
+                Engineering: ['Engineering', 'Technology'], Law: ['Law'],
+            };
+            (catMap[interest] || []).forEach(c => cats.add(c));
+        });
+        const filtered = cats.size > 0 ? careers.filter(c => cats.has(c.category)) : [];
+        return filtered.slice(0, 4);
+    }, [careers, assessment, profile]);
 
     useEffect(() => {
         API.get('/careers')
@@ -71,6 +104,7 @@ export default function CareerExplorer() {
                         <Link to="/dashboard" className="hover:text-[#00D4FF] transition">Dashboard</Link>
                         <Link to="/careers" className="text-[#00D4FF] font-semibold">Careers</Link>
                         <Link to="/colleges" className="hover:text-[#00D4FF] transition">Colleges</Link>
+                        <Link to="/insights" className="hover:text-[#00D4FF] transition">Insights</Link>
                         <Link to="/profile" className="hover:text-[#00D4FF] transition">Profile</Link>
                     </div>
                     <div className="flex items-center gap-3">
@@ -81,10 +115,67 @@ export default function CareerExplorer() {
             </nav>
 
             <main className="max-w-7xl mx-auto px-6 py-8">
-                <div className="mb-8">
+                <div className="mb-6">
                     <h1 className="text-4xl font-extrabold text-[#0A2540]">Career Explorer</h1>
                     <p className="text-gray-500 mt-2">Browse {careers.length} career paths with roadmaps and salary data</p>
                 </div>
+
+                {/* Recommended for You */}
+                {recommended.length > 0 && (
+                    <div className="mb-8">
+                        <h2 className="text-lg font-bold text-[#0A2540] mb-3">
+                            ⭐ Recommended for You
+                            <span className="ml-2 text-xs font-normal text-gray-400">
+                                {assessment?.results?.length ? 'Based on your quiz results' : `Based on your stream & interests`}
+                            </span>
+                        </h2>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {recommended.map((career, i) => {
+                                const savedResult = (assessment?.results || []).find((r: any) => r.careerTitle === career.title);
+                                return (
+                                    <motion.div
+                                        key={career._id || i}
+                                        initial={{ opacity: 0, y: 16 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.08 }}
+                                        className="bg-gradient-to-br from-[#0A2540] to-[#1a3d66] text-white rounded-2xl p-5 cursor-pointer hover:shadow-xl transition"
+                                        onClick={() => setSelected(selected?._id === career._id ? null : career)}
+                                    >
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h3 className="font-bold text-sm leading-snug">{career.title}</h3>
+                                            {savedResult && (
+                                                <span className="text-xs bg-[#00D4FF] text-[#0A2540] font-bold px-2 py-0.5 rounded-full ml-2 shrink-0">
+                                                    {savedResult.score}%
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-xs text-gray-300 mb-3 leading-relaxed line-clamp-2">{career.description}</p>
+                                        <p className="text-xs text-[#00D4FF] font-semibold">
+                                            ₹{Math.round((career.salary?.min || 0) / 100000)}L – ₹{Math.round((career.salary?.max || 0) / 100000)}L / yr
+                                        </p>
+                                        <p className="text-xs text-gray-400 mt-2">▼ View roadmap</p>
+                                        {selected?._id === career._id && career.roadmap?.length > 0 && (
+                                            <div className="mt-4 border-t border-white/20 pt-3 space-y-2">
+                                                {career.roadmap.map((step: any, idx: number) => (
+                                                    <div key={idx} className="flex gap-2 items-start text-xs">
+                                                        <span className="bg-[#00D4FF] text-[#0A2540] font-bold rounded-full w-4 h-4 flex items-center justify-center flex-shrink-0">{idx + 1}</span>
+                                                        <span className="text-gray-200">{step.step} <span className="text-gray-400">· {step.duration}</span></span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {!recommended.length && !loading && (
+                    <div className="mb-6 bg-blue-50 border border-blue-100 rounded-xl px-5 py-4 text-sm text-blue-700">
+                        💡 Set your <Link to="/profile" className="font-bold underline">stream and interests in Profile</Link> to see personalised career recommendations at the top.
+                    </div>
+                )}
 
                 {/* Filters */}
                 <div className="flex flex-col md:flex-row gap-4 mb-8">

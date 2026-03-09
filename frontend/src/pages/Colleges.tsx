@@ -8,6 +8,25 @@ import CollegeMap from '../components/CollegeMap';
 export default function Colleges() {
     const { user, logoutUser } = useAuth();
     const navigate = useNavigate();
+    const userStream = user?.profile?.stream || '';
+    const userAssessment = user?.assessment;
+
+    // Which program keywords match which streams
+    const STREAM_PROGRAMS: Record<string, string[]> = {
+        'Science-PCM': ['B.Tech', 'M.Tech', 'BSc', 'Engineering', 'CS', 'IT', 'Mech', 'Civil', 'ECE', 'Architecture'],
+        'Science-PCB': ['MBBS', 'BDS', 'BSc', 'B.Pharm', 'Agriculture', 'Nursing', 'MD', 'MS', 'BVSc'],
+        'Commerce': ['B.Com', 'BBA', 'MBA', 'CA', 'MCA', 'BCom', 'Finance', 'Management'],
+        'Arts / Humanities': ['BA', 'BFA', 'LLB', 'BDes', 'Journalism', 'MA', 'BSW', 'Fine Arts', 'Design'],
+        'Vocational': ['Diploma', 'ITI', 'Polytechnic', 'B.Tech', 'Mech'],
+    };
+
+    const programMatchScore = (college: any) => {
+        const progList = (userStream ? STREAM_PROGRAMS[userStream] : null);
+        if (!progList || !college.programs?.length) return 0;
+        return college.programs.filter((p: string) =>
+            progList.some(kw => p.toLowerCase().includes(kw.toLowerCase()))
+        ).length;
+    };
 
     const handleLogout = () => {
         logoutUser();
@@ -20,6 +39,7 @@ export default function Colleges() {
     const [program, setProgram] = useState('');
     const [useLocation, setUseLocation] = useState(false);
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const [sortBy, setSortBy] = useState<'bestMatch' | 'ranking' | 'state'>('bestMatch');
 
     const fetchColleges = async (params: any = {}) => {
         setLoading(true);
@@ -76,6 +96,7 @@ export default function Colleges() {
                         <Link to="/dashboard" className="hover:text-[#00D4FF] transition">Dashboard</Link>
                         <Link to="/careers" className="hover:text-[#00D4FF] transition">Careers</Link>
                         <Link to="/colleges" className="text-[#00D4FF] font-semibold">Colleges</Link>
+                        <Link to="/insights" className="hover:text-[#00D4FF] transition">Insights</Link>
                         <Link to="/profile" className="hover:text-[#00D4FF] transition">Profile</Link>
                     </div>
                     <div className="flex items-center gap-3">
@@ -133,20 +154,33 @@ export default function Colleges() {
                     </button>
                 </div>
 
-                {/* View Toggle */}
-                <div className="flex justify-between items-center mb-6">
-                    <p className="text-gray-500 text-sm">{colleges.length} colleges found</p>
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setViewMode('list')}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium transition ${viewMode === 'list' ? 'bg-[#0A2540] text-white' : 'bg-white border-2 border-gray-200 text-gray-600'}`}
-                        >
+                {/* View Toggle + Sort Controls */}
+                <div className="flex flex-wrap justify-between items-center mb-6 gap-3">
+                    <div>
+                        <p className="text-gray-500 text-sm">{colleges.length} colleges found</p>
+                        {userStream && (
+                            <p className="text-xs text-[#635BFF] mt-0.5 font-medium">
+                                Sorted for: {userStream} stream
+                            </p>
+                        )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        {/* Sort */}
+                        {(['bestMatch', 'ranking', 'state'] as const).map(s => (
+                            <button key={s} onClick={() => setSortBy(s)}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${sortBy === s ? 'bg-[#635BFF] text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-[#635BFF]'
+                                    }`}>
+                                {s === 'bestMatch' ? '⭐ Best Match' : s === 'ranking' ? '🏆 By Ranking' : '🗺️ State A→Z'}
+                            </button>
+                        ))}
+                        <div className="w-px bg-gray-200 self-stretch" />
+                        {/* View */}
+                        <button onClick={() => setViewMode('list')}
+                            className={`px-4 py-1.5 rounded-xl text-xs font-medium transition ${viewMode === 'list' ? 'bg-[#0A2540] text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>
                             📋 List
                         </button>
-                        <button
-                            onClick={() => setViewMode('map')}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium transition ${viewMode === 'map' ? 'bg-[#0A2540] text-white' : 'bg-white border-2 border-gray-200 text-gray-600'}`}
-                        >
+                        <button onClick={() => setViewMode('map')}
+                            className={`px-4 py-1.5 rounded-xl text-xs font-medium transition ${viewMode === 'map' ? 'bg-[#0A2540] text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>
                             🗺️ Map
                         </button>
                     </div>
@@ -165,57 +199,75 @@ export default function Colleges() {
                             </div>
                         )}
 
-                        {viewMode === 'list' && (
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {colleges.length === 0 ? (
-                                    <div className="col-span-3 text-center py-12 text-gray-400">
-                                        No colleges found. Try different filters.
-                                    </div>
-                                ) : (
-                                    colleges.map((college, i) => (
-                                        <motion.div
-                                            key={college._id || i}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: i * 0.06 }}
-                                            className="glass rounded-2xl p-6 card-hover"
-                                        >
-                                            <div className="flex justify-between items-start mb-3">
-                                                <h3 className="text-base font-bold text-[#0A2540] leading-tight">{college.name}</h3>
-                                                <span className={`text-xs font-semibold px-2 py-1 rounded-full ml-2 whitespace-nowrap ${college.type === 'Government' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                                                    }`}>
-                                                    {college.type}
-                                                </span>
-                                            </div>
-                                            <p className="text-gray-400 text-xs mb-3">📍 {college.address || college.state}</p>
+                        {viewMode === 'list' && (() => {
+                            const sorted = [...colleges].sort((a, b) => {
+                                if (sortBy === 'bestMatch') {
+                                    return programMatchScore(b) - programMatchScore(a);
+                                } else if (sortBy === 'ranking') {
+                                    return (a.ranking || 999) - (b.ranking || 999);
+                                } else {
+                                    return (a.state || '').localeCompare(b.state || '');
+                                }
+                            });
+                            return (
+                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {sorted.length === 0 ? (
+                                        <div className="col-span-3 text-center py-12 text-gray-400">
+                                            No colleges found. Try different filters.
+                                        </div>
+                                    ) : (
+                                        sorted.map((college, i) => {
+                                            const matchScore = programMatchScore(college);
+                                            return (
+                                                <motion.div
+                                                    key={college._id || i}
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: i * 0.04 }}
+                                                    className="glass rounded-2xl p-6 card-hover"
+                                                >
+                                                    <div className="flex justify-between items-start mb-3">
+                                                        <h3 className="text-base font-bold text-[#0A2540] leading-tight">{college.name}</h3>
+                                                        <div className="flex flex-col items-end gap-1 ml-2 shrink-0">
+                                                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${college.type === 'Government' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                                                                }`}>{college.type}</span>
+                                                            {matchScore > 0 && (
+                                                                <span className="text-xs bg-[#635BFF]/10 text-[#635BFF] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
+                                                                    ✓ Matches {userStream}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-gray-400 text-xs mb-3">📍 {college.address || college.state}</p>
 
-                                            {/* Programs */}
-                                            <div className="flex flex-wrap gap-1 mb-4">
-                                                {college.programs?.slice(0, 4).map((p: string) => (
-                                                    <span key={p} className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded">
-                                                        {p}
-                                                    </span>
-                                                ))}
-                                                {college.programs?.length > 4 && (
-                                                    <span className="text-xs text-gray-400">+{college.programs.length - 4} more</span>
-                                                )}
-                                            </div>
+                                                    {/* Programs */}
+                                                    <div className="flex flex-wrap gap-1 mb-4">
+                                                        {college.programs?.slice(0, 4).map((p: string) => (
+                                                            <span key={p} className={`text-xs px-2 py-0.5 rounded ${(STREAM_PROGRAMS[userStream] || []).some(kw => p.toLowerCase().includes(kw.toLowerCase()))
+                                                                    ? 'bg-[#635BFF]/10 text-[#635BFF] font-medium'
+                                                                    : 'bg-blue-50 text-blue-700'
+                                                                }`}>{p}</span>
+                                                        ))}
+                                                        {college.programs?.length > 4 && (
+                                                            <span className="text-xs text-gray-400">+{college.programs.length - 4} more</span>
+                                                        )}
+                                                    </div>
 
-                                            {/* Facilities */}
-                                            {college.facilities?.length > 0 && (
-                                                <div className="flex flex-wrap gap-1">
-                                                    {college.facilities.slice(0, 3).map((f: string) => (
-                                                        <span key={f} className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded">
-                                                            {f}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </motion.div>
-                                    ))
-                                )}
-                            </div>
-                        )}
+                                                    {/* Facilities */}
+                                                    {college.facilities?.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {college.facilities.slice(0, 3).map((f: string) => (
+                                                                <span key={f} className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded">{f}</span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </motion.div>
+                                            );
+                                        })
+                                    )}
+                                </div>
+                            );
+                        })()}
                     </>
                 )}
             </main>

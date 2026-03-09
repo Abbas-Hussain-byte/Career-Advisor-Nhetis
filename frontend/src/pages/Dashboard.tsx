@@ -25,6 +25,7 @@ const Navbar = ({ user, logoutUser }: any) => {
                     <Link to="/dashboard" className="hover:text-[#00D4FF] transition font-medium">Dashboard</Link>
                     <Link to="/careers" className="hover:text-[#00D4FF] transition font-medium">Careers</Link>
                     <Link to="/colleges" className="hover:text-[#00D4FF] transition font-medium">Colleges</Link>
+                    <Link to="/insights" className="hover:text-[#00D4FF] transition font-medium">Insights</Link>
                     <Link to="/profile" className="hover:text-[#00D4FF] transition font-medium">Profile</Link>
                 </div>
                 <div className="flex items-center gap-3">
@@ -42,7 +43,7 @@ const Navbar = ({ user, logoutUser }: any) => {
 };
 
 export default function Dashboard() {
-    const { user, logoutUser } = useAuth();
+    const { user, logoutUser, refreshUser } = useAuth();
     const [view, setView] = useState<'home' | 'quiz' | 'results'>('home');
     const [recommendations, setRecommendations] = useState<any>(null);
     const [loadingResults, setLoadingResults] = useState(false);
@@ -76,6 +77,22 @@ export default function Dashboard() {
             });
             setRecommendations(data);
             setView('results');
+
+            // Persist assessment to MongoDB so Insights + other pages can use it
+            try {
+                await API.put('/users/assessment', {
+                    vector: data.userVector || scores,
+                    results: (data.recommendedCareers || []).slice(0, 5).map((c: any) => ({
+                        careerTitle: c.title,
+                        score: c.score,
+                        category: c.category,
+                        skills: c.skills || [],
+                    })),
+                });
+                await refreshUser(); // Update AuthContext so Insights sees new assessment immediately
+            } catch {
+                // Non-critical: assessment save failure doesn't break the quiz flow
+            }
         } catch (err: any) {
             setError(err?.response?.data?.message || 'Failed to get recommendations. Please try again.');
             setView('home');
@@ -266,27 +283,73 @@ export default function Dashboard() {
             </div>
 
             {/* College Map */}
-            {recommendations?.nearbyColleges?.length > 0 && (
-                <div>
-                    <h3 className="text-lg font-bold text-[#0A2540] mb-4">🗺️ Nearby Government Colleges</h3>
-                    <CollegeMap colleges={recommendations.nearbyColleges} />
-                    <div className="grid md:grid-cols-3 gap-4 mt-4">
-                        {recommendations.nearbyColleges.slice(0, 6).map((c: any, i: number) => (
-                            <div key={i} className="glass rounded-xl p-4 text-sm">
-                                <p className="font-bold text-[#0A2540]">{c.name}</p>
-                                <p className="text-gray-500 text-xs mt-1">{c.state} · {c.type}</p>
-                                <div className="flex flex-wrap gap-1 mt-2">
-                                    {c.programs?.slice(0, 2).map((p: string) => (
-                                        <span key={p} className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded">
-                                            {p}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
+            {recommendations?.nearbyColleges?.length > 0 && (() => {
+                // Build the set of relevant programs from recommended career categories
+                const CATEGORY_PROGRAMS_MAP: Record<string, string[]> = {
+                    'Technology': ['B.Tech', 'BE', 'BCA', 'MCA', 'M.Tech', 'BSc IT', 'Diploma in CS', 'Diploma in ECE', 'B.Sc (Research)'],
+                    'Engineering': ['B.Tech', 'BE', 'M.Tech', 'ME', 'Diploma in Mechanical', 'Diploma in Civil', 'BArch'],
+                    'Medical': ['MBBS', 'MD', 'MS', 'BDS', 'B.Pharm', 'B.Sc Nursing', 'DM', 'BAMS', 'BHMS'],
+                    'Agriculture': ['BSc Agriculture', 'MSc Agriculture', 'B.Tech Food Tech', 'BTech Agri Engineering', 'Veterinary'],
+                    'Commerce': ['B.Com', 'BMS', 'BAF', 'MBA', 'M.Com', 'B.A. (H) Economics', 'B.Com (H)', 'B.Com (Banking)'],
+                    'Business': ['MBA', 'BBA', 'B.Com', 'M.Com', 'Executive MBA'],
+                    'Arts & Design': ['BFA', 'B.Des', 'M.Des', 'MFA', 'BMus', 'BArch', 'Diploma in Design'],
+                    'Media': ['BA', 'MA', 'BFA', 'BMus'],
+                    'Education': ['BA', 'MA', 'BSc', 'MSc', 'M.Phil', 'PhD'],
+                    'Law': ['BA LLB', 'LLB', 'BBA LLB', 'LLM', 'MBA (Law)'],
+                };
+                const relevantPrograms = new Set<string>();
+                (recommendations.recommendedCareers || []).forEach((c: any) => {
+                    (CATEGORY_PROGRAMS_MAP[c.category] || []).forEach((p: string) => relevantPrograms.add(p));
+                });
+
+                return (
+                    <div>
+                        <div className="flex items-baseline gap-3 mb-4">
+                            <h3 className="text-lg font-bold text-[#0A2540]">🗺️ Colleges for Your Career Path</h3>
+                            <span className="text-xs text-gray-400">Sorted by program relevance to your results</span>
+                        </div>
+                        <CollegeMap colleges={recommendations.nearbyColleges} />
+                        <div className="grid md:grid-cols-3 gap-4 mt-4">
+                            {recommendations.nearbyColleges.slice(0, 6).map((c: any, i: number) => {
+                                const matchingPrograms = (c.programs || []).filter((p: string) => relevantPrograms.has(p));
+                                const hasMatch = matchingPrograms.length > 0;
+                                return (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.06 }}
+                                        className={`glass rounded-xl p-4 text-sm border-l-4 ${hasMatch ? 'border-l-[#00D4FF]' : 'border-l-gray-200'}`}
+                                    >
+                                        <div className="flex justify-between items-start mb-1">
+                                            <p className="font-bold text-[#0A2540] leading-tight">{c.name}</p>
+                                            {hasMatch && (
+                                                <span className="ml-2 shrink-0 text-[10px] bg-[#00D4FF]/15 text-[#0A5080] px-1.5 py-0.5 rounded font-semibold">
+                                                    ✓ Matches
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-gray-500 text-xs mb-2">{c.state} · {c.type}</p>
+                                        <div className="flex flex-wrap gap-1">
+                                            {/* Show matching programs first, highlighted */}
+                                            {matchingPrograms.slice(0, 2).map((p: string) => (
+                                                <span key={p} className="bg-[#00D4FF]/15 text-[#0A5080] text-[10px] px-2 py-0.5 rounded font-medium">{p}</span>
+                                            ))}
+                                            {/* Then show other programs */}
+                                            {(c.programs || []).filter((p: string) => !relevantPrograms.has(p)).slice(0, 1).map((p: string) => (
+                                                <span key={p} className="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded">{p}</span>
+                                            ))}
+                                            {(c.programs || []).length > 3 && (
+                                                <span className="text-gray-400 text-[10px] px-1 py-0.5">+{(c.programs || []).length - 3} more</span>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
-            )}
+                );
+            })()}
         </div>
     );
 

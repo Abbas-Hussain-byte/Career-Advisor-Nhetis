@@ -31,6 +31,8 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/careers', require('./routes/careerRoutes'));
 app.use('/api/colleges', require('./routes/collegeRoutes'));
 app.use('/api/aptitude', require('./routes/aptitudeRoutes'));
+app.use('/api/jobs', require('./routes/jobRoutes'));
+app.use('/api/chat', require('./routes/chatRoutes'));
 
 // Root Route
 app.get('/', (req, res) => {

@@ -8,7 +8,9 @@ const UserSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        // Removed unique: true to avoid conflicts when email is empty/omitted
+        sparse: true,   // allows multiple docs to have no email (null/undefined)
+        trim: true,
+        lowercase: true,
     },
     phone: {
         type: String,
@@ -43,9 +45,26 @@ const UserSchema = new mongoose.Schema({
         interests: [String],
         academicScore: Number,
     },
+    // Persistent assessment results — saved when student completes the quiz
+    assessment: {
+        vector: {
+            logic: { type: Number, default: 0 },
+            creativity: { type: Number, default: 0 },
+            technical: { type: Number, default: 0 },
+            social: { type: Number, default: 0 },
+        },
+        results: [{          // top matched careers saved from last quiz
+            careerTitle: String,
+            score: Number,
+            category: String,
+            skills: [String],
+        }],
+        takenAt: Date,
+    },
 }, {
     timestamps: true,
 });
+
 
 UserSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);

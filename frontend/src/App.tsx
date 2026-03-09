@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import CareerExplorer from './pages/CareerExplorer';
 import Colleges from './pages/Colleges';
 import Profile from './pages/Profile';
+import Insights from './pages/Insights';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
@@ -49,6 +50,7 @@ function App() {
             <Route path="/careers" element={<PrivateRoute><CareerExplorer /></PrivateRoute>} />
             <Route path="/colleges" element={<PrivateRoute><Colleges /></PrivateRoute>} />
             <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            <Route path="/insights" element={<PrivateRoute><Insights /></PrivateRoute>} />
 
             {/* Catch-all */}
             <Route path="*" element={<Navigate to="/" replace />} />
