@@ -30,7 +30,7 @@ router.get('/', asyncHandler(async (req, res) => {
     if (program) query.programs = { $elemMatch: { $regex: program, $options: 'i' } };
     if (q) query.name = { $regex: q, $options: 'i' };
 
-    const colleges = await College.find(query).limit(30);
+    const colleges = await College.find(query).sort({ ranking: 1 }).limit(30);
     res.json(colleges);
 }));
 

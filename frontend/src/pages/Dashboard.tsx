@@ -74,6 +74,7 @@ export default function Dashboard() {
                 stream: user?.profile?.stream || '',
                 academicScore: user?.profile?.academicScore || null,
                 location: locationData,
+                careerCategoryScores: scores._careerCategoryScores || {},
             });
             setRecommendations(data);
             setView('results');

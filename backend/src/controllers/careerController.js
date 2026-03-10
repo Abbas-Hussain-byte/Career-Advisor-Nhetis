@@ -61,7 +61,7 @@ const CATEGORY_PROGRAMS_MAP = {
 // @desc    Get recommendations based on quiz results
 // @route   POST /api/careers/recommend
 const getRecommendations = asyncHandler(async (req, res) => {
-    const { quizScores, interests = [], academicScore, location, stream } = req.body;
+    const { quizScores, interests = [], academicScore, location, stream, careerCategoryScores } = req.body;
 
     if (!quizScores) {
         res.status(400);
@@ -80,28 +80,39 @@ const getRecommendations = asyncHandler(async (req, res) => {
     // Categories compatible with user stream
     const streamCompatible = new Set(STREAM_CAREER_MAP[stream] || []);
 
+    // ── Normalize careerCategoryScores to 0-100 ──
+    const catScores = careerCategoryScores || {};
+    const maxCatScore = Math.max(...Object.values(catScores).map(v => Number(v) || 0), 1);
+
     const scoredCareers = allCareers.map(career => {
         let score = 0;
 
-        // 1. Cosine similarity on aptitude quiz scores (max 50 pts)
+        // ═══ SIGNAL 1: Career-category weights from assessment (60% — max 60 pts) ═══
+        // This is the PRIMARY signal: how much did the student's answers align with this career's category?
+        const categoryWeight = Number(catScores[career.category]) || 0;
+        const normalizedCatWeight = (categoryWeight / maxCatScore) * 60;
+        score += normalizedCatWeight;
+
+        // ═══ SIGNAL 2: Cosine similarity on aptitude quiz vector (20% — max 20 pts) ═══
         const similarity = cosineSimilarity(quizScores, career.matchVector || {});
-        score += similarity * 50;
+        score += similarity * 20;
 
-        // 2. Interest-to-category match: user interests mapped to career categories (max 25 pts)
-        if (boostedCategories.has(career.category)) score += 25;
+        // ═══ SIGNAL 3: Interest + stream compatibility (20% — max 20 pts) ═══
+        // 3a. Interest-to-category match (max 10 pts)
+        if (boostedCategories.has(career.category)) score += 10;
 
-        // 3. Stream compatibility boost (max 20 pts)
-        if (stream && streamCompatible.has(career.category)) score += 20;
+        // 3b. Stream compatibility boost (max 7 pts)
+        if (stream && streamCompatible.has(career.category)) score += 7;
 
-        // 4. Skill-level interest keyword match (max 10 pts fallback)
+        // 3c. Skill-level interest keyword match (max 3 pts)
         const skillMatch = career.skills.some(skill =>
             interests.map(i => i.toLowerCase()).includes(skill.toLowerCase())
         );
-        if (skillMatch) score += 10;
+        if (skillMatch) score += 3;
 
-        // 5. Academic score multiplier (subtle 0-5% boost for high scorers)
+        // ═══ BONUS: Academic score multiplier (subtle 0-3% boost for high scorers) ═══
         if (academicScore && academicScore > 70) {
-            score *= (1 + (academicScore - 70) / 2000);
+            score *= (1 + (academicScore - 70) / 3000);
         }
 
         return { ...career.toObject(), score: Math.min(100, Math.round(score)) };
@@ -111,7 +122,6 @@ const getRecommendations = asyncHandler(async (req, res) => {
     const topCareers = scoredCareers.slice(0, 5);
 
     // ── College matching: filter by programs relevant to top career categories ──
-    // Collect the set of programs that matter for the top-5 careers
     const relevantPrograms = new Set();
     topCareers.forEach(career => {
         const progs = CATEGORY_PROGRAMS_MAP[career.category] || [];
@@ -126,11 +136,11 @@ const getRecommendations = asyncHandler(async (req, res) => {
                 location: {
                     $near: {
                         $geometry: { type: 'Point', coordinates: [location.lng, location.lat] },
-                        $maxDistance: 300000, // 300 km radius for better coverage
+                        $maxDistance: 300000,
                     }
                 },
                 programs: { $elemMatch: { $in: [...relevantPrograms] } },
-            }).limit(10);
+            }).limit(15);
 
             // Step 2: if fewer than 4 program-matched colleges nearby, widen to all nearby
             if (nearbyColleges.length < 4) {
@@ -141,30 +151,37 @@ const getRecommendations = asyncHandler(async (req, res) => {
                             $maxDistance: 300000,
                         }
                     }
-                }).limit(10);
+                }).limit(15);
             }
         }
 
-        // Step 3: still nothing → program-filtered from all colleges
+        // Step 3: still nothing → program-filtered from all colleges sorted by ranking
         if (nearbyColleges.length === 0 && relevantPrograms.size > 0) {
             nearbyColleges = await College.find({
                 programs: { $elemMatch: { $in: [...relevantPrograms] } },
-            }).limit(10);
+            }).sort({ ranking: 1 }).limit(15);
         }
 
-        // Step 4: absolute fallback — any 8 colleges
+        // Step 4: absolute fallback — top-ranked colleges
         if (nearbyColleges.length === 0) {
-            nearbyColleges = await College.find({}).limit(8);
+            nearbyColleges = await College.find({}).sort({ ranking: 1 }).limit(10);
         }
 
-        // Sort: colleges with MORE matching programs come first
+        // Sort: program-match count first, then by ranking
         nearbyColleges = nearbyColleges.map(c => {
             const matchCount = (c.programs || []).filter(p => relevantPrograms.has(p)).length;
             return { ...c.toObject(), _programMatchScore: matchCount };
-        }).sort((a, b) => b._programMatchScore - a._programMatchScore);
+        }).sort((a, b) => {
+            // Primary: more matching programs first
+            if (b._programMatchScore !== a._programMatchScore) {
+                return b._programMatchScore - a._programMatchScore;
+            }
+            // Secondary: better ranking first
+            return (a.ranking || 999) - (b.ranking || 999);
+        });
 
     } catch (e) {
-        nearbyColleges = await College.find({}).limit(8);
+        nearbyColleges = await College.find({}).sort({ ranking: 1 }).limit(10);
     }
 
     res.json({

@@ -2,6 +2,31 @@ import React, { useState, useEffect } from 'react';
 import API from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// ── Career categories used for weight mapping ────────────────────────────────
+const CAREER_CATEGORIES = [
+    'Technology', 'Engineering', 'Medical', 'Agriculture',
+    'Commerce', 'Business', 'Arts & Design', 'Media', 'Education', 'Law',
+] as const;
+
+// ── Skill → Career-category boost map ────────────────────────────────────────
+const SKILL_CAREER_MAP: Record<string, Record<string, number>> = {
+    math: { Technology: 2, Engineering: 3, Medical: 0, Agriculture: 0, Commerce: 2, Business: 0, 'Arts & Design': 0, Media: 0, Education: 1, Law: 0 },
+    coding: { Technology: 3, Engineering: 1, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 },
+    science: { Technology: 1, Engineering: 2, Medical: 1, Agriculture: 1, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 },
+    biology: { Technology: 0, Engineering: 0, Medical: 3, Agriculture: 2, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 },
+    design: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 3, Media: 1, Education: 0, Law: 0 },
+    writing: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 1, Media: 3, Education: 2, Law: 1 },
+    leadership: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 1, Business: 3, 'Arts & Design': 0, Media: 0, Education: 1, Law: 0 },
+    problemSolve: { Technology: 2, Engineering: 2, Medical: 1, Agriculture: 0, Commerce: 1, Business: 1, 'Arts & Design': 0, Media: 0, Education: 0, Law: 1 },
+    empathy: { Technology: 0, Engineering: 0, Medical: 2, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 3, Law: 1 },
+    business: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 3, Business: 3, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 },
+    research: { Technology: 2, Engineering: 1, Medical: 2, Agriculture: 2, Commerce: 1, Business: 0, 'Arts & Design': 0, Media: 0, Education: 1, Law: 1 },
+    speaking: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 2, 'Arts & Design': 0, Media: 2, Education: 2, Law: 3 },
+    languages: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 1, Media: 2, Education: 2, Law: 1 },
+    mechanical: { Technology: 1, Engineering: 3, Medical: 0, Agriculture: 1, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 },
+    sports: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 2, Law: 0 },
+};
+
 // ── Skills for the self-rating grid (Stage 2) ────────────────────────────────
 const SKILL_ITEMS = [
     { id: 'math', label: 'Mathematics / Logic', icon: '🔢', category: 'logic' },
@@ -29,51 +54,51 @@ const FALLBACK_QUESTIONS = [
     {
         id: 1, question: 'Your school science fair is coming up. Which role excites you most?', category: 'technical', type: 'scenario',
         options: [
-            { text: 'Build and program a robot or device', score: 1.0 },
-            { text: 'Run a biology or chemistry experiment', score: 0.7 },
-            { text: 'Design the display and visual materials', score: 0.4 },
-            { text: 'Present our project to judges', score: 0.2 },
-            { text: 'Coordinate the whole team', score: 0.3 },
+            { text: 'Build and program a robot or device', score: 1.0, careerWeights: { Technology: 3, Engineering: 2, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
+            { text: 'Run a biology or chemistry experiment', score: 0.7, careerWeights: { Technology: 0, Engineering: 0, Medical: 3, Agriculture: 2, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 1, Law: 0 } },
+            { text: 'Design the display and visual materials', score: 0.4, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 3, Media: 2, Education: 0, Law: 0 } },
+            { text: 'Present our project to judges', score: 0.2, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 1, 'Arts & Design': 0, Media: 2, Education: 2, Law: 2 } },
+            { text: 'Coordinate the whole team', score: 0.3, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 1, Business: 3, 'Arts & Design': 0, Media: 0, Education: 1, Law: 0 } },
         ]
     },
     {
         id: 2, question: 'Which challenge would you most want to solve professionally?', category: 'logic', type: 'scenario',
         options: [
-            { text: 'Build AI tech to fight climate change', score: 1.0 },
-            { text: 'Develop a vaccine for a new disease', score: 0.8 },
-            { text: 'Write a bestselling novel', score: 0.4 },
-            { text: 'Design infrastructure for a city', score: 0.7 },
-            { text: 'Win a landmark court case', score: 0.5 },
+            { text: 'Build AI tech to fight climate change', score: 1.0, careerWeights: { Technology: 3, Engineering: 2, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
+            { text: 'Develop a vaccine for a new disease', score: 0.8, careerWeights: { Technology: 0, Engineering: 0, Medical: 3, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
+            { text: 'Write a bestselling novel', score: 0.4, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 1, Media: 3, Education: 1, Law: 0 } },
+            { text: 'Design infrastructure for a city', score: 0.7, careerWeights: { Technology: 0, Engineering: 3, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
+            { text: 'Win a landmark court case', score: 0.5, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 3 } },
         ]
     },
     {
         id: 3, question: 'You have free time to create anything. You choose to:', category: 'creativity', type: 'scenario',
         options: [
-            { text: 'Write a short story or song', score: 1.0 },
-            { text: 'Design a logo or digital artwork', score: 0.9 },
-            { text: 'Build a small game or app', score: 0.6 },
-            { text: 'Analyse data on a topic I love', score: 0.4 },
-            { text: 'Sketch architectural plans', score: 0.7 },
+            { text: 'Write a short story or song', score: 1.0, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 2, Media: 3, Education: 1, Law: 0 } },
+            { text: 'Design a logo or digital artwork', score: 0.9, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 3, Media: 1, Education: 0, Law: 0 } },
+            { text: 'Build a small game or app', score: 0.6, careerWeights: { Technology: 3, Engineering: 1, Medical: 0, Agriculture: 0, Commerce: 0, Business: 1, 'Arts & Design': 1, Media: 0, Education: 0, Law: 0 } },
+            { text: 'Analyse data on a topic I love', score: 0.4, careerWeights: { Technology: 2, Engineering: 0, Medical: 0, Agriculture: 1, Commerce: 2, Business: 1, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
+            { text: 'Sketch architectural plans', score: 0.7, careerWeights: { Technology: 0, Engineering: 3, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 2, Media: 0, Education: 0, Law: 0 } },
         ]
     },
     {
         id: 4, question: 'A friend is going through a tough time. You naturally:', category: 'social', type: 'scenario',
         options: [
-            { text: 'Listen patiently and offer support', score: 1.0 },
-            { text: 'Give practical advice on what to do', score: 0.6 },
-            { text: 'Connect them with a professional', score: 0.7 },
-            { text: 'Distract them with fun activities', score: 0.4 },
-            { text: 'I prefer logical problems to emotional ones', score: 0.0 },
+            { text: 'Listen patiently and offer support', score: 1.0, careerWeights: { Technology: 0, Engineering: 0, Medical: 2, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 3, Law: 1 } },
+            { text: 'Give practical advice on what to do', score: 0.6, careerWeights: { Technology: 0, Engineering: 0, Medical: 1, Agriculture: 0, Commerce: 1, Business: 2, 'Arts & Design': 0, Media: 0, Education: 1, Law: 2 } },
+            { text: 'Connect them with a professional', score: 0.7, careerWeights: { Technology: 0, Engineering: 0, Medical: 1, Agriculture: 0, Commerce: 0, Business: 1, 'Arts & Design': 0, Media: 0, Education: 2, Law: 0 } },
+            { text: 'Distract them with fun activities', score: 0.4, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 1, Media: 2, Education: 1, Law: 0 } },
+            { text: 'I prefer logical problems to emotional ones', score: 0.0, careerWeights: { Technology: 2, Engineering: 2, Medical: 0, Agriculture: 0, Commerce: 1, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
         ]
     },
     {
         id: 5, question: 'In a group project, which role do you naturally fall into?', category: 'leadership', type: 'scenario',
         options: [
-            { text: 'The leader who sets direction', score: 1.0 },
-            { text: 'The researcher who gathers data', score: 0.6 },
-            { text: 'The creative who designs outputs', score: 0.5 },
-            { text: 'The fixer when things go wrong', score: 0.7 },
-            { text: 'The mediator who keeps harmony', score: 0.8 },
+            { text: 'The leader who sets direction', score: 1.0, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 1, Business: 3, 'Arts & Design': 0, Media: 0, Education: 1, Law: 1 } },
+            { text: 'The researcher who gathers data', score: 0.6, careerWeights: { Technology: 2, Engineering: 1, Medical: 1, Agriculture: 1, Commerce: 1, Business: 0, 'Arts & Design': 0, Media: 1, Education: 1, Law: 1 } },
+            { text: 'The creative who designs outputs', score: 0.5, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 1, 'Arts & Design': 3, Media: 2, Education: 0, Law: 0 } },
+            { text: 'The fixer when things go wrong', score: 0.7, careerWeights: { Technology: 3, Engineering: 2, Medical: 1, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
+            { text: 'The mediator who keeps harmony', score: 0.8, careerWeights: { Technology: 0, Engineering: 0, Medical: 1, Agriculture: 0, Commerce: 0, Business: 1, 'Arts & Design': 0, Media: 0, Education: 2, Law: 2 } },
         ]
     },
 ];
@@ -102,7 +127,6 @@ const SkillRating = ({ onComplete }: { onComplete: (ratings: Record<string, numb
     const handleSubmit = () => {
         if (!allRated) return;
         setSubmitting(true);
-        // Normalise: rating is 0–4, convert to 0–1 and attach category
         onComplete(ratings);
     };
 
@@ -143,8 +167,8 @@ const SkillRating = ({ onComplete }: { onComplete: (ratings: Record<string, numb
                                         onClick={() => setRating(skill.id, val)}
                                         title={RATING_LABELS[val]}
                                         className={`flex-1 rounded-lg py-2 text-[10px] font-bold transition-all duration-150 border-2 ${selected
-                                                ? 'border-[#0A2540] text-[#0A2540] scale-105 shadow-sm'
-                                                : 'border-gray-200 text-gray-400 hover:border-gray-400'
+                                            ? 'border-[#0A2540] text-[#0A2540] scale-105 shadow-sm'
+                                            : 'border-gray-200 text-gray-400 hover:border-gray-400'
                                             }`}
                                         style={selected ? { background: RATING_COLORS[val] } : {}}
                                     >
@@ -174,8 +198,8 @@ const SkillRating = ({ onComplete }: { onComplete: (ratings: Record<string, numb
                     onClick={handleSubmit}
                     disabled={!allRated || submitting}
                     className={`px-10 py-3.5 rounded-2xl font-bold text-white text-base transition-all shadow-lg ${allRated && !submitting
-                            ? 'bg-gradient-to-r from-[#0A2540] to-[#635BFF] hover:shadow-xl cursor-pointer'
-                            : 'bg-gray-300 cursor-not-allowed'
+                        ? 'bg-gradient-to-r from-[#0A2540] to-[#635BFF] hover:shadow-xl cursor-pointer'
+                        : 'bg-gray-300 cursor-not-allowed'
                         }`}
                 >
                     {submitting ? 'Analysing...' : '🎯 Get My Career Matches'}
@@ -195,6 +219,8 @@ const Quiz = ({ onComplete }: { onComplete: (scores: any) => void }) => {
     const [loading, setLoading] = useState(true);
     const [stage, setStage] = useState<'scenarios' | 'skills'>('scenarios');
     const [scenarioScores, setScenarioScores] = useState<Record<string, number>>({});
+    // ── NEW: Accumulated career-category weights from scenario answers ──
+    const [careerCategoryScores, setCareerCategoryScores] = useState<Record<string, number>>({});
 
     useEffect(() => {
         API.get('/aptitude')
@@ -206,17 +232,27 @@ const Quiz = ({ onComplete }: { onComplete: (scores: any) => void }) => {
             .finally(() => setLoading(false));
     }, []);
 
-    const handleAnswer = (score: number, category: string) => {
+    const handleAnswer = (score: number, category: string, option: any) => {
         const updatedScores = {
             ...scores,
             [category]: [...(scores[category] || []), score],
         };
         setScores(updatedScores);
 
+        // ── Accumulate careerWeights from this option ──
+        const weights = option.careerWeights || {};
+        setCareerCategoryScores(prev => {
+            const updated = { ...prev };
+            for (const [cat, w] of Object.entries(weights)) {
+                updated[cat] = (updated[cat] || 0) + (w as number);
+            }
+            return updated;
+        });
+
         if (currentStep < questions.length - 1) {
             setCurrentStep(s => s + 1);
         } else {
-            // Normalise scenario scores
+            // Normalise scenario scores (aptitude vector)
             const normalised: Record<string, number> = {};
             Object.entries(updatedScores).forEach(([cat, vals]) => {
                 normalised[cat] = vals.reduce((a, b) => a + b, 0) / vals.length;
@@ -227,12 +263,11 @@ const Quiz = ({ onComplete }: { onComplete: (scores: any) => void }) => {
     };
 
     const handleSkillsComplete = (skillRatings: Record<string, number>) => {
-        // Merge skill ratings (0-4 → 0-1) with scenario scores
+        // Merge skill ratings (0-4 → 0-1) with scenario scores for aptitude vector
         const skillVector: Record<string, number> = {};
         SKILL_ITEMS.forEach(s => {
             const raw = skillRatings[s.id] ?? 0;
             const normalised = raw / 4; // 0–4 → 0–1
-            // Add to corresponding aptitude category
             if (!skillVector[s.category]) skillVector[s.category] = 0;
             skillVector[s.category] = Math.max(skillVector[s.category], normalised);
         });
@@ -249,8 +284,26 @@ const Quiz = ({ onComplete }: { onComplete: (scores: any) => void }) => {
             finalScores[cat] = Math.round((scenario * 0.7 + skill * 0.3) * 100) / 100;
         });
 
-        // Pass enriched scores along with raw skill ratings for skill-gap analysis
-        onComplete({ ...finalScores, _skillRatings: skillRatings });
+        // ── Merge skill ratings into career-category scores ──
+        // High skill rating (3-4) in coding → boosts Technology career category, etc.
+        const mergedCareerScores = { ...careerCategoryScores };
+        SKILL_ITEMS.forEach(s => {
+            const rating = skillRatings[s.id] ?? 0;
+            if (rating >= 2) { // only count intermediate+ skills
+                const careerMap = SKILL_CAREER_MAP[s.id] || {};
+                const factor = rating / 4; // 0-1 normalized
+                for (const [cat, w] of Object.entries(careerMap)) {
+                    mergedCareerScores[cat] = (mergedCareerScores[cat] || 0) + (w as number) * factor;
+                }
+            }
+        });
+
+        // Pass enriched scores + career category weights + raw skill ratings
+        onComplete({
+            ...finalScores,
+            _skillRatings: skillRatings,
+            _careerCategoryScores: mergedCareerScores,
+        });
     };
 
     if (loading) {
@@ -315,7 +368,7 @@ const Quiz = ({ onComplete }: { onComplete: (scores: any) => void }) => {
                                 key={idx}
                                 whileHover={{ scale: 1.01 }}
                                 whileTap={{ scale: 0.99 }}
-                                onClick={() => handleAnswer(opt.score, question.category)}
+                                onClick={() => handleAnswer(opt.score, question.category, opt)}
                                 className="w-full text-left px-5 py-4 rounded-xl border-2 border-gray-200 hover:border-[#0A2540] hover:bg-[#0A2540] hover:text-white transition-all duration-200 font-medium text-gray-700 group"
                             >
                                 <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border-2 border-current mr-3 text-xs font-bold shrink-0 align-middle">
