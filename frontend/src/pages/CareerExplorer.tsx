@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import API from '../api';
 
@@ -34,6 +34,17 @@ export default function CareerExplorer() {
     const [category, setCategory] = useState('All');
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<any | null>(null);
+    const [compareList, setCompareList] = useState<any[]>([]);
+    const [showCompare, setShowCompare] = useState(false);
+
+    const toggleCompare = (career: any) => {
+        setCompareList(prev => {
+            const exists = prev.find(c => c._id === career._id);
+            if (exists) return prev.filter(c => c._id !== career._id);
+            if (prev.length >= 3) return prev; // Max 3
+            return [...prev, career];
+        });
+    };
 
     // ── Personalised recommendations for this student ──
     const recommended = useMemo(() => {
@@ -277,13 +288,187 @@ export default function CareerExplorer() {
                                     </motion.div>
                                 )}
 
-                                <p className="text-xs text-[#635BFF] mt-3 font-medium text-center">
-                                    {selected?._id === career._id ? '▲ Hide roadmap' : '▼ View roadmap'}
-                                </p>
+                                {/* Compare toggle + Roadmap toggle */}
+                                <div className="flex items-center justify-between mt-3">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); toggleCompare(career); }}
+                                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg border-2 transition ${
+                                            compareList.find(c => c._id === career._id)
+                                                ? 'bg-[#635BFF] text-white border-[#635BFF]'
+                                                : 'border-gray-200 text-gray-500 hover:border-[#635BFF] hover:text-[#635BFF]'
+                                        }`}
+                                    >
+                                        {compareList.find(c => c._id === career._id) ? '✓ In Compare' : '+ Compare'}
+                                    </button>
+                                    <p className="text-xs text-[#635BFF] font-medium">
+                                        {selected?._id === career._id ? '▲ Hide roadmap' : '▼ View roadmap'}
+                                    </p>
+                                </div>
                             </motion.div>
                         ))}
                     </div>
                 )}
+
+                {/* Floating compare bar */}
+                <AnimatePresence>
+                    {compareList.length >= 2 && (
+                        <motion.div
+                            initial={{ y: 100, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 100, opacity: 0 }}
+                            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#0A2540] text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-4 z-50"
+                        >
+                            <span className="text-sm font-medium">{compareList.length} careers selected</span>
+                            <button
+                                onClick={() => setShowCompare(true)}
+                                className="bg-[#00D4FF] text-[#0A2540] font-bold px-5 py-2 rounded-xl text-sm hover:brightness-110 transition"
+                            >
+                                Compare Now →
+                            </button>
+                            <button
+                                onClick={() => setCompareList([])}
+                                className="text-xs text-gray-400 hover:text-white transition"
+                            >
+                                Clear
+                            </button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Comparison Modal */}
+                <AnimatePresence>
+                    {showCompare && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+                            onClick={() => setShowCompare(false)}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                className="bg-white rounded-2xl max-w-5xl w-full max-h-[85vh] overflow-y-auto p-6"
+                                onClick={e => e.stopPropagation()}
+                            >
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-2xl font-extrabold text-[#0A2540]">Career Comparison</h2>
+                                    <button onClick={() => setShowCompare(false)} className="text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+                                </div>
+
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm border-collapse">
+                                        <thead>
+                                            <tr className="border-b-2 border-gray-100">
+                                                <th className="text-left py-3 pr-4 text-gray-500 font-semibold w-32">Criteria</th>
+                                                {compareList.map(c => (
+                                                    <th key={c._id} className="text-left py-3 px-3">
+                                                        <span className="font-bold text-[#0A2540]">{c.title}</span>
+                                                        <br />
+                                                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${streamColors[c.category] || 'bg-gray-100 text-gray-700'}`}>
+                                                            {c.category}
+                                                        </span>
+                                                    </th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {/* Salary Range */}
+                                            <tr className="border-b border-gray-50">
+                                                <td className="py-3 pr-4 text-gray-500 font-medium">💰 Salary</td>
+                                                {compareList.map(c => {
+                                                    const minL = Math.round((c.salary?.min || 0) / 100000);
+                                                    const maxL = Math.round((c.salary?.max || 0) / 100000);
+                                                    const maxSalary = Math.max(...compareList.map(x => x.salary?.max || 0));
+                                                    const widthPct = maxSalary > 0 ? ((c.salary?.max || 0) / maxSalary) * 100 : 0;
+                                                    return (
+                                                        <td key={c._id} className="py-3 px-3">
+                                                            <p className="font-bold text-green-600">₹{minL}L – ₹{maxL}L / yr</p>
+                                                            <div className="h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
+                                                                <div className="h-full bg-green-400 rounded-full" style={{ width: `${widthPct}%` }} />
+                                                            </div>
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                            {/* Required Stream */}
+                                            <tr className="border-b border-gray-50">
+                                                <td className="py-3 pr-4 text-gray-500 font-medium">🎓 Stream</td>
+                                                {compareList.map(c => (
+                                                    <td key={c._id} className="py-3 px-3 font-semibold text-[#0A2540]">{c.requiredStream || 'Any'}</td>
+                                                ))}
+                                            </tr>
+                                            {/* Skills */}
+                                            <tr className="border-b border-gray-50">
+                                                <td className="py-3 pr-4 text-gray-500 font-medium">🛠️ Skills</td>
+                                                {compareList.map(c => (
+                                                    <td key={c._id} className="py-3 px-3">
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {(c.skills || []).map((s: string) => (
+                                                                <span key={s} className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded">{s}</span>
+                                                            ))}
+                                                        </div>
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                            {/* Roadmap */}
+                                            <tr className="border-b border-gray-50">
+                                                <td className="py-3 pr-4 text-gray-500 font-medium align-top">📍 Roadmap</td>
+                                                {compareList.map(c => (
+                                                    <td key={c._id} className="py-3 px-3">
+                                                        <div className="space-y-1">
+                                                            {(c.roadmap || []).map((step: any, idx: number) => (
+                                                                <div key={idx} className="flex gap-1 text-xs">
+                                                                    <span className="text-[#00D4FF] font-bold">{idx + 1}.</span>
+                                                                    <span className="text-gray-600">{step.step} <span className="text-gray-400">({step.duration})</span></span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                            {/* Outcome */}
+                                            <tr className="border-b border-gray-50">
+                                                <td className="py-3 pr-4 text-gray-500 font-medium">🎯 Outcome</td>
+                                                {compareList.map(c => (
+                                                    <td key={c._id} className="py-3 px-3 text-green-700 font-medium">{c.outcome || '—'}</td>
+                                                ))}
+                                            </tr>
+                                            {/* Required Exam */}
+                                            {compareList.some(c => c.requiredExam) && (
+                                                <tr className="border-b border-gray-50">
+                                                    <td className="py-3 pr-4 text-gray-500 font-medium">📝 Exam</td>
+                                                    {compareList.map(c => (
+                                                        <td key={c._id} className="py-3 px-3 text-blue-600 font-medium">{c.requiredExam || 'None required'}</td>
+                                                    ))}
+                                                </tr>
+                                            )}
+                                            {/* Match Score (if assessment taken) */}
+                                            {assessment?.results?.length > 0 && (
+                                                <tr>
+                                                    <td className="py-3 pr-4 text-gray-500 font-medium">⭐ Your Match</td>
+                                                    {compareList.map(c => {
+                                                        const result = (assessment.results || []).find((r: any) => r.careerTitle === c.title);
+                                                        return (
+                                                            <td key={c._id} className="py-3 px-3">
+                                                                {result ? (
+                                                                    <span className="bg-[#635BFF] text-white font-bold px-3 py-1 rounded-full text-xs">{result.score}% match</span>
+                                                                ) : (
+                                                                    <span className="text-gray-400 text-xs">Not in your results</span>
+                                                                )}
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </main>
         </div>
     );

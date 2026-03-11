@@ -12,6 +12,11 @@ import CareerExplorer from './pages/CareerExplorer';
 import Colleges from './pages/Colleges';
 import Profile from './pages/Profile';
 import Insights from './pages/Insights';
+import Scholarships from './pages/Scholarships';
+import Resources from './pages/Resources';
+
+// Components
+import ChatWidget from './components/ChatWidget';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
@@ -34,6 +39,12 @@ const PublicRoute = ({ children }: { children: JSX.Element }) => {
   return user ? <Navigate to="/dashboard" replace /> : children;
 };
 
+// Chat widget wrapper — only shows when logged in
+const AuthenticatedChat = () => {
+  const { user } = useAuth();
+  return user ? <ChatWidget /> : null;
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -51,10 +62,13 @@ function App() {
             <Route path="/colleges" element={<PrivateRoute><Colleges /></PrivateRoute>} />
             <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
             <Route path="/insights" element={<PrivateRoute><Insights /></PrivateRoute>} />
+            <Route path="/scholarships" element={<PrivateRoute><Scholarships /></PrivateRoute>} />
+            <Route path="/resources" element={<PrivateRoute><Resources /></PrivateRoute>} />
 
             {/* Catch-all */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <AuthenticatedChat />
         </Router>
       </OfflineProvider>
     </AuthProvider>

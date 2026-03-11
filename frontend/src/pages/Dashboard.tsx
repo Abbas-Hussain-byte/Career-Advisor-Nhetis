@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
@@ -25,6 +25,8 @@ const Navbar = ({ user, logoutUser }: any) => {
                     <Link to="/dashboard" className="hover:text-[#00D4FF] transition font-medium">Dashboard</Link>
                     <Link to="/careers" className="hover:text-[#00D4FF] transition font-medium">Careers</Link>
                     <Link to="/colleges" className="hover:text-[#00D4FF] transition font-medium">Colleges</Link>
+                    <Link to="/scholarships" className="hover:text-[#00D4FF] transition font-medium">Scholarships</Link>
+                    <Link to="/resources" className="hover:text-[#00D4FF] transition font-medium">Resources</Link>
                     <Link to="/insights" className="hover:text-[#00D4FF] transition font-medium">Insights</Link>
                     <Link to="/profile" className="hover:text-[#00D4FF] transition font-medium">Profile</Link>
                 </div>
@@ -46,8 +48,17 @@ export default function Dashboard() {
     const { user, logoutUser, refreshUser } = useAuth();
     const [view, setView] = useState<'home' | 'quiz' | 'results'>('home');
     const [recommendations, setRecommendations] = useState<any>(null);
+    const [streamRec, setStreamRec] = useState<any>(null);
     const [loadingResults, setLoadingResults] = useState(false);
     const [error, setError] = useState('');
+    const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+
+    // Fetch upcoming timeline events on mount
+    useEffect(() => {
+        API.get('/timeline/upcoming')
+            .then(res => setUpcomingEvents(res.data?.slice(0, 5) || []))
+            .catch(() => {});
+    }, []);
 
     const handleQuizComplete = async (scores: any) => {
         setLoadingResults(true);
@@ -79,6 +90,19 @@ export default function Dashboard() {
             setRecommendations(data);
             setView('results');
 
+            // Also get stream recommendation (critical for Class 10 students)
+            try {
+                const { data: streamData } = await API.post('/careers/recommend-stream', {
+                    careerCategoryScores: scores._careerCategoryScores || {},
+                    quizScores: scores,
+                    interests: user?.profile?.interests || [],
+                    grade: user?.profile?.grade || '12',
+                });
+                setStreamRec(streamData);
+            } catch {
+                // Stream recommendation is supplementary; don't break the flow
+            }
+
             // Persist assessment to MongoDB so Insights + other pages can use it
             try {
                 await API.put('/users/assessment', {
@@ -89,6 +113,11 @@ export default function Dashboard() {
                         category: c.category,
                         skills: c.skills || [],
                     })),
+                    recommendedStreams: streamRec?.recommendations?.slice(0, 3).map((s: any) => ({
+                        stream: s.stream,
+                        confidence: s.confidence,
+                        reasoning: s.reasoning,
+                    })) || [],
                 });
                 await refreshUser(); // Update AuthContext so Insights sees new assessment immediately
             } catch {
@@ -181,6 +210,46 @@ export default function Dashboard() {
                         Open College Map →
                     </Link>
                 </motion.div>
+
+                {/* Scholarships */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="glass rounded-2xl p-8 card-hover text-center"
+                >
+                    <div className="text-5xl mb-4">🎓</div>
+                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">Scholarships</h3>
+                    <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+                        Discover verified government scholarships matched to your profile.
+                    </p>
+                    <Link
+                        to="/scholarships"
+                        className="block w-full bg-[#635BFF] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#564fe5] transition text-center"
+                    >
+                        Find Scholarships →
+                    </Link>
+                </motion.div>
+
+                {/* Resources */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="glass rounded-2xl p-8 card-hover text-center"
+                >
+                    <div className="text-5xl mb-4">📖</div>
+                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">Study Resources</h3>
+                    <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+                        Free courses from NPTEL, SWAYAM, Khan Academy & exam prep links.
+                    </p>
+                    <Link
+                        to="/resources"
+                        className="block w-full bg-[#0A2540] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#1a3d66] transition text-center"
+                    >
+                        Explore Resources →
+                    </Link>
+                </motion.div>
             </div>
 
             {/* Profile quick info */}
@@ -226,6 +295,42 @@ export default function Dashboard() {
                         </div>
                     )}
                 </motion.div>
+                )}
+
+            {/* Upcoming Deadlines */}
+            {upcomingEvents.length > 0 && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="mt-8 glass rounded-2xl p-6"
+                >
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-bold text-[#0A2540]">📅 Upcoming Deadlines</h3>
+                        <span className="text-xs text-gray-400">Next 60 days</span>
+                    </div>
+                    <div className="space-y-3">
+                        {upcomingEvents.map((evt: any, i: number) => {
+                            const typeIcons: Record<string, string> = { exam: '📝', admission: '🏫', scholarship: '🎓', counseling: '📋', result: '📊' };
+                            return (
+                                <div key={i} className={`flex items-start gap-3 p-3 rounded-xl ${evt.important ? 'bg-red-50 border border-red-100' : 'bg-gray-50'}`}>
+                                    <span className="text-xl">{typeIcons[evt.type] || '📌'}</span>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-start">
+                                            <p className={`text-sm font-bold ${evt.important ? 'text-red-700' : 'text-[#0A2540]'}`}>{evt.title}</p>
+                                            {evt.important && <span className="text-[9px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold">IMPORTANT</span>}
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-0.5">{evt.date}{evt.endDate ? ` — ${evt.endDate}` : ''}</p>
+                                        {evt.source && <span className="text-[10px] text-gray-400 mt-1 inline-block">Source: {evt.source}</span>}
+                                    </div>
+                                    {evt.url && (
+                                        <a href={evt.url} target="_blank" rel="noopener noreferrer" className="text-xs text-[#635BFF] font-semibold hover:underline shrink-0">Details →</a>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </motion.div>
             )}
 
         </div>
@@ -245,6 +350,128 @@ export default function Dashboard() {
                     ← New Assessment
                 </button>
             </div>
+
+            {/* ══════ STREAM RECOMMENDATION (Most prominent for Class 10) ══════ */}
+            {streamRec && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="glass rounded-2xl p-6 border-l-4 border-l-[#635BFF]"
+                >
+                    <div className="flex items-center gap-3 mb-4">
+                        <span className="text-3xl">🎯</span>
+                        <div>
+                            <h3 className="text-xl font-extrabold text-[#0A2540]">
+                                {streamRec.isClass10 ? 'Your Recommended Stream' : 'Stream Compatibility'}
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                                {streamRec.isClass10
+                                    ? 'Based on your aptitude, here\'s which stream you should choose after Class 10'
+                                    : 'How well your current stream matches your aptitude'}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Class 12 compatibility message */}
+                    {streamRec.compatibility && (
+                        <div className={`rounded-xl px-4 py-3 text-sm mb-4 ${
+                            streamRec.compatibility.isOptimal
+                                ? 'bg-green-50 border border-green-200 text-green-700'
+                                : 'bg-amber-50 border border-amber-200 text-amber-700'
+                        }`}>
+                            <p className="font-semibold">
+                                {streamRec.compatibility.isOptimal ? '✅' : '💡'} {streamRec.compatibility.message}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Stream recommendation cards */}
+                    <div className={`grid gap-4 ${streamRec.isClass10 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
+                        {(streamRec.recommendations || []).slice(0, streamRec.isClass10 ? 7 : 7).map((rec: any, idx: number) => {
+                            const isTop = idx === 0;
+                            const isRecommended = idx < 3 && streamRec.isClass10;
+                            const STREAM_COLORS: Record<string, string> = {
+                                'Science-PCM': '#3b82f6',
+                                'Science-PCB': '#10b981',
+                                'Commerce': '#8b5cf6',
+                                'Arts / Humanities': '#f59e0b',
+                                'Diploma / Polytechnic': '#f97316',
+                                'ITI / Skill Training': '#ef4444',
+                                'Paramedical / Nursing Diploma': '#06b6d4',
+                            };
+                            const color = STREAM_COLORS[rec.stream] || '#635BFF';
+                            return (
+                                <motion.div
+                                    key={rec.stream}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: idx * 0.1 }}
+                                    className={`rounded-xl p-4 border-2 transition ${
+                                        isTop && streamRec.isClass10
+                                            ? 'border-[#635BFF] bg-gradient-to-br from-[#0A2540] to-[#1a3d66] text-white shadow-lg'
+                                            : isRecommended
+                                                ? 'border-[#635BFF]/40 bg-white'
+                                                : 'border-gray-200 bg-white opacity-80'
+                                    }`}
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            {isTop && streamRec.isClass10 && (
+                                                <span className="text-[10px] bg-[#00D4FF] text-[#0A2540] font-bold px-2 py-0.5 rounded-full mb-1 inline-block">
+                                                    ⭐ BEST MATCH
+                                                </span>
+                                            )}
+                                            {!isTop && isRecommended && (
+                                                <span className="text-[10px] bg-[#635BFF]/10 text-[#635BFF] font-bold px-2 py-0.5 rounded-full mb-1 inline-block">
+                                                    RECOMMENDED
+                                                </span>
+                                            )}
+                                            {!isRecommended && streamRec.isClass10 && (
+                                                <span className="text-[10px] bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded-full mb-1 inline-block">
+                                                    ALTERNATIVE
+                                                </span>
+                                            )}
+                                            <h4 className={`font-bold text-sm ${isTop && streamRec.isClass10 ? 'text-white' : 'text-[#0A2540]'}`}>
+                                                {rec.label || rec.stream}
+                                            </h4>
+                                        </div>
+                                        <span
+                                            className="text-xs font-bold px-2 py-0.5 rounded-full"
+                                            style={{
+                                                background: isTop && streamRec.isClass10 ? '#00D4FF' : `${color}20`,
+                                                color: isTop && streamRec.isClass10 ? '#0A2540' : color,
+                                            }}
+                                        >
+                                            {rec.confidence}%
+                                        </span>
+                                    </div>
+                                    {/* Confidence bar */}
+                                    <div className={`h-1.5 rounded-full overflow-hidden mb-2 ${isTop && streamRec.isClass10 ? 'bg-white/20' : 'bg-gray-100'}`}>
+                                        <div
+                                            className="h-full rounded-full transition-all duration-700"
+                                            style={{ width: `${rec.confidence}%`, background: color }}
+                                        />
+                                    </div>
+                                    <p className={`text-xs leading-relaxed mb-2 ${isTop && streamRec.isClass10 ? 'text-gray-300' : 'text-gray-500'}`}>
+                                        {rec.reasoning}
+                                    </p>
+
+                                    {/* Pathway info */}
+                                    {rec.info && (
+                                        <div className={`text-[11px] rounded-lg p-2 mt-1 space-y-0.5 ${
+                                            isTop && streamRec.isClass10 ? 'bg-white/10 text-gray-200' : 'bg-gray-50 text-gray-600'
+                                        }`}>
+                                            <p><strong>⏱ Duration:</strong> {rec.info.duration}</p>
+                                            <p><strong>📋 After this:</strong> {rec.info.after}</p>
+                                            <p><strong>🏫 Where:</strong> {rec.info.institutions}</p>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+                </motion.div>
+            )}
 
             {/* Career Cards */}
             <div>

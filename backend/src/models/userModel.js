@@ -59,6 +59,11 @@ const UserSchema = new mongoose.Schema({
             category: String,
             skills: [String],
         }],
+        recommendedStreams: [{  // stream suggestions (especially for Class 10 students)
+            stream: String,       // e.g. "Science-PCM"
+            confidence: Number,   // 0-100
+            reasoning: String,    // e.g. "Strong logic + technical scores"
+        }],
         takenAt: Date,
     },
 }, {

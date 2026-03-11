@@ -83,9 +83,8 @@ export default function Insights() {
 
     // Fetch Remotive trending skills (public)
     useEffect(() => {
-        fetch('http://localhost:5000/api/jobs/trending')
-            .then(r => r.ok ? r.json() : null)
-            .then(data => { if (data) setJobTrends(data); })
+        API.get('/jobs/trending')
+            .then(res => { if (res.data) setJobTrends(res.data); })
             .catch(console.warn)
             .finally(() => setJobsLoading(false));
     }, []);
@@ -141,9 +140,8 @@ export default function Insights() {
     useEffect(() => {
         if (!selectedCareer) return;
         setMarketLoading(true);
-        fetch(`http://localhost:5000/api/jobs/market?career=${encodeURIComponent(selectedCareer)}`)
-            .then(r => r.ok ? r.json() : null)
-            .then(data => { if (data && !data.error) setMarketData(data); else setMarketData(null); })
+        API.get(`/jobs/market?career=${encodeURIComponent(selectedCareer)}`)
+            .then(res => { if (res.data && !res.data.error) setMarketData(res.data); else setMarketData(null); })
             .catch(console.warn)
             .finally(() => setMarketLoading(false));
     }, [selectedCareer]);

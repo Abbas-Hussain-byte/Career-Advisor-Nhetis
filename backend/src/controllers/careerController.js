@@ -1,4 +1,4 @@
-﻿const asyncHandler = require('express-async-handler');
+const asyncHandler = require('express-async-handler');
 const CareerPath = require('../models/careerPathModel');
 const College = require('../models/collegeModel');
 
@@ -1637,4 +1637,189 @@ const updateData = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { getRecommendations, getCareers, seedData, autoSeed, updateData };
+// ═══════════════════════════════════════════════════════════════════════════════
+// STREAM RECOMMENDATION — Most important for Class 10 students
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Stream → career-category mapping (used for scoring)
+// Covers ALL real post-Class 10 pathways in India
+const STREAM_TO_CATEGORIES = {
+    'Science-PCM': { Technology: 3, Engineering: 3, Commerce: 0.5, Business: 0.5, Medical: 0, Agriculture: 0, 'Arts & Design': 0, Media: 0, Education: 0.5, Law: 0.5 },
+    'Science-PCB': { Medical: 3, Agriculture: 2, Technology: 0.5, Engineering: 0.5, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0.5, Law: 0 },
+    'Commerce':    { Commerce: 3, Business: 3, Law: 1.5, Technology: 0.5, Engineering: 0, Medical: 0, Agriculture: 0, 'Arts & Design': 0, Media: 0, Education: 0.5 },
+    'Arts / Humanities': { 'Arts & Design': 3, Media: 3, Education: 2.5, Law: 2, Commerce: 0.5, Business: 0.5, Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0 },
+    'Diploma / Polytechnic': { Engineering: 3, Technology: 2.5, Agriculture: 1.5, Commerce: 0, Business: 0.5, Medical: 0, 'Arts & Design': 0.5, Media: 0, Education: 0, Law: 0 },
+    'ITI / Skill Training':  { Engineering: 2.5, Technology: 1.5, Agriculture: 1, Commerce: 0, Business: 0, Medical: 0, 'Arts & Design': 0.5, Media: 0, Education: 0, Law: 0 },
+    'Paramedical / Nursing Diploma': { Medical: 3, Agriculture: 0.5, Technology: 0, Engineering: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 1, Law: 0 },
+};
+
+// Aptitude vector → stream affinity
+const APTITUDE_STREAM_WEIGHTS = {
+    'Science-PCM': { logic: 0.35, technical: 0.35, creativity: 0.15, social: 0.15 },
+    'Science-PCB': { logic: 0.25, technical: 0.25, creativity: 0.15, social: 0.35 },
+    'Commerce':    { logic: 0.35, technical: 0.15, creativity: 0.15, social: 0.35 },
+    'Arts / Humanities': { logic: 0.10, technical: 0.10, creativity: 0.40, social: 0.40 },
+    'Diploma / Polytechnic': { logic: 0.25, technical: 0.40, creativity: 0.15, social: 0.20 },
+    'ITI / Skill Training':  { logic: 0.15, technical: 0.45, creativity: 0.20, social: 0.20 },
+    'Paramedical / Nursing Diploma': { logic: 0.20, technical: 0.20, creativity: 0.10, social: 0.50 },
+};
+
+const STREAM_LABELS = {
+    'Science-PCM': 'Science (PCM — Physics, Chemistry, Math) → B.Tech, B.Sc, JEE pathway',
+    'Science-PCB': 'Science (PCB — Physics, Chemistry, Biology) → MBBS, B.Sc, NEET pathway',
+    'Commerce': 'Commerce (Accounts, Economics, Business Studies) → B.Com, CA, MBA pathway',
+    'Arts / Humanities': 'Arts / Humanities (History, Pol. Science, Languages) → BA, Law, Civil Services',
+    'Diploma / Polytechnic': 'Diploma / Polytechnic (3-year technical diploma) → Engineering, IT, direct industry jobs',
+    'ITI / Skill Training': 'ITI / Skill Training (1-2 year trade course) → Electrician, Fitter, COPA, Welder, Mechanic',
+    'Paramedical / Nursing Diploma': 'Paramedical / Nursing Diploma (DMLT, ANM/GNM, X-Ray Tech) → Healthcare jobs',
+};
+
+// Extra info shown to students about each pathway
+const STREAM_INFO = {
+    'Science-PCM': { duration: '2 years (11th-12th)', after: 'B.Tech/BE, B.Sc, BCA, JEE Main/Advanced', institutions: 'CBSE/State Board schools' },
+    'Science-PCB': { duration: '2 years (11th-12th)', after: 'MBBS, BDS, B.Sc Nursing, BAMS, NEET', institutions: 'CBSE/State Board schools' },
+    'Commerce': { duration: '2 years (11th-12th)', after: 'B.Com, BBA, CA/CS, MBA', institutions: 'CBSE/State Board schools' },
+    'Arts / Humanities': { duration: '2 years (11th-12th)', after: 'BA, BFA, BA LLB, UPSC, Journalism', institutions: 'CBSE/State Board schools' },
+    'Diploma / Polytechnic': { duration: '3 years after 10th', after: 'Direct jobs, Lateral entry to B.Tech 2nd year, higher diplomas', institutions: 'Govt. Polytechnics (AICTE approved)' },
+    'ITI / Skill Training': { duration: '1-2 years after 10th', after: 'Govt/Private sector jobs, Apprenticeships, further ITI', institutions: 'Govt. ITIs (DGT/NCVT certified)' },
+    'Paramedical / Nursing Diploma': { duration: '1-3 years after 10th', after: 'Hospital jobs, Lab technician, ANM/GNM nursing, X-Ray tech', institutions: 'State Health Board / Govt. paramedical colleges' },
+};
+
+// @desc    Get personalized stream recommendations
+// @route   POST /api/careers/recommend-stream
+const getStreamRecommendation = asyncHandler(async (req, res) => {
+    const { careerCategoryScores, quizScores, interests = [], grade } = req.body;
+
+    if (!careerCategoryScores && !quizScores) {
+        res.status(400);
+        throw new Error('Assessment data required (careerCategoryScores or quizScores)');
+    }
+
+    const catScores = careerCategoryScores || {};
+    const aptVec = quizScores || {};
+
+    // Normalize career-category scores to 0-1
+    const maxCatScore = Math.max(...Object.values(catScores).map(v => Number(v) || 0), 1);
+
+    const streamScores = {};
+
+    for (const [stream, catWeights] of Object.entries(STREAM_TO_CATEGORIES)) {
+        let score = 0;
+
+        // ═══ SIGNAL 1: Career-category alignment (50%) ═══
+        // How well do the student's quiz-derived career-category scores match this stream?
+        let catSignal = 0;
+        for (const [cat, weight] of Object.entries(catWeights)) {
+            const studentCatScore = (Number(catScores[cat]) || 0) / maxCatScore;
+            catSignal += studentCatScore * weight;
+        }
+        // Normalize by max possible (sum of weights)
+        const maxWeight = Object.values(catWeights).reduce((a, b) => a + b, 0);
+        score += (catSignal / (maxWeight || 1)) * 50;
+
+        // ═══ SIGNAL 2: Aptitude vector alignment (30%) ═══
+        const aptWeights = APTITUDE_STREAM_WEIGHTS[stream] || {};
+        let aptSignal = 0;
+        for (const [dim, weight] of Object.entries(aptWeights)) {
+            aptSignal += (Number(aptVec[dim]) || 0) * weight;
+        }
+        score += aptSignal * 30;
+
+        // ═══ SIGNAL 3: Interest alignment (20%) ═══
+        const boostedCategories = new Set();
+        interests.forEach(interest => {
+            const cats = INTEREST_CATEGORY_MAP[interest] || [];
+            cats.forEach(c => boostedCategories.add(c));
+        });
+        let interestMatches = 0;
+        for (const [cat, weight] of Object.entries(catWeights)) {
+            if (weight > 1 && boostedCategories.has(cat)) interestMatches++;
+        }
+        const highWeightCats = Object.values(catWeights).filter(w => w > 1).length;
+        score += (interestMatches / (highWeightCats || 1)) * 20;
+
+        streamScores[stream] = Math.min(100, Math.round(score));
+    }
+
+    // Sort by score and build reasoning
+    const sortedStreams = Object.entries(streamScores)
+        .sort(([, a], [, b]) => b - a)
+        .map(([stream, confidence]) => {
+            // Build human-readable reasoning
+            const reasons = [];
+            const catWeights = STREAM_TO_CATEGORIES[stream];
+            const topCats = Object.entries(catWeights)
+                .filter(([, w]) => w >= 2)
+                .map(([cat]) => cat);
+
+            // Check which of the stream's top categories match the student's strengths
+            const studentTopCats = Object.entries(catScores)
+                .sort(([, a], [, b]) => Number(b) - Number(a))
+                .slice(0, 3)
+                .map(([cat]) => cat);
+
+            const matchingCats = topCats.filter(c => studentTopCats.includes(c));
+            if (matchingCats.length > 0) {
+                reasons.push(`Strong alignment with ${matchingCats.join(', ')} career fields`);
+            }
+
+            // Check aptitude match
+            const aptWeights = APTITUDE_STREAM_WEIGHTS[stream] || {};
+            const topAptDim = Object.entries(aptWeights).sort(([, a], [, b]) => b - a)[0];
+            if (topAptDim && (Number(aptVec[topAptDim[0]]) || 0) > 0.5) {
+                reasons.push(`Your ${topAptDim[0]} aptitude score supports this choice`);
+            }
+
+            // Check interest match
+            const matchedInterests = interests.filter(i => {
+                const cats = INTEREST_CATEGORY_MAP[i] || [];
+                return cats.some(c => topCats.includes(c));
+            });
+            if (matchedInterests.length > 0) {
+                reasons.push(`Aligns with your interests: ${matchedInterests.slice(0, 3).join(', ')}`);
+            }
+
+            if (reasons.length === 0) {
+                reasons.push('Based on overall assessment profile');
+            }
+
+            return {
+                stream,
+                label: STREAM_LABELS[stream] || stream,
+                confidence,
+                reasoning: reasons.join('. ') + '.',
+                info: STREAM_INFO[stream] || null,
+            };
+        });
+
+    // For Class 10: return top 3 as explicit recommendations
+    // For Class 12: return all with compatibility note
+    const isClass10 = grade === '10';
+    const recommendations = isClass10 ? sortedStreams.slice(0, 3) : sortedStreams;
+
+    // If Class 12, add compatibility info
+    const currentStream = req.user?.profile?.stream;
+    let compatibility = null;
+    if (!isClass10 && currentStream) {
+        const currentStreamScore = streamScores[currentStream] || 0;
+        const bestStream = sortedStreams[0];
+        compatibility = {
+            currentStream,
+            currentScore: currentStreamScore,
+            bestStream: bestStream.stream,
+            bestScore: bestStream.confidence,
+            isOptimal: currentStream === bestStream.stream,
+            message: currentStream === bestStream.stream
+                ? `Great news! Your current stream (${currentStream}) is the best match for your aptitude profile.`
+                : `Your aptitude best matches ${bestStream.label}, but your current stream (${currentStream}) scored ${currentStreamScore}%. ${currentStreamScore > 40 ? "You can still excel in many careers with your current stream." : "Consider exploring careers that bridge both streams."}`,
+        };
+    }
+
+    res.json({
+        recommendations,
+        compatibility,
+        isClass10,
+    });
+});
+
+module.exports = { getRecommendations, getCareers, seedData, autoSeed, updateData, getStreamRecommendation };
