@@ -115,7 +115,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 // ═══════════════════════════════════════════════════════════════════════════════
 // STAGE 2 — Skills Self-Rating Grid
 // ═══════════════════════════════════════════════════════════════════════════════
-const SkillRating = ({ onComplete }: { onComplete: (ratings: Record<string, number>) => void }) => {
+const SkillRating = ({ onComplete, onBack }: { onComplete: (ratings: Record<string, number>) => void, onBack: () => void }) => {
     const [ratings, setRatings] = useState<Record<string, number>>({});
     const [submitting, setSubmitting] = useState(false);
 
@@ -134,8 +134,13 @@ const SkillRating = ({ onComplete }: { onComplete: (ratings: Record<string, numb
         <div className="max-w-3xl mx-auto">
             {/* Header */}
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
-                <div className="inline-block bg-gradient-to-r from-[#0A2540] to-[#00D4FF] text-white text-xs font-bold px-4 py-1.5 rounded-full mb-3 tracking-widest uppercase">
-                    Stage 2 of 2 — Skills Rating
+                <div className="flex items-center justify-center gap-3 mb-3">
+                    <button onClick={onBack} className="text-gray-400 hover:text-[#0A2540] text-sm font-bold flex items-center gap-1">
+                        ← Back
+                    </button>
+                    <div className="inline-block bg-gradient-to-r from-[#0A2540] to-[#00D4FF] text-white text-xs font-bold px-4 py-1.5 rounded-full tracking-widest uppercase">
+                        Stage 2 of 2 — Skills Rating
+                    </div>
                 </div>
                 <h2 className="text-2xl font-extrabold text-[#0A2540] leading-snug">
                     Rate your current skill level
@@ -221,6 +226,8 @@ const Quiz = ({ onComplete }: { onComplete: (scores: any) => void }) => {
     const [scenarioScores, setScenarioScores] = useState<Record<string, number>>({});
     // ── NEW: Accumulated career-category weights from scenario answers ──
     const [careerCategoryScores, setCareerCategoryScores] = useState<Record<string, number>>({});
+    // ── NEW: History stack for "Back" button functionality ──
+    const [history, setHistory] = useState<any[]>([]);
 
     useEffect(() => {
         API.get('/aptitude')
@@ -232,7 +239,23 @@ const Quiz = ({ onComplete }: { onComplete: (scores: any) => void }) => {
             .finally(() => setLoading(false));
     }, []);
 
+    const handleBack = () => {
+        if (history.length === 0) return;
+        const lastState = history[history.length - 1];
+        setScores(lastState.scores);
+        setCareerCategoryScores(lastState.careerCategoryScores);
+        setCurrentStep(lastState.currentStep);
+        setHistory(prev => prev.slice(0, -1));
+    };
+
     const handleAnswer = (score: number, category: string, option: any) => {
+        // Save current state to history before updating
+        setHistory(prev => [...prev, {
+            currentStep,
+            scores,
+            careerCategoryScores,
+        }]);
+
         const updatedScores = {
             ...scores,
             [category]: [...(scores[category] || []), score],
@@ -316,7 +339,7 @@ const Quiz = ({ onComplete }: { onComplete: (scores: any) => void }) => {
     }
 
     if (stage === 'skills') {
-        return <SkillRating onComplete={handleSkillsComplete} />;
+        return <SkillRating onComplete={handleSkillsComplete} onBack={() => setStage('scenarios')} />;
     }
 
     const question = questions[currentStep];
@@ -326,7 +349,15 @@ const Quiz = ({ onComplete }: { onComplete: (scores: any) => void }) => {
     return (
         <div className="max-w-2xl mx-auto">
             {/* Stage badge */}
-            <div className="text-center mb-4">
+            <div className="flex items-center justify-center gap-4 mb-4">
+                {currentStep > 0 && (
+                    <button
+                        onClick={handleBack}
+                        className="text-gray-400 hover:text-[#0A2540] text-sm font-bold flex items-center gap-1 transition-colors"
+                    >
+                        ← Back
+                    </button>
+                )}
                 <span className="inline-block bg-gradient-to-r from-[#0A2540] to-[#00D4FF] text-white text-xs font-bold px-4 py-1.5 rounded-full tracking-widest uppercase">
                     Stage 1 of 2 — Scenarios
                 </span>

@@ -18,6 +18,9 @@ const ResourceSchema = new mongoose.Schema({
     language: { type: String, default: 'English' },
 });
 
-ResourceSchema.index({ type: 1, stream: 1, careerCategory: 1 });
+// Separate indexes — MongoDB doesn't allow compound indexes on two array fields
+ResourceSchema.index({ type: 1 });
+ResourceSchema.index({ stream: 1 });
+ResourceSchema.index({ careerCategory: 1 });
 
 module.exports = mongoose.model('Resource', ResourceSchema);

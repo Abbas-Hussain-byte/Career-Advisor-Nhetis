@@ -1,2202 +1,327 @@
 [
     {
         "id": 1,
-        "question": "Your school is organising a science fair. Which role excites you most?",
-        "category": "technical",
+        "question": "Your school is organising a major event. Which role excites you most?",
+        "category": "leadership",
         "type": "scenario",
         "options": [
-            {
-                "text": "Build and program a working robot or device",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 2,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Conduct a biology or chemistry experiment",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 3,
-                    "Agriculture": 2,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Design the booth layout and visual displays",
-                "score": 0.3,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 2,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Present and explain our project to judges",
-                "score": 0.1,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 2,
-                    "Education": 2,
-                    "Law": 2
-                }
-            },
-            {
-                "text": "Coordinate the whole team and logistics",
-                "score": 0.2,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 3,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 0
-                }
-            }
+            { "text": "Set the overall vision and manage the team", "score": 1, "careerWeights": { "Business": 3, "Education": 1, "Law": 1 } },
+            { "text": "Handle the budget and registrations meticulously", "score": 0.8, "careerWeights": { "Commerce": 3, "Business": 1 } },
+            { "text": "Communicate with guests and handle conflict resolution", "score": 0.9, "careerWeights": { "Law": 2, "Media": 2, "Education": 2 } },
+            { "text": "Design the technical setup (sound, lights, stage)", "score": 0.7, "careerWeights": { "Engineering": 3, "Technology": 2 } },
+            { "text": "Create the visual theme and marketing materials", "score": 0.6, "careerWeights": { "Arts & Design": 3, "Media": 2 } }
         ]
     },
     {
         "id": 2,
-        "question": "You need to earn money during summer. Which option appeals to you most?",
-        "category": "social",
+        "question": "You see a news report about a new government policy. You naturally:",
+        "category": "logic",
         "type": "scenario",
         "options": [
-            {
-                "text": "Teach younger students maths or science",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 3,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Build an app or website for a local shop",
-                "score": 0.1,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 1,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Freelance graphic design or art commissions",
-                "score": 0.2,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 2,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Sell handmade crafts or run a small business",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 2,
-                    "Business": 3,
-                    "Arts & Design": 1,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Help at a clinic or hospital as a volunteer",
-                "score": 0.9,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 3,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 0
-                }
-            }
+            { "text": "Analyse how it will impact different social groups", "score": 1, "careerWeights": { "Law": 3, "Education": 2, "Media": 2 } },
+            { "text": "Think about the logistical challenges of implementing it", "score": 0.8, "careerWeights": { "Engineering": 2, "Business": 2, "Law": 1 } },
+            { "text": "Calculate the economic and tax implications", "score": 0.9, "careerWeights": { "Commerce": 3, "Business": 2 } },
+            { "text": "Wonder about the scientific research behind the policy", "score": 0.7, "careerWeights": { "Medical": 3, "Agriculture": 2 } },
+            { "text": "Consider how to communicate it to the public clearly", "score": 0.6, "careerWeights": { "Media": 3, "Education": 2 } }
         ]
     },
     {
         "id": 3,
-        "question": "You discover a bug in your friend's code that crashes their app. You:",
+        "question": "When solving a difficult puzzle or mystery, you usually:",
         "category": "technical",
         "type": "scenario",
         "options": [
-            {
-                "text": "Dive in immediately and debug it line by line",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Google the error and suggest fixes",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Help them think through the logic verbally",
-                "score": 0.4,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 2,
-                    "Law": 1
-                }
-            },
-            {
-                "text": "Suggest they ask a more technical friend",
-                "score": 0.1,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 1,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Tell them to restart and rewrite the problematic section",
-                "score": 0.2,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "Break it into logical parts and solve step-by-step", "score": 1, "careerWeights": { "Technology": 3, "Engineering": 3, "Commerce": 2 } },
+            { "text": "Look for patterns and overall design connections", "score": 0.8, "careerWeights": { "Arts & Design": 2, "Technology": 2, "Medical": 1 } },
+            { "text": "Discuss it with others to get different perspectives", "score": 0.5, "careerWeights": { "Business": 2, "Education": 3, "Media": 1 } },
+            { "text": "Read all the rules and background info first", "score": 0.9, "careerWeights": { "Law": 3, "Commerce": 2, "Education": 1 } },
+            { "text": "Try a creative or outside-the-box approach", "score": 0.7, "careerWeights": { "Arts & Design": 3, "Media": 2 } }
         ]
     },
     {
         "id": 4,
-        "question": "You're given free time to create anything you want. You choose to:",
-        "category": "creativity",
+        "question": "You are at a hospital. Which of these areas interests you most?",
+        "category": "technical",
         "type": "scenario",
         "options": [
-            {
-                "text": "Write a short story, poem or song",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 2,
-                    "Media": 3,
-                    "Education": 1,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Design a logo or digital artwork",
-                "score": 0.9,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 1,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Build a small game or app prototype",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 1,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Sketch architectural plans for a building idea",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 3,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 2,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Analyse data from a topic I'm curious about",
-                "score": 0.2,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 1,
-                    "Commerce": 2,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "How doctors diagnose diseases from symptoms", "score": 1, "careerWeights": { "Medical": 3, "Technology": 1 } },
+            { "text": "The complex machinery and medical equipment used", "score": 0.8, "careerWeights": { "Engineering": 3, "Medical": 1 } },
+            { "text": "The administration and management of the facility", "score": 0.7, "careerWeights": { "Business": 3, "Commerce": 1 } },
+            { "text": "How patients are cared for and counselled", "score": 0.9, "careerWeights": { "Education": 3, "Medical": 2 } },
+            { "text": "The ethical and legal rules governing treatments", "score": 0.6, "careerWeights": { "Law": 3, "Education": 1 } }
         ]
     },
     {
         "id": 5,
-        "question": "A friend is going through a tough time emotionally. You naturally:",
-        "category": "social",
+        "question": "A community garden is struggling to grow. You would want to help by:",
+        "category": "technical",
         "type": "scenario",
         "options": [
-            {
-                "text": "Listen patiently and offer support without judgment",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 2,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 3,
-                    "Law": 1
-                }
-            },
-            {
-                "text": "Give them practical advice on what to do",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 1,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 2
-                }
-            },
-            {
-                "text": "Connect them with someone better suited to help",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 1,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 2,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Distract them with fun activities",
-                "score": 0.4,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 1,
-                    "Media": 2,
-                    "Education": 1,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Feel unsure — I prefer logical problems to emotional ones",
-                "score": 0.0,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 2,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "Testing the soil and identifying plant diseases", "score": 1, "careerWeights": { "Agriculture": 3, "Medical": 1 } },
+            { "text": "Designing an automated irrigation system", "score": 0.9, "careerWeights": { "Engineering": 3, "Technology": 2, "Agriculture": 1 } },
+            { "text": "Organising a local market to sell the produce", "score": 0.8, "careerWeights": { "Business": 3, "Commerce": 2 } },
+            { "text": "Teaching children how nature works through the garden", "score": 0.7, "careerWeights": { "Education": 3, "Media": 1 } },
+            { "text": "Lobbying the city for more land and protection", "score": 0.6, "careerWeights": { "Law": 3, "Media": 1 } }
         ]
     },
     {
         "id": 6,
-        "question": "You're researching a topic for an essay. Which approach do you enjoy?",
+        "question": "When you see an error in a financial report, you naturally:",
         "category": "logic",
         "type": "scenario",
         "options": [
-            {
-                "text": "Dig into data, statistics, and research papers",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 1,
-                    "Medical": 1,
-                    "Agriculture": 1,
-                    "Commerce": 2,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 1
-                }
-            },
-            {
-                "text": "Watch documentaries and build a visual understanding",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 2,
-                    "Media": 3,
-                    "Education": 1,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Interview people who have direct experience",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 1,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 3,
-                    "Education": 1,
-                    "Law": 2
-                }
-            },
-            {
-                "text": "Find creative angles that others haven't explored",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 2,
-                    "Arts & Design": 2,
-                    "Media": 1,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Look for the quickest reliable summary I can find",
-                "score": 0.2,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "Audit the entire sheet to find the source of the leak", "score": 1, "careerWeights": { "Commerce": 3, "Business": 1 } },
+            { "text": "Worry about the legal and compliance risks", "score": 0.9, "careerWeights": { "Law": 3, "Commerce": 1 } },
+            { "text": "Think about how to automate the check in the future", "score": 0.8, "careerWeights": { "Technology": 3, "Engineering": 1 } },
+            { "text": "Analyse how it affects the team's morale and budget", "score": 0.7, "careerWeights": { "Business": 2, "Education": 2 } },
+            { "text": "Look for a creative way to present the fix to stakeholders", "score": 0.6, "careerWeights": { "Media": 2, "Business": 1 } }
         ]
     },
     {
         "id": 7,
-        "question": "If you could spend a year mastering one skill, it would be:",
-        "category": "technical",
+        "question": "While working in a team project, if a conflict arises, you usually:",
+        "category": "social",
         "type": "scenario",
         "options": [
-            {
-                "text": "Machine learning and AI programming",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Surgery and advanced medical procedures",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 3,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Oil painting or digital illustration",
-                "score": 0.3,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 1,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Public speaking and debate",
-                "score": 0.2,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 2,
-                    "Education": 1,
-                    "Law": 3
-                }
-            },
-            {
-                "text": "Structural engineering and bridge design",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 3,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "Step in as a mediator to hear both sides logically", "score": 1, "careerWeights": { "Law": 3, "Business": 2, "Education": 2 } },
+            { "text": "Focus on the tasks to keep the project moving", "score": 0.7, "careerWeights": { "Engineering": 2, "Technology": 2, "Business": 1 } },
+            { "text": "Check if any company/team rules were broken", "score": 0.8, "careerWeights": { "Law": 2, "Commerce": 2 } },
+            { "text": "Encourage people to share their feelings and bond", "score": 0.9, "careerWeights": { "Education": 3, "Medical": 1, "Media": 1 } },
+            { "text": "Propose an entirely new way of working to avoid it", "score": 0.6, "careerWeights": { "Arts & Design": 2, "Media": 2 } }
         ]
     },
     {
         "id": 8,
-        "question": "In a group project, which role do you naturally fall into?",
-        "category": "leadership",
+        "question": "Which of these topics would you read about for fun?",
+        "category": "logic",
         "type": "scenario",
         "options": [
-            {
-                "text": "The leader who sets the direction and delegates",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 3,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 1
-                }
-            },
-            {
-                "text": "The researcher who gathers all the data",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 1,
-                    "Medical": 1,
-                    "Agriculture": 1,
-                    "Commerce": 1,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 1,
-                    "Education": 1,
-                    "Law": 1
-                }
-            },
-            {
-                "text": "The creative who designs and presents ideas",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 3,
-                    "Media": 2,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "The problem-solver who fixes things when they go wrong",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 2,
-                    "Medical": 1,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "The mediator who keeps everyone working together",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 1,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 2,
-                    "Law": 2
-                }
-            }
+            { "text": "How court cases and constitutional laws are shaped", "score": 1, "careerWeights": { "Law": 3, "Education": 1 } },
+            { "text": "Advancements in gene therapy and medical research", "score": 1, "careerWeights": { "Medical": 3, "Technology": 1 } },
+            { "text": "The stock market, crypto, and global economics", "score": 1, "careerWeights": { "Commerce": 3, "Business": 2 } },
+            { "text": "Design trends, UX/UI, or architecture", "score": 1, "careerWeights": { "Arts & Design": 3, "Engineering": 1 } },
+            { "text": "The psychology of human behaviour and education", "score": 1, "careerWeights": { "Education": 3, "Media": 2 } }
         ]
     },
     {
         "id": 9,
-        "question": "You can shadow a professional for a day. Which would you pick?",
-        "category": "technical",
+        "question": "If you had to run a department for a day, you'd choose:",
+        "category": "leadership",
         "type": "scenario",
         "options": [
-            {
-                "text": "A software engineer at a tech startup",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "A surgeon performing operations",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 3,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "A newspaper journalist covering breaking news",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 3,
-                    "Education": 0,
-                    "Law": 1
-                }
-            },
-            {
-                "text": "A civil engineer supervising a bridge construction",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 3,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "A judge hearing a court case",
-                "score": 0.3,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 3
-                }
-            }
+            { "text": "Public Policy & Administration (UPSC Style)", "score": 1, "careerWeights": { "Law": 3, "Education": 2, "Business": 1 } },
+            { "text": "Finance & Treasury (CA/Accountant Style)", "score": 1, "careerWeights": { "Commerce": 3, "Business": 1 } },
+            { "text": "Human Resources & Talent (MBA Style)", "score": 1, "careerWeights": { "Business": 3, "Education": 2, "Law": 1 } },
+            { "text": "Innovation & R&D (Engineering Style)", "score": 1, "careerWeights": { "Engineering": 3, "Technology": 2 } },
+            { "text": "Marketing & Public Relations (Media Style)", "score": 1, "careerWeights": { "Media": 3, "Arts & Design": 2 } }
         ]
     },
     {
         "id": 10,
-        "question": "Which of these problems would you most want to solve?",
+        "question": "A small business is failing to attract customers. You suggest:",
         "category": "logic",
         "type": "scenario",
         "options": [
-            {
-                "text": "Climate change using better energy technology",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 3,
-                    "Medical": 0,
-                    "Agriculture": 1,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Cancer — find a cure through medical research",
-                "score": 0.9,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 3,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Poverty — improve economic opportunities in villages",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 2,
-                    "Commerce": 1,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 2,
-                    "Law": 1
-                }
-            },
-            {
-                "text": "Misinformation — make news more accurate and trustworthy",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 3,
-                    "Education": 1,
-                    "Law": 2
-                }
-            },
-            {
-                "text": "Mental health — make therapy accessible to students",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 2,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 3,
-                    "Law": 0
-                }
-            }
+            { "text": "Analysing their cash flow and reducing expenses (CA)", "score": 0.9, "careerWeights": { "Commerce": 3, "Business": 1 } },
+            { "text": "Rebranding and creating a viral social campaign (Media)", "score": 0.8, "careerWeights": { "Media": 3, "Arts & Design": 2 } },
+            { "text": "Training the staff better and fixing culture (MBA-HR)", "score": 1, "careerWeights": { "Business": 3, "Education": 2 } },
+            { "text": "Developing a more efficient delivery app (Tech)", "score": 0.7, "careerWeights": { "Technology": 3, "Engineering": 1 } },
+            { "text": "Checking if they are complying with trade laws", "score": 0.6, "careerWeights": { "Law": 3, "Commerce": 1 } }
         ]
     },
     {
         "id": 11,
-        "question": "You receive a complex maths problem. Your first reaction is:",
+        "question": "Which of these statements resonates with you most?",
         "category": "logic",
         "type": "scenario",
         "options": [
-            {
-                "text": "Excited — I love a good mental challenge",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 2,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 2,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Calm — I'll work through it step by step",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 2,
-                    "Medical": 1,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 1
-                }
-            },
-            {
-                "text": "Neutral — depends on the type of problem",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Slightly uneasy — I prefer words over numbers",
-                "score": 0.2,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 1,
-                    "Media": 2,
-                    "Education": 1,
-                    "Law": 2
-                }
-            },
-            {
-                "text": "Frustrated — maths is not my strength",
-                "score": 0.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 1,
-                    "Media": 1,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "I want to ensure justice and equality for all", "score": 1, "careerWeights": { "Law": 3, "Education": 2 } },
+            { "text": "I want to help people live longer, healthier lives", "score": 1, "careerWeights": { "Medical": 3, "Agriculture": 1 } },
+            { "text": "I want to build efficient systems that solve problems", "score": 1, "careerWeights": { "Engineering": 3, "Technology": 2 } },
+            { "text": "I want to create sustainable wealth and businesses", "score": 1, "careerWeights": { "Commerce": 2, "Business": 3 } },
+            { "text": "I want to inspire people through art and stories", "score": 1, "careerWeights": { "Arts & Design": 2, "Media": 3, "Education": 2 } }
         ]
     },
     {
         "id": 12,
-        "question": "A startup offers you an internship. Which role is most interesting?",
-        "category": "creativity",
+        "question": "Your friend is wrongly accused of breaking a rule. You:",
+        "category": "social",
         "type": "scenario",
         "options": [
-            {
-                "text": "UI/UX Designer — make the product look and feel great",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 1,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Backend Developer — build the server and database logic",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Growth Marketer — grow the user base through campaigns",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 3,
-                    "Arts & Design": 0,
-                    "Media": 2,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Data Analyst — find what the data says about users",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 2,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Operations — keep the business running smoothly",
-                "score": 0.4,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "Gather evidence and build a strong logical defense", "score": 1, "careerWeights": { "Law": 3, "Media": 1, "Education": 1 } },
+            { "text": "Focus on making sure they feel supported emotionally", "score": 0.9, "careerWeights": { "Education": 3, "Medical": 2 } },
+            { "text": "Try to identify who actually broke the rule logically", "score": 0.8, "careerWeights": { "Technology": 2, "Law": 1 } },
+            { "text": "Analyse if the rule itself is fair and reasonable", "score": 0.7, "careerWeights": { "Law": 3, "Education": 2 } },
+            { "text": "Design a campaign to raise awareness for them", "score": 0.6, "careerWeights": { "Media": 3, "Arts & Design": 2 } }
         ]
     },
     {
         "id": 13,
-        "question": "A patient at a hospital is scared before surgery. If you were the doctor, you would:",
+        "question": "If you were to volunteer at an NGO, what work would you do?",
         "category": "social",
         "type": "scenario",
         "options": [
-            {
-                "text": "Take time to explain everything clearly and calm them down",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 3,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 2,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Focus on the procedure — emotions can wait",
-                "score": 0.1,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 2,
-                    "Medical": 1,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Ask a counsellor or nurse to speak with them",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 2,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Give them a brief reassurance and move on",
-                "score": 0.4,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 1,
-                    "Medical": 1,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Medicine is technical — I wouldn't be a doctor",
-                "score": 0.0,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 0,
-                    "Arts & Design": 1,
-                    "Media": 1,
-                    "Education": 0,
-                    "Law": 1
-                }
-            }
+            { "text": "Legal aid for those who can't afford it", "score": 1, "careerWeights": { "Law": 3, "Education": 1 } },
+            { "text": "Setting up health camps and medical supplies", "score": 1, "careerWeights": { "Medical": 3, "Business": 1 } },
+            { "text": "Teaching kids essential subjects and life skills", "score": 1, "careerWeights": { "Education": 3, "Media": 1 } },
+            { "text": "Auditing their books to ensure zero fraud", "score": 1, "careerWeights": { "Commerce": 3, "Business": 1 } },
+            { "text": "Optimising their tech systems for donations", "score": 1, "careerWeights": { "Technology": 3, "Engineering": 1 } }
         ]
     },
     {
         "id": 14,
-        "question": "You have to give a 5-minute presentation. How do you prepare?",
-        "category": "creativity",
+        "question": "A village has no clean water. Your priority is to:",
+        "category": "logic",
         "type": "scenario",
         "options": [
-            {
-                "text": "Design beautiful slides with infographics and visuals",
-                "score": 0.9,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 1,
-                    "Education": 1,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Write a detailed script and rehearse it many times",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 2,
-                    "Education": 2,
-                    "Law": 1
-                }
-            },
-            {
-                "text": "Gather compelling data and structure my argument logically",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 2,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 2
-                }
-            },
-            {
-                "text": "Tell a personal story that connects with the audience",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 3,
-                    "Education": 2,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Keep it minimal and speak freely from memory",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 1
-                }
-            }
+            { "text": "Engineer a sustainable filtration and pump system", "score": 1, "careerWeights": { "Engineering": 3, "Agriculture": 2, "Technology": 1 } },
+            { "text": "Work with local govt to enforce water rights laws", "score": 0.9, "careerWeights": { "Law": 3, "Education": 2 } },
+            { "text": "Raise funds and manage the budget for the project", "score": 0.8, "careerWeights": { "Commerce": 2, "Business": 3 } },
+            { "text": "Study the impact of dirty water on health (Epidemiology)", "score": 1, "careerWeights": { "Medical": 3, "Education": 1 } },
+            { "text": "Create educational content on sanitation habits", "score": 0.7, "careerWeights": { "Education": 3, "Media": 2 } }
         ]
     },
     {
         "id": 15,
-        "question": "Which subject do you spend extra time studying even when not required?",
-        "category": "logic",
+        "question": "You take a personality test and score high on 'Empathy'. This connects most to:",
+        "category": "social",
         "type": "scenario",
         "options": [
-            {
-                "text": "Physics or Mathematics",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 3,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Biology or Chemistry",
-                "score": 0.9,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 3,
-                    "Agriculture": 2,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "History or Political Science",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 1,
-                    "Education": 2,
-                    "Law": 3
-                }
-            },
-            {
-                "text": "Drawing, Music or Literature",
-                "score": 0.3,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 2,
-                    "Education": 1,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Economics or Business Studies",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 3,
-                    "Business": 3,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "Counselling patients or surgery with care", "score": 1, "careerWeights": { "Medical": 3, "Education": 1 } },
+            { "text": "Mentoring a team and managing culture (HR)", "score": 1, "careerWeights": { "Business": 3, "Education": 2, "Law": 1 } },
+            { "text": "Teaching and helping students find their way", "score": 1, "careerWeights": { "Education": 3, "Media": 2 } },
+            { "text": "Connecting users to better visual experiences (UX)", "score": 0.5, "careerWeights": { "Arts & Design": 3, "Technology": 2 } },
+            { "text": "Reporting stories of human interest fairly", "score": 0.7, "careerWeights": { "Media": 3, "Law": 1 } }
         ]
     },
     {
         "id": 16,
-        "question": "Which part of building a mobile app would you most enjoy?",
-        "category": "technical",
+        "question": "If provided with a complex data set, you'd most enjoy:",
+        "category": "logic",
         "type": "scenario",
         "options": [
-            {
-                "text": "Writing clean, efficient code for the backend",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Designing smooth, beautiful user interfaces",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Writing compelling product descriptions and marketing copy",
-                "score": 0.3,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 3,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Testing the app and finding bugs",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Pitching it to investors and building a business plan",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 2,
-                    "Business": 3,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "Finding financial trends and tax leaks", "score": 1, "careerWeights": { "Commerce": 3, "Business": 1 } },
+            { "text": "Using it to build a predictive software model", "score": 1, "careerWeights": { "Technology": 3, "Engineering": 1 } },
+            { "text": "Visualising it into a beautiful infographic", "score": 0.8, "careerWeights": { "Arts & Design": 3, "Media": 2 } },
+            { "text": "Making a strong evidence-based argument for a policy", "score": 0.9, "careerWeights": { "Law": 3, "Education": 2 } },
+            { "text": "Analysing it for medical research and patterns", "score": 1, "careerWeights": { "Medical": 3, "Education": 1 } }
         ]
     },
     {
         "id": 17,
-        "question": "You are watching the news. Which story captures your attention the most?",
+        "question": "You see someone being treated unfairly by a company. You'd likely:",
         "category": "social",
         "type": "scenario",
         "options": [
-            {
-                "text": "A breakthrough in cancer treatment",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 3,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "A new AI tool changing the software industry",
-                "score": 0.9,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "A conflict requiring diplomatic negotiations",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 1,
-                    "Education": 1,
-                    "Law": 3
-                }
-            },
-            {
-                "text": "A new architecture award for a stunning building",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 3,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 2,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "A student who started a social enterprise to help farmers",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 2,
-                    "Commerce": 0,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 2,
-                    "Law": 0
-                }
-            }
+            { "text": "Write a strong letter citing their legal rights", "score": 1, "careerWeights": { "Law": 3, "Education": 1 } },
+            { "text": "Blog or report about it to get public support", "score": 0.9, "careerWeights": { "Media": 3, "Arts & Design": 1 } },
+            { "text": "Try to negotiate a fair business compromise", "score": 0.8, "careerWeights": { "Business": 3, "Commerce": 2 } },
+            { "text": "Help the victim find better resources/education", "score": 0.7, "careerWeights": { "Education": 3, "Medical": 1 } },
+            { "text": "Find a way to hack the system for a fix (JK, logical fix!)", "score": 0.5, "careerWeights": { "Technology": 2, "Engineering": 1 } }
         ]
     },
     {
         "id": 18,
-        "question": "Your ideal work environment in 10 years is:",
+        "question": "In a high-pressure situation, your greatest strength is:",
         "category": "leadership",
         "type": "scenario",
         "options": [
-            {
-                "text": "A tech company solving hard engineering problems",
-                "score": 0.9,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 2,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "A hospital or research lab saving lives",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 3,
-                    "Agriculture": 1,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "My own business where I make the decisions",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 3,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "A creative agency or studio making art and media",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 2,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "A government or policy role shaping society",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 2,
-                    "Law": 3
-                }
-            }
+            { "text": "Staying calm and giving clear, logical orders", "score": 1, "careerWeights": { "Business": 3, "Law": 2, "Education": 1 } },
+            { "text": "Working tirelessly and fixing technical bugs", "score": 0.8, "careerWeights": { "Engineering": 3, "Technology": 3 } },
+            { "text": "Being very precise with data and numbers", "score": 0.9, "careerWeights": { "Commerce": 3, "Business": 1 } },
+            { "text": "Ensuring everyone stays safe and healthy", "score": 1, "careerWeights": { "Medical": 3, "Education": 2 } },
+            { "text": "Keeping communication clear under fire", "score": 0.7, "careerWeights": { "Media": 3, "Law": 2 } }
         ]
     },
     {
         "id": 19,
-        "question": "If you had ₹10 lakhs to invest, you would most likely:",
-        "category": "logic",
+        "question": "If you had to invent one thing, it would be:",
+        "category": "creativity",
         "type": "scenario",
         "options": [
-            {
-                "text": "Analyse the stock market and invest in diversified funds",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 3,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Start a small business or product idea",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 3,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Fund a friend's startup that I believe in",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Buy land or real estate",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 1,
-                    "Commerce": 2,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Donate a portion and keep rest in a fixed deposit",
-                "score": 0.3,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 2,
-                    "Law": 0
-                }
-            }
+            { "text": "A cure for a major disease", "score": 1, "careerWeights": { "Medical": 3, "Agriculture": 1 } },
+            { "text": "An efficient zero-emission engine", "score": 1, "careerWeights": { "Engineering": 3, "Technology": 1 } },
+            { "text": "A system for universal free legal aid", "score": 1, "careerWeights": { "Law": 3, "Education": 2 } },
+            { "text": "An ultra-realistic virtual reality interface", "score": 1, "careerWeights": { "Technology": 3, "Arts & Design": 2 } },
+            { "text": "A revolutionary new banking and fund system", "score": 1, "careerWeights": { "Commerce": 3, "Business": 2 } }
         ]
     },
     {
         "id": 20,
-        "question": "As a child, what did you love to do most?",
-        "category": "creativity",
+        "question": "Which of these classes would you enjoy teaching?",
+        "category": "social",
         "type": "scenario",
         "options": [
-            {
-                "text": "Take apart gadgets and put them back together",
-                "score": 0.9,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 3,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Draw, paint, or make crafts",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 1,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Read books about history, science or stories",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 1,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 1,
-                    "Education": 2,
-                    "Law": 2
-                }
-            },
-            {
-                "text": "Play sports or organise games with friends",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 2,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Ask endless questions about how everything works",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 1,
-                    "Medical": 1,
-                    "Agriculture": 1,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 0
-                }
-            }
+            { "text": "Human Anatomy & World Health", "score": 1, "careerWeights": { "Medical": 3, "Education": 2 } },
+            { "text": "Civics, Constitution & Legal Rights", "score": 1, "careerWeights": { "Law": 3, "Education": 2, "Media": 1 } },
+            { "text": "Computer Science & Programming", "score": 1, "careerWeights": { "Technology": 3, "Engineering": 1, "Education": 2 } },
+            { "text": "Economics, Taxation & Busiess Studies", "score": 1, "careerWeights": { "Commerce": 3, "Business": 2, "Education": 2 } },
+            { "text": "Literature, Art & Film Studies", "score": 1, "careerWeights": { "Arts & Design": 3, "Media": 3, "Education": 2 } }
         ]
     },
     {
         "id": 21,
-        "question": "Which challenge would you be most proud to solve professionally?",
-        "category": "technical",
+        "question": "A global crisis starts. You think the best solution is for:",
+        "category": "logic",
         "type": "scenario",
         "options": [
-            {
-                "text": "Design a satellite that improves internet access in rural India",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 2,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Develop a vaccine for a new infectious disease",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 3,
-                    "Agriculture": 1,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Write a novel that becomes a bestseller",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 1,
-                    "Media": 3,
-                    "Education": 1,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Build roads and infrastructure for a new city",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 3,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Win a court case that sets an important legal precedent",
-                "score": 0.4,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 3
-                }
-            }
+            { "text": "Govt to draft strict laws and unified policies (UPSC)", "score": 1, "careerWeights": { "Law": 3, "Education": 2, "Business": 1 } },
+            { "text": "Scientists to find a rapid medical or tech solution", "score": 1, "careerWeights": { "Medical": 3, "Engineering": 2, "Technology": 2 } },
+            { "text": "Global business to fund and manage resources efficiently", "score": 0.9, "careerWeights": { "Business": 3, "Commerce": 2 } },
+            { "text": "The public to be educated better about the risks", "score": 0.8, "careerWeights": { "Education": 3, "Media": 2 } },
+            { "text": "Artists to inspire hope and change human mindset", "score": 0.7, "careerWeights": { "Arts & Design": 2, "Media": 3, "Education": 1 } }
         ]
     },
     {
         "id": 22,
-        "question": "You have to choose a college specialisation. What pulls you most?",
+        "question": "Your natural way to handle a big budget is to:",
         "category": "logic",
         "type": "scenario",
         "options": [
-            {
-                "text": "Computer Science — software, AI, and data systems",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "MBBS — medicine and patient care",
-                "score": 0.9,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 3,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Architecture — designing buildings and spaces",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 2,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Law — understanding rights, justice and policy",
-                "score": 0.5,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 3
-                }
-            },
-            {
-                "text": "Economics — understanding markets and human behaviour",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 3,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "Track every rupee and optimise for taxes (CA)", "score": 1, "careerWeights": { "Commerce": 3, "Business": 1 } },
+            { "text": "Invest it in high-growth companies or ventures", "score": 0.9, "careerWeights": { "Business": 3, "Commerce": 2 } },
+            { "text": "Ensure it is distributed fairly to all social causes", "score": 1, "careerWeights": { "Law": 2, "Education": 3 } },
+            { "text": "Spend it on the latest R&D and tech infrastructure", "score": 0.8, "careerWeights": { "Technology": 2, "Engineering": 3 } },
+            { "text": "Use it to build an award-winning brand presence", "score": 0.7, "careerWeights": { "Media": 3, "Arts & Design": 2 } }
         ]
     },
     {
         "id": 23,
-        "question": "You find a mistake in a company's published financial report. You:",
-        "category": "logic",
+        "question": "When taking notes, you naturally prefer:",
+        "category": "creativity",
         "type": "scenario",
         "options": [
-            {
-                "text": "Verify it thoroughly with multiple sources before acting",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 0,
-                    "Medical": 1,
-                    "Agriculture": 0,
-                    "Commerce": 2,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 2
-                }
-            },
-            {
-                "text": "Report it to a senior or authority right away",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 1,
-                    "Law": 2
-                }
-            },
-            {
-                "text": "Calculate the impact it would have on investors",
-                "score": 0.9,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 3,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 1
-                }
-            },
-            {
-                "text": "Post about it on social media to get attention",
-                "score": 0.3,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 3,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Assume someone else will catch it and move on",
-                "score": 0.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "Logical flowcharts and bullet points", "score": 1, "careerWeights": { "Engineering": 2, "Technology": 3, "Law": 2 } },
+            { "text": "Detailed tables with figures and symbols", "score": 1, "careerWeights": { "Commerce": 3, "Business": 1 } },
+            { "text": "Sketches, diagrams, and artistic doodles", "score": 1, "careerWeights": { "Arts & Design": 3, "Engineering": 2 } },
+            { "text": "Written stories and long-form journals", "score": 1, "careerWeights": { "Education": 3, "Media": 3 } },
+            { "text": "Voice notes and speaking about the ideas", "score": 1, "careerWeights": { "Law": 1, "Media": 2, "Business": 2 } }
         ]
     },
     {
         "id": 24,
-        "question": "You are assigned to lead a new team project at work. Your first step is:",
-        "category": "leadership",
+        "question": "You see a sick animal on the road. You:",
+        "category": "social",
         "type": "scenario",
         "options": [
-            {
-                "text": "Call a meeting to understand everyone's strengths and set clear goals",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 3,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 2,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Draw up a detailed project plan and timeline",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 2,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 1,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Start working immediately and figure out the team later",
-                "score": 0.4,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 1,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 1,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Look at the budget and resources first",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 3,
-                    "Business": 2,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Ask what the previous team tried and why it didn't work",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 1,
-                    "Engineering": 1,
-                    "Medical": 1,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 1,
-                    "Education": 1,
-                    "Law": 1
-                }
-            }
+            { "text": "Bring them to a vet and learn about their recovery", "score": 1, "careerWeights": { "Medical": 3, "Agriculture": 2, "Education": 1 } },
+            { "text": "Report it to a govt animal welfare dept (UPSC)", "score": 0.9, "careerWeights": { "Law": 3, "Education": 2 } },
+            { "text": "Research the scientific cause of their illness", "score": 0.8, "careerWeights": { "Medical": 3, "Technology": 1 } },
+            { "text": "Organise a donation drive for local shelters", "score": 0.8, "careerWeights": { "Commerce": 2, "Business": 3 } },
+            { "text": "Write a moving story or campaign for them", "score": 0.7, "careerWeights": { "Media": 3, "Arts & Design": 2 } }
         ]
     },
     {
         "id": 25,
-        "question": "You're most satisfied when you finish a day of work where you:",
-        "category": "social",
+        "question": "If you could change one thing about the world, it would be:",
+        "category": "logic",
         "type": "scenario",
         "options": [
-            {
-                "text": "Helped someone solve a personal or emotional problem",
-                "score": 1.0,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 2,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 3,
-                    "Law": 1
-                }
-            },
-            {
-                "text": "Built or coded something that actually works",
-                "score": 0.9,
-                "careerWeights": {
-                    "Technology": 3,
-                    "Engineering": 2,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Made a creative piece that people reacted to strongly",
-                "score": 0.8,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 0,
-                    "Business": 0,
-                    "Arts & Design": 3,
-                    "Media": 2,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Analysed data and found a non-obvious insight",
-                "score": 0.7,
-                "careerWeights": {
-                    "Technology": 2,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 1,
-                    "Commerce": 2,
-                    "Business": 1,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            },
-            {
-                "text": "Closed a deal or grew the business measurably",
-                "score": 0.6,
-                "careerWeights": {
-                    "Technology": 0,
-                    "Engineering": 0,
-                    "Medical": 0,
-                    "Agriculture": 0,
-                    "Commerce": 2,
-                    "Business": 3,
-                    "Arts & Design": 0,
-                    "Media": 0,
-                    "Education": 0,
-                    "Law": 0
-                }
-            }
+            { "text": "Perfect, incorruptible local govt systems (UPSC)", "score": 1, "careerWeights": { "Law": 3, "Education": 2, "Business": 1 } },
+            { "text": "Sustainable agriculture and zero global hunger", "score": 1, "careerWeights": { "Agriculture": 3, "Medical": 2 } },
+            { "text": "A world where every machine runs on solar energy", "score": 1, "careerWeights": { "Engineering": 3, "Technology": 2 } },
+            { "text": "Global financial systems with zero poverty", "score": 1, "careerWeights": { "Commerce": 3, "Business": 2 } },
+            { "text": "Universal access to the best education & truth", "score": 1, "careerWeights": { "Education": 3, "Media": 3 } }
         ]
     }
 ]

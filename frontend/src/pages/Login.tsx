@@ -121,7 +121,7 @@ export default function Login() {
                                     onChange={handleChange}
                                     autoComplete="tel"
                                     placeholder="10-digit mobile number"
-                                    className="w-full border-2 border-gray-200 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                                    className="w-full bg-white text-gray-900 border-2 border-gray-200 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-white transition"
                                 />
                                 {form.phone.length === 10 && (
                                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 text-sm">✓</span>
@@ -142,7 +142,7 @@ export default function Login() {
                                     onChange={handleChange}
                                     autoComplete="current-password"
                                     placeholder="Your password"
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                                    className="w-full bg-white text-gray-900 border-2 border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-white transition"
                                 />
                                 <button
                                     type="button"

@@ -209,7 +209,6 @@ const getPersonalized = asyncHandler(async (req, res) => {
 router.get('/', getScholarships);
 router.get('/personalized', protect, getPersonalized);
 
-// Auto-seed on import
-seedScholarships().catch(console.error);
+router._seedScholarships = seedScholarships;
 
 module.exports = router;

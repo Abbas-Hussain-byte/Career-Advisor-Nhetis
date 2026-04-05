@@ -93,6 +93,6 @@ const getRecommended = asyncHandler(async (req, res) => {
 router.get('/', getResources);
 router.get('/recommended', protect, getRecommended);
 
-seedResources().catch(console.error);
+router._seedResources = seedResources;
 
 module.exports = router;

@@ -149,7 +149,7 @@ export default function Register() {
                                 onChange={handleChange}
                                 autoComplete="name"
                                 placeholder="e.g. Rahul Sharma"
-                                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                                className="w-full bg-white text-gray-900 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] transition focus:bg-white"
                             />
                         </div>
 
@@ -168,7 +168,7 @@ export default function Register() {
                                     value={form.phone}
                                     onChange={handleChange}
                                     placeholder="10-digit mobile number"
-                                    className="w-full border-2 border-gray-200 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                                    className="w-full bg-white text-gray-900 border-2 border-gray-200 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] transition focus:bg-white"
                                 />
                                 {form.phone.length === 10 && (
                                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 text-sm">✓</span>
@@ -188,7 +188,7 @@ export default function Register() {
                                 onChange={handleChange}
                                 autoComplete="email"
                                 placeholder="you@example.com"
-                                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                                className="w-full bg-white text-gray-900 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] transition focus:bg-white"
                             />
                         </div>
 
@@ -201,7 +201,7 @@ export default function Register() {
                                 name="grade"
                                 value={form.grade}
                                 onChange={handleChange}
-                                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white"
+                                className="w-full bg-white text-gray-900 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] transition"
                             >
                                 <option value="10">Class 10</option>
                                 <option value="12">Class 12</option>
@@ -222,7 +222,7 @@ export default function Register() {
                                     onChange={handleChange}
                                     autoComplete="new-password"
                                     placeholder="Create a strong password"
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                                    className="w-full bg-white text-gray-900 border-2 border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:border-[#00D4FF] transition focus:bg-white"
                                 />
                                 <button
                                     type="button"
@@ -249,7 +249,7 @@ export default function Register() {
                                     onChange={handleChange}
                                     autoComplete="new-password"
                                     placeholder="Re-enter your password"
-                                    className={`w-full border-2 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none transition ${form.confirmPassword && form.password !== form.confirmPassword
+                                    className={`w-full bg-white text-gray-900 border-2 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:bg-white transition ${form.confirmPassword && form.password !== form.confirmPassword
                                             ? 'border-red-300 focus:border-red-400'
                                             : form.confirmPassword && form.password === form.confirmPassword
                                                 ? 'border-green-300 focus:border-green-400'

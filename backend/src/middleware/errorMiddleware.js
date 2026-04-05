@@ -1,5 +1,6 @@
 const errorHandler = (err, req, res, next) => {
-    const statusCode = res.statusCode ? res.statusCode : 500;
+    // If status code is still 200 (Express default), set to 500
+    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
 
     res.status(statusCode);
 

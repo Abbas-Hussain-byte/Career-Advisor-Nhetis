@@ -48,32 +48,31 @@ You guide this specific student based solely on their profile above. Your advice
 2. **India-specific** — mention Indian colleges (IITs, NITs, AIIMS, government colleges), Indian job market, NIRF rankings, entrance exams (JEE, NEET, CLAT, CAT, GATE etc.), and salary figures in ₹ lakhs.
 3. **Actionable** — give specific steps, timelines, and resources, not vague advice.
 4. **Honest** — if their aptitude scores suggest a career is a poor fit, say so kindly and redirect them.
-5. **Concise** — keep responses under 300 words unless the student asks for detail. Use bullet points for lists.
-
-## What you can help with
-- Career path selection and comparison
-- College choices and entrance exam strategy
-- Skill gaps and what to learn next
-- Course recommendations (online + offline)
-- Day-in-the-life of specific careers
-- Salary ranges and job market demand in India
+5. **Well-Formatted** — Use Markdown (**bold**, *lists*, # headers) to make your answers easy to read. NEVER return raw code blocks or special symbols that aren't markdown.
+6. **Complete** — Provide full, detailed answers. Do NOT cut off mid-sentence.
 
 ## Personality
-Be warm, encouraging, and direct — like a knowledgeable senior who genuinely cares. Avoid generic motivational fluff. Start responses conversationally (no robotic "Of course!" openers).`;
+Be warm, encouraging, and direct — like a knowledgeable senior who genuinely cares. Avoid generic motivational fluff. Start responses conversationally.`;
 }
 
 // ── Chat model instance (created per-request to avoid stale state) ────────────
-function getModel() {
+function getModel(systemPrompt) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('GEMINI_API_KEY not set in .env');
     const genAI = new GoogleGenerativeAI(apiKey);
     return genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
+        // In the @google/generative-ai SDK, system instruction must be passed here, 
+        // formatted as a Content object or a properly parsed string parts array.
+        systemInstruction: {
+            role: "system",
+            parts: [{ text: systemPrompt }]
+        },
         generationConfig: {
             temperature: 0.75,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 600,
+            maxOutputTokens: 1500,
         },
     });
 }
@@ -89,21 +88,32 @@ const chat = asyncHandler(async (req, res) => {
         throw new Error('Message is required');
     }
 
-    const model = getModel();
     const systemPrompt = buildSystemPrompt(user);
+    const model = getModel(systemPrompt);
 
-    // Inject system prompt as first model turn if history is empty
-    const fullHistory = history.length === 0
+    // Sanitize incoming history: Gemini strictly requires roles to be 'user' or 'model'
+    // and the first message MUST be from 'user'.
+    let sanitizedHistory = (history || []).map(msg => ({
+        role: msg.role === 'assistant' ? 'model' : (msg.role || 'user'),
+        parts: msg.parts || [{ text: '' }]
+    }));
+
+    // If the frontend sent a history that starts with a 'model' greeting, 
+    // Gemini will crash. Prepend a dummy user message to satisfy validation.
+    if (sanitizedHistory.length > 0 && sanitizedHistory[0].role === 'model') {
+        sanitizedHistory.unshift({ role: 'user', parts: [{ text: 'Hello, who are you?' }] });
+    }
+
+    // Inject system prompt as first model turn if history is completely empty
+    const fullHistory = sanitizedHistory.length === 0
         ? [
             { role: 'user', parts: [{ text: 'Hello, who are you?' }] },
             { role: 'model', parts: [{ text: `Hi! I'm your NHETIS career guide. Based on your profile — ${user?.name || 'student'} — I'm here to give you personalised career and college advice. What's on your mind?` }] },
         ]
-        : history;
+        : sanitizedHistory;
 
-    // Send systemPrompt as a prepended user message in the first turn when history starts fresh
     const chatSession = model.startChat({
         history: fullHistory,
-        systemInstruction: systemPrompt,
     });
 
     const result = await chatSession.sendMessage(message);

@@ -81,6 +81,6 @@ const getUpcoming = asyncHandler(async (req, res) => {
 router.get('/', getTimeline);
 router.get('/upcoming', protect, getUpcoming);
 
-seedTimeline().catch(console.error);
+router._seedTimeline = seedTimeline;
 
 module.exports = router;
