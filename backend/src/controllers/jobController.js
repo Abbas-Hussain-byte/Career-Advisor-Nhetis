@@ -197,6 +197,9 @@ const SKILL_KEYWORDS = [
     'Blockchain', 'AI', 'NLP', 'Go', 'Rust', 'Networking', 'Linux',
     'SAP', 'Salesforce', 'Finance', 'Accounting', 'Legal', 'Marketing',
     'Content Writing', 'SEO', 'Social Media', 'Graphic Design', 'AutoCAD',
+    'Public Policy', 'Civil Service', 'Anatomy', 'Clinical Research',
+    'Diagnosis', 'Audit', 'Taxation', 'Litigation', 'HR Management',
+    'Counseling', 'Teaching', 'Curriculum Design', 'Agronomy',
 ];
 
 function extractSkills(jobs) {
@@ -222,9 +225,13 @@ function extractSectors(jobs) {
         'design': 'Design & Media', 'marketing': 'Business & Marketing',
         'finance': 'Commerce & Finance', 'accounting': 'Commerce & Finance',
         'medical': 'Healthcare', 'nurse': 'Healthcare', 'pharma': 'Healthcare',
+        'doctor': 'Healthcare', 'surgery': 'Healthcare',
         'teaching': 'Education', 'professor': 'Education',
-        'legal': 'Law', 'lawyer': 'Law',
+        'legal': 'Law', 'lawyer': 'Law', 'litigation': 'Law',
         'civil': 'Engineering', 'mechanical': 'Engineering',
+        'upsc': 'Public Service', 'ias': 'Public Service', 'ips': 'Public Service',
+        'policy': 'Public Service', 'administration': 'Public Service',
+        'hr': 'HR & Consulting', 'recruitment': 'HR & Consulting',
     };
     const counts = {};
     jobs.forEach(job => {
@@ -282,13 +289,13 @@ const getTrendingSkills = asyncHandler(async (req, res) => {
         return res.json({ skills: extractSkills(cached.jobs), sectors: extractSectors(cached.jobs), topJobs: cached.jobs.slice(0, 10), cached: true });
     }
 
-    const [tech, commerce, design, adzuna] = await Promise.all([
+    const [tech, commerce, design, extra] = await Promise.all([
         fetchRemotive('software-dev'),
         fetchRemotive('finance-legal'),
         fetchRemotive('design'),
-        fetchAdzuna('software OR engineer OR developer OR medical'),
+        fetchAdzuna('medical OR healthcare OR lawyer OR teacher OR upsc OR ias'),
     ]);
-    const allJobs = [...tech, ...commerce, ...design, ...adzuna];
+    const allJobs = [...tech, ...commerce, ...design, ...extra];
 
     await JobCache.findOneAndUpdate({ cacheKey }, { cacheKey, jobs: allJobs, fetchedAt: new Date(), source: 'mixed', query: 'trending' }, { upsert: true });
     res.json({ skills: extractSkills(allJobs), sectors: extractSectors(allJobs), topJobs: allJobs.slice(0, 10), cached: false });
