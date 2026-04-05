@@ -127,7 +127,7 @@ export default function Profile() {
                                     type="text"
                                     value={form.name}
                                     onChange={e => setForm({ ...form, name: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
                                 />
                             </div>
                             <div>
@@ -136,7 +136,7 @@ export default function Profile() {
                                     type="email"
                                     value={form.email}
                                     onChange={e => setForm({ ...form, email: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
                                 />
                             </div>
                         </div>
@@ -151,7 +151,7 @@ export default function Profile() {
                                 <select
                                     value={form.grade}
                                     onChange={e => setForm({ ...form, grade: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
                                 >
                                     <option value="10">Class 10</option>
                                     <option value="12">Class 12</option>
@@ -162,7 +162,7 @@ export default function Profile() {
                                 <select
                                     value={form.stream}
                                     onChange={e => setForm({ ...form, stream: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
                                 >
                                     <option value="">Not selected</option>
                                     {STREAM_OPTIONS.map(s => (
@@ -176,7 +176,7 @@ export default function Profile() {
                                     type="text"
                                     value={form.board}
                                     onChange={e => setForm({ ...form, board: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
                                 />
                             </div>
                             <div>
@@ -187,7 +187,7 @@ export default function Profile() {
                                     onChange={e => setForm({ ...form, academicScore: e.target.value })}
                                     min="0"
                                     max="100"
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
                                 />
                             </div>
                         </div>

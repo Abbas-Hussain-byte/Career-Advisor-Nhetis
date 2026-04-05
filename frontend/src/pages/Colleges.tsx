@@ -208,7 +208,7 @@ export default function Colleges() {
                             placeholder="State (e.g. Telangana)"
                             value={state}
                             onChange={e => setState(e.target.value)}
-                            className="border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                            className="border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
                             disabled={useLocation}
                         />
                         <input
@@ -216,7 +216,7 @@ export default function Colleges() {
                             placeholder="Program (e.g. B.Tech, MBBS)"
                             value={program}
                             onChange={e => setProgram(e.target.value)}
-                            className="border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition"
+                            className="border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
                         />
                         <button
                             onClick={handleSearch}

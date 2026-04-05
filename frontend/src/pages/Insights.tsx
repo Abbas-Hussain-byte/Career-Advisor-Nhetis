@@ -404,10 +404,10 @@ export default function Insights() {
                             <div key={skill}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition ${have
                                     ? 'bg-green-50 border-green-200 text-green-700'
-                                    : 'bg-red-50 border-red-200 text-red-600'}`}>
-                                <span>{have ? '✅' : '⚠️'}</span>
+                                    : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
+                                <span>{have ? '✅' : '✨'}</span>
                                 <span>{skill}</span>
-                                <span className={`text-xs rounded-full px-1.5 ${have ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-700'}`}>
+                                <span className={`text-xs rounded-full px-1.5 ${have ? 'bg-green-200 text-green-800' : 'bg-amber-200 text-amber-800'}`}>
                                     {count} career{count > 1 ? 's' : ''}
                                 </span>
                             </div>
@@ -417,8 +417,8 @@ export default function Insights() {
                         )}
                     </div>
                     {skillsGap.some(s => !s.have) && (
-                        <div className="mt-4 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-sm text-blue-700">
-                            💡 Focus on the red skills above — developing these will significantly improve your career prospects in your matched fields.
+                        <div className="mt-4 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-600">
+                            💡 Focus on the highlighted skills above — adding these to your interests will strengthen your career roadmap.
                         </div>
                     )}
                 </Section>
