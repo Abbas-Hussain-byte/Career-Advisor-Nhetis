@@ -34,6 +34,7 @@ async function runScrapers({ target = 'all', dryRun = false } = {}) {
 
     if (target === 'colleges' || target === 'all') {
         try {
+            const { updateCollegesFromNIRF } = require('./nirfScraper');
             results.colleges = await updateCollegesFromNIRF({ dryRun });
         } catch (err) {
             results.colleges = { error: err.message };
@@ -43,10 +44,31 @@ async function runScrapers({ target = 'all', dryRun = false } = {}) {
 
     if (target === 'careers' || target === 'all') {
         try {
+            const { updateCareerMarketData } = require('./careerDataUpdater');
             results.careers = await updateCareerMarketData({ dryRun });
         } catch (err) {
             results.careers = { error: err.message };
             console.error('[Scraper Scheduler] Career updater failed:', err.message);
+        }
+    }
+
+    if (target === 'exams' || target === 'all') {
+        try {
+            const { updateExamData } = require('./examScraper');
+            results.exams = await updateExamData({ dryRun });
+        } catch (err) {
+            results.exams = { error: err.message };
+            console.error('[Scraper Scheduler] Exam scraper failed:', err.message);
+        }
+    }
+
+    if (target === 'scholarships' || target === 'all') {
+        try {
+            const { updateScholarshipData } = require('./scholarshipScraper');
+            results.scholarships = await updateScholarshipData({ dryRun });
+        } catch (err) {
+            results.scholarships = { error: err.message };
+            console.error('[Scraper Scheduler] Scholarship scraper failed:', err.message);
         }
     }
 

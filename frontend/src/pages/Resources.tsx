@@ -4,15 +4,6 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import API from '../api';
 
-const TYPE_ICONS: Record<string, string> = {
-    course: '📚',
-    article: '📰',
-    video: '🎥',
-    ebook: '📖',
-    tool: '🔧',
-    'exam-prep': '📝',
-};
-
 const TYPE_LABELS: Record<string, string> = {
     course: 'Course',
     article: 'Article',
@@ -20,6 +11,27 @@ const TYPE_LABELS: Record<string, string> = {
     ebook: 'E-Book',
     tool: 'Tool',
     'exam-prep': 'Exam Prep',
+    exam: 'Official Exam',
+};
+
+const TYPE_COLORS: Record<string, string> = {
+    exam: 'bg-red-100 text-red-800',
+    'exam-prep': 'bg-orange-100 text-orange-800',
+    course: 'bg-blue-100 text-blue-800',
+    video: 'bg-purple-100 text-purple-800',
+    article: 'bg-green-100 text-green-800',
+    ebook: 'bg-indigo-100 text-indigo-800',
+    tool: 'bg-teal-100 text-teal-800',
+};
+
+const TYPE_ICONS: Record<string, string> = {
+    course: '📚',
+    article: '📰',
+    video: '🎥',
+    ebook: '📖',
+    tool: '🔧',
+    'exam-prep': '📝',
+    exam: '🎯',
 };
 
 const Navbar = ({ user, logoutUser }: any) => {
@@ -117,7 +129,7 @@ export default function Resources() {
                         <select
                             value={typeFilter}
                             onChange={e => setTypeFilter(e.target.value)}
-                            className="border-2 border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-[#635BFF] outline-none"
+                            className="border-2 border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-[#635BFF] outline-none bg-white text-gray-900"
                             disabled={personalized}
                         >
                             <option value="">All Types</option>
@@ -131,7 +143,7 @@ export default function Resources() {
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
                                 placeholder="Search resources..."
-                                className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-[#635BFF] outline-none"
+                                className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-[#635BFF] outline-none bg-white text-gray-900"
                                 disabled={personalized}
                             />
                             <button type="submit" className="bg-[#0A2540] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#1a3d66] transition" disabled={personalized}>
@@ -176,20 +188,38 @@ export default function Resources() {
                                                 <h3 className="text-base font-bold text-[#0A2540] leading-tight group-hover:text-[#635BFF] transition pr-2">
                                                     {r.title}
                                                 </h3>
-                                                {r.free && (
+                                                {r.type === 'exam' ? (
+                                                    <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">LIVE UPDATE</span>
+                                                ) : r.free && (
                                                     <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">FREE</span>
                                                 )}
                                             </div>
                                             <p className="text-xs text-[#635BFF] font-semibold mb-2">{r.provider}</p>
                                             <p className="text-gray-500 text-xs mb-3 leading-relaxed">{r.description}</p>
+                                            
+                                            {r.type === 'exam' && (r.examDate || r.registrationDeadline) && (
+                                                <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 mb-3 grid grid-cols-2 gap-2 text-[10px]">
+                                                    <div>
+                                                        <p className="text-gray-400 font-medium">Exam Date</p>
+                                                        <p className="text-[#0A2540] font-bold">{r.examDate ? new Date(r.examDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBA'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-gray-400 font-medium">Registration</p>
+                                                        <p className="text-[#0A2540] font-bold">{r.registrationDeadline ? (new Date(r.registrationDeadline) < new Date() ? 'CLOSED' : new Date(r.registrationDeadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })) : 'TBA'}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             <div className="flex flex-wrap gap-1">
                                                 {r.subject && <span className="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded">{r.subject}</span>}
                                                 {(r.stream || []).filter((s: string) => s !== 'All').slice(0, 2).map((s: string) => (
                                                     <span key={s} className="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded">{s}</span>
                                                 ))}
-                                                {r.language && r.language !== 'English' && <span className="bg-amber-50 text-amber-700 text-[10px] px-2 py-0.5 rounded">{r.language}</span>}
+                                                {r.type === 'exam' && r.lastVerified && (
+                                                    <span className="text-[9px] text-green-600 font-medium ml-auto self-center">✓ Verified {new Date(r.lastVerified).toLocaleDateString()}</span>
+                                                )}
                                             </div>
-                                            <p className="text-[#635BFF] text-xs font-semibold mt-3 group-hover:underline">Open Resource →</p>
+                                            <p className="text-[#635BFF] text-xs font-semibold mt-3 group-hover:underline">View Details →</p>
                                         </motion.a>
                                     ))}
                                 </div>

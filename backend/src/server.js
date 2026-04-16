@@ -8,7 +8,9 @@ const app = require('./app');
 connectDB();
 
 const PORT = process.env.PORT || 5000;
+const { initScheduler } = require('./services/cronScheduler');
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT} (IPv4)`);
+    initScheduler(); // Start background sync jobs
 });

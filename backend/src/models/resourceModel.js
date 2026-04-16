@@ -4,16 +4,20 @@ const ResourceSchema = new mongoose.Schema({
     title: { type: String, required: true },
     type: {
         type: String,
-        enum: ['course', 'article', 'video', 'ebook', 'tool', 'exam-prep'],
+        enum: ['course', 'article', 'video', 'ebook', 'tool', 'exam-prep', 'exam'],
         default: 'course',
     },
-    provider: String, // "NPTEL", "SWAYAM", "Khan Academy", etc.
+    provider: String, // "NPTEL", "SWAYAM", "Khan Academy", "NTA", etc.
     url: { type: String, required: true },
     subject: String, // "Computer Science", "Mathematics", "Biology", etc.
     grade: [String], // ['10', '12', 'UG', 'PG']
     stream: [String], // ['Science-PCM', 'Science-PCB', 'Commerce', 'Arts / Humanities', 'All']
     careerCategory: [String], // ['Technology', 'Medical', etc.] — for personalized recommendations
     description: String,
+    examDate: Date,
+    registrationDeadline: Date,
+    isLiveUpdate: { type: Boolean, default: false },
+    lastVerified: Date,
     free: { type: Boolean, default: true }, // only curate free resources
     language: { type: String, default: 'English' },
 });

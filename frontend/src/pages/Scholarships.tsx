@@ -117,7 +117,7 @@ export default function Scholarships() {
                         <select
                             value={category}
                             onChange={e => setCategory(e.target.value)}
-                            className="border-2 border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-[#635BFF] outline-none"
+                            className="border-2 border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-[#635BFF] outline-none bg-white text-gray-900"
                             disabled={personalized}
                         >
                             {CATEGORIES.map(c => (
@@ -132,7 +132,7 @@ export default function Scholarships() {
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
                                 placeholder="Search scholarships..."
-                                className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-[#635BFF] outline-none"
+                                className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-[#635BFF] outline-none bg-white text-gray-900"
                                 disabled={personalized}
                             />
                             <button type="submit" className="bg-[#0A2540] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#1a3d66] transition" disabled={personalized}>
