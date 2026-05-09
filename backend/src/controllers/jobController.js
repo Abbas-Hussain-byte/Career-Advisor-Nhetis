@@ -22,6 +22,25 @@ function adzunaBase() {
     return `${ADZUNA_BASE}?app_id=${appId}&app_key=${appKey}`;
 }
 
+// ── Rate Limit Helper ──────────────────────────────────────────────────────
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function fetchWithRetry(url, options = {}, retries = 2, delay = 1000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            return await axios.get(url, { ...options, timeout: 8000 });
+        } catch (e) {
+            if (e.response?.status === 429 && i < retries - 1) {
+                console.warn(`[Adzuna] Rate limited (429). Retrying in ${delay}ms... (Attempt ${i + 1}/${retries})`);
+                await sleep(delay);
+                delay *= 2; // exponential backoff
+                continue;
+            }
+            throw e;
+        }
+    }
+}
+
 // ── Remotive (free, no key) ─────────────────────────────────────────────────
 async function fetchRemotive(category = '') {
     try {
@@ -52,9 +71,12 @@ async function fetchRemotive(category = '') {
 async function fetchAdzuna(query = 'software engineer', location = '') {
     if (!hasAdzuna()) return [];
     try {
-        const loc = location ? `&location0=India&location1=${encodeURIComponent(location)}` : '&location0=India';
-        const url = `${ADZUNA_BASE}/search/1?app_id=${adzunaCredentials().appId}&app_key=${adzunaCredentials().appKey}&results_per_page=20&what=${encodeURIComponent(query)}${loc}&content-type=application/json`;
-        const { data } = await axios.get(url, { timeout: 8000 });
+        const { appId, appKey } = adzunaCredentials();
+        // Correct parameter for location in search is 'where', not 'location0/location1'
+        const loc = location ? `&where=${encodeURIComponent(location)}` : '&where=India';
+        const url = `${ADZUNA_BASE}/search/1?app_id=${appId}&app_key=${appKey}&results_per_page=20&what=${encodeURIComponent(query)}${loc}&content-type=application/json`;
+        
+        const { data } = await fetchWithRetry(url);
         return (data.results || []).map(job => ({
             id: `adzuna-${job.id}`,
             title: job.title,
@@ -73,7 +95,11 @@ async function fetchAdzuna(query = 'software engineer', location = '') {
             description: (job.description || '').slice(0, 400),
         }));
     } catch (e) {
-        console.warn('[Jobs] Adzuna search failed:', e.message);
+        console.error('[Jobs] Adzuna search failed:', e.message);
+        if (e.response) {
+            console.error('   Status:', e.response.status);
+            console.error('   Data:', JSON.stringify(e.response.data).slice(0, 500));
+        }
         return [];
     }
 }
@@ -86,7 +112,7 @@ async function fetchAdzunaHistory(query = 'software engineer') {
     try {
         const { appId, appKey } = adzunaCredentials();
         const url = `${ADZUNA_BASE}/history?app_id=${appId}&app_key=${appKey}&what=${encodeURIComponent(query)}&location0=India&content-type=application/json`;
-        const { data } = await axios.get(url, { timeout: 8000 });
+        const { data } = await fetchWithRetry(url);
         // data.month is an object like { "2024-03": 1234, "2024-04": 1567, ... }
         const months = data.month || {};
         return Object.entries(months)
@@ -110,7 +136,7 @@ async function fetchAdzunaHistogram(query = 'software engineer') {
     try {
         const { appId, appKey } = adzunaCredentials();
         const url = `${ADZUNA_BASE}/histogram?app_id=${appId}&app_key=${appKey}&what=${encodeURIComponent(query)}&location0=India&content-type=application/json`;
-        const { data } = await axios.get(url, { timeout: 8000 });
+        const { data } = await fetchWithRetry(url);
         // data.histogram is { "100000": 23, "200000": 87, ... } — salary bucket: count
         const hist = data.histogram || {};
         return Object.entries(hist)
@@ -135,7 +161,7 @@ async function fetchAdzunaRegional(query = 'software engineer') {
     try {
         const { appId, appKey } = adzunaCredentials();
         const url = `${ADZUNA_BASE}/geodata?app_id=${appId}&app_key=${appKey}&what=${encodeURIComponent(query)}&location0=India&content-type=application/json`;
-        const { data } = await axios.get(url, { timeout: 8000 });
+        const { data } = await fetchWithRetry(url);
         // data.locations is an array of { location: { display_name }, count }
         const locations = data.locations || [];
         return locations
@@ -160,7 +186,7 @@ async function fetchAdzunaTopCompanies(query = 'software engineer') {
     try {
         const { appId, appKey } = adzunaCredentials();
         const url = `${ADZUNA_BASE}/top_companies?app_id=${appId}&app_key=${appKey}&what=${encodeURIComponent(query)}&location0=India&content-type=application/json`;
-        const { data } = await axios.get(url, { timeout: 8000 });
+        const { data } = await fetchWithRetry(url);
         // data.leaderboard is [{ canonical_name, count }, ...]
         const companies = data.leaderboard || [];
         return companies.slice(0, 12).map(c => ({
@@ -277,7 +303,7 @@ const getJobs = asyncHandler(async (req, res) => {
     const allJobs = [...adzunaJobs, ...remotiveJobs];
     const source = adzunaJobs.length > 0 && remotiveJobs.length > 0 ? 'mixed' : adzunaJobs.length > 0 ? 'adzuna' : 'remotive';
 
-    await JobCache.findOneAndUpdate({ cacheKey }, { cacheKey, jobs: allJobs, fetchedAt: new Date(), source, query: career }, { upsert: true });
+    await JobCache.findOneAndUpdate({ cacheKey }, { cacheKey, jobs: allJobs, fetchedAt: new Date(), source, query: career }, { upsert: true, returnDocument: 'after' });
     res.json({ jobs: allJobs, skills: extractSkills(allJobs), sectors: extractSectors(allJobs), source, cached: false, total: allJobs.length });
 });
 
@@ -297,7 +323,7 @@ const getTrendingSkills = asyncHandler(async (req, res) => {
     ]);
     const allJobs = [...tech, ...commerce, ...design, ...extra];
 
-    await JobCache.findOneAndUpdate({ cacheKey }, { cacheKey, jobs: allJobs, fetchedAt: new Date(), source: 'mixed', query: 'trending' }, { upsert: true });
+    await JobCache.findOneAndUpdate({ cacheKey }, { cacheKey, jobs: allJobs, fetchedAt: new Date(), source: 'mixed', query: 'trending' }, { upsert: true, returnDocument: 'after' });
     res.json({ skills: extractSkills(allJobs), sectors: extractSectors(allJobs), topJobs: allJobs.slice(0, 10), cached: false });
 });
 
@@ -317,13 +343,14 @@ const getMarketData = asyncHandler(async (req, res) => {
         return res.status(503).json({ error: 'Adzuna API credentials not configured. Set ADZUNA_APP_ID and ADZUNA_APP_KEY in .env' });
     }
 
-    // Fetch all 4 Adzuna data types in parallel
-    const [history, histogram, regional, topCompanies] = await Promise.all([
-        fetchAdzunaHistory(career),
-        fetchAdzunaHistogram(career),
-        fetchAdzunaRegional(career),
-        fetchAdzunaTopCompanies(career),
-    ]);
+    // Fetch Adzuna data types with small delays to avoid immediate rate limit
+    const history = await fetchAdzunaHistory(career);
+    await sleep(200);
+    const histogram = await fetchAdzunaHistogram(career);
+    await sleep(200);
+    const regional = await fetchAdzunaRegional(career);
+    await sleep(200);
+    const topCompanies = await fetchAdzunaTopCompanies(career);
 
     const payload = { career, history, histogram, regional, topCompanies };
 
@@ -331,7 +358,7 @@ const getMarketData = asyncHandler(async (req, res) => {
     await JobCache.findOneAndUpdate(
         { cacheKey },
         { cacheKey, jobs: [payload], fetchedAt: new Date(), source: 'adzuna', query: career },
-        { upsert: true }
+        { upsert: true, returnDocument: 'after' }
     );
 
     res.json({ ...payload, cached: false });

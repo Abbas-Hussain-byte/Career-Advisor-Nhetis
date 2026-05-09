@@ -26,6 +26,11 @@ const UserSchema = new mongoose.Schema({
         enum: ['student', 'admin'],
         default: 'student',
     },
+    preferredLanguage: {
+        type: String,
+        enum: ['en', 'hi', 'te'],
+        default: 'en',
+    },
     profile: {
         grade: {
             type: String,
@@ -44,6 +49,31 @@ const UserSchema = new mongoose.Schema({
         },
         interests: [String],
         academicScore: Number,
+        longTermGoal: String,
+        aspirationTrack: {
+            type: String,
+            enum: ['Higher Studies', 'Job Ready', 'Government Exams', 'Entrepreneurship', 'Vocational Skills', 'Undecided'],
+            default: 'Undecided',
+        },
+        coreValues: [String],
+        constraints: {
+            budgetLevel: {
+                type: String,
+                enum: ['high-support-needed', 'moderate', 'flexible'],
+                default: 'moderate',
+            },
+            mobility: {
+                type: String,
+                enum: ['near-home', 'within-state', 'anywhere'],
+                default: 'within-state',
+            },
+            preferredLearningMode: {
+                type: String,
+                enum: ['offline', 'online', 'blended'],
+                default: 'blended',
+            },
+            languageComfort: String,
+        },
     },
     // Persistent assessment results — saved when student completes the quiz
     assessment: {
@@ -64,6 +94,17 @@ const UserSchema = new mongoose.Schema({
             confidence: Number,   // 0-100
             reasoning: String,    // e.g. "Strong logic + technical scores"
         }],
+        studentSignals: {
+            longTermGoal: String,
+            aspirationTrack: String,
+            coreValues: [String],
+            constraints: {
+                budgetLevel: String,
+                mobility: String,
+                preferredLearningMode: String,
+                languageComfort: String,
+            },
+        },
         takenAt: Date,
     },
 }, {

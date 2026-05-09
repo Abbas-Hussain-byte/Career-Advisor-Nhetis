@@ -3,28 +3,29 @@ import API from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ── Career categories used for weight mapping ────────────────────────────────
+// ── Career categories used for weight mapping ────────────────────────────────
 const CAREER_CATEGORIES = [
     'Technology', 'Engineering', 'Medical', 'Agriculture',
     'Commerce', 'Business', 'Arts & Design', 'Media', 'Education', 'Law',
 ] as const;
 
-// ── Skill → Career-category boost map ────────────────────────────────────────
+// ── Skill → Career-category boost map (Balanced: Sum of weights per skill = 5) ──
 const SKILL_CAREER_MAP: Record<string, Record<string, number>> = {
-    math: { Technology: 2, Engineering: 3, Medical: 0, Agriculture: 0, Commerce: 2, Business: 0, 'Arts & Design': 0, Media: 0, Education: 1, Law: 0 },
-    coding: { Technology: 3, Engineering: 1, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 },
-    science: { Technology: 1, Engineering: 2, Medical: 1, Agriculture: 1, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 },
-    biology: { Technology: 0, Engineering: 0, Medical: 3, Agriculture: 2, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 },
-    design: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 3, Media: 1, Education: 0, Law: 0 },
-    writing: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 1, Media: 3, Education: 2, Law: 1 },
-    leadership: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 1, Business: 3, 'Arts & Design': 0, Media: 0, Education: 1, Law: 0 },
-    problemSolve: { Technology: 2, Engineering: 2, Medical: 1, Agriculture: 0, Commerce: 1, Business: 1, 'Arts & Design': 0, Media: 0, Education: 0, Law: 1 },
-    empathy: { Technology: 0, Engineering: 0, Medical: 2, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 3, Law: 1 },
-    business: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 3, Business: 3, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 },
-    research: { Technology: 2, Engineering: 1, Medical: 2, Agriculture: 2, Commerce: 1, Business: 0, 'Arts & Design': 0, Media: 0, Education: 1, Law: 1 },
-    speaking: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 2, 'Arts & Design': 0, Media: 2, Education: 2, Law: 3 },
-    languages: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 1, Media: 2, Education: 2, Law: 1 },
-    mechanical: { Technology: 1, Engineering: 3, Medical: 0, Agriculture: 1, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 },
-    sports: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 2, Law: 0 },
+    math: { Technology: 2, Engineering: 2, Commerce: 1 },
+    coding: { Technology: 4, Engineering: 1 },
+    science: { Technology: 1, Engineering: 1, Medical: 2, Agriculture: 1 },
+    biology: { Medical: 3, Agriculture: 2 },
+    design: { 'Arts & Design': 4, Media: 1 },
+    writing: { Media: 2, Education: 1, Law: 1, 'Arts & Design': 1 },
+    leadership: { Business: 3, Commerce: 1, Law: 1 },
+    problemSolve: { Engineering: 2, Technology: 1, Law: 1, Medical: 1 },
+    empathy: { Medical: 2, Education: 2, Social: 1 }, // Note: added Social as internal proxy for empathy heavy
+    business: { Business: 3, Commerce: 2 },
+    research: { Education: 2, Medical: 1, Technology: 1, Law: 1 },
+    speaking: { Media: 2, Law: 2, Business: 1 },
+    languages: { Media: 2, Education: 2, 'Arts & Design': 1 },
+    mechanical: { Engineering: 4, Technology: 1 },
+    sports: { Medical: 2, Education: 2, Media: 1 }, // Sports rehab, coaching, broadcasting
 };
 
 // ── Skills for the self-rating grid (Stage 2) ────────────────────────────────
@@ -49,59 +50,60 @@ const SKILL_ITEMS = [
 const RATING_LABELS = ['Beginner', 'Basic', 'Intermediate', 'Proficient', 'Expert'];
 const RATING_COLORS = ['#e2e8f0', '#bfdbfe', '#93c5fd', '#60a5fa', '#3b82f6'];
 
-// Fallback questions if backend is offline (5 minimum to avoid empty quiz)
+// Fallback questions (Balanced careerWeights)
 const FALLBACK_QUESTIONS = [
     {
         id: 1, question: 'Your school science fair is coming up. Which role excites you most?', category: 'technical', type: 'scenario',
         options: [
-            { text: 'Build and program a robot or device', score: 1.0, careerWeights: { Technology: 3, Engineering: 2, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
-            { text: 'Run a biology or chemistry experiment', score: 0.7, careerWeights: { Technology: 0, Engineering: 0, Medical: 3, Agriculture: 2, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 1, Law: 0 } },
-            { text: 'Design the display and visual materials', score: 0.4, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 3, Media: 2, Education: 0, Law: 0 } },
-            { text: 'Present our project to judges', score: 0.2, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 1, 'Arts & Design': 0, Media: 2, Education: 2, Law: 2 } },
-            { text: 'Coordinate the whole team', score: 0.3, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 1, Business: 3, 'Arts & Design': 0, Media: 0, Education: 1, Law: 0 } },
+            { text: 'Build and program a robot or device', score: 1.0, careerWeights: { Technology: 3, Engineering: 2 } },
+            { text: 'Run a biology or chemistry experiment', score: 0.7, careerWeights: { Medical: 3, Agriculture: 2 } },
+            { text: 'Design the display and visual materials', score: 0.4, careerWeights: { 'Arts & Design': 3, Media: 2 } },
+            { text: 'Present our project to judges', score: 0.2, careerWeights: { Media: 3, Law: 2 } },
+            { text: 'Coordinate the whole team', score: 0.3, careerWeights: { Business: 3, Commerce: 2 } },
         ]
     },
     {
         id: 2, question: 'Which challenge would you most want to solve professionally?', category: 'logic', type: 'scenario',
         options: [
-            { text: 'Build AI tech to fight climate change', score: 1.0, careerWeights: { Technology: 3, Engineering: 2, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
-            { text: 'Develop a vaccine for a new disease', score: 0.8, careerWeights: { Technology: 0, Engineering: 0, Medical: 3, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
-            { text: 'Write a bestselling novel', score: 0.4, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 1, Media: 3, Education: 1, Law: 0 } },
-            { text: 'Design infrastructure for a city', score: 0.7, careerWeights: { Technology: 0, Engineering: 3, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
-            { text: 'Win a landmark court case', score: 0.5, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 3 } },
+            { text: 'Build AI tech to fight climate change', score: 1.0, careerWeights: { Technology: 5 } },
+            { text: 'Develop a vaccine for a new disease', score: 0.8, careerWeights: { Medical: 5 } },
+            { text: 'Write a bestselling novel or script', score: 0.4, careerWeights: { Media: 5 } },
+            { text: 'Design infrastructure for a city', score: 0.7, careerWeights: { Engineering: 5 } },
+            { text: 'Win a landmark court case', score: 0.5, careerWeights: { Law: 5 } },
         ]
     },
     {
         id: 3, question: 'You have free time to create anything. You choose to:', category: 'creativity', type: 'scenario',
         options: [
-            { text: 'Write a short story or song', score: 1.0, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 2, Media: 3, Education: 1, Law: 0 } },
-            { text: 'Design a logo or digital artwork', score: 0.9, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 3, Media: 1, Education: 0, Law: 0 } },
-            { text: 'Build a small game or app', score: 0.6, careerWeights: { Technology: 3, Engineering: 1, Medical: 0, Agriculture: 0, Commerce: 0, Business: 1, 'Arts & Design': 1, Media: 0, Education: 0, Law: 0 } },
-            { text: 'Analyse data on a topic I love', score: 0.4, careerWeights: { Technology: 2, Engineering: 0, Medical: 0, Agriculture: 1, Commerce: 2, Business: 1, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
-            { text: 'Sketch architectural plans', score: 0.7, careerWeights: { Technology: 0, Engineering: 3, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 2, Media: 0, Education: 0, Law: 0 } },
+            { text: 'Write a short story or song', score: 1.0, careerWeights: { Media: 3, Education: 2 } },
+            { text: 'Design a logo or digital artwork', score: 0.9, careerWeights: { 'Arts & Design': 5 } },
+            { text: 'Build a small game or app', score: 0.6, careerWeights: { Technology: 4, Business: 1 } },
+            { text: 'Analyse data on a topic I love', score: 0.4, careerWeights: { Commerce: 3, Business: 2 } },
+            { text: 'Sketch architectural plans', score: 0.7, careerWeights: { Engineering: 3, 'Arts & Design': 2 } },
         ]
     },
     {
         id: 4, question: 'A friend is going through a tough time. You naturally:', category: 'social', type: 'scenario',
         options: [
-            { text: 'Listen patiently and offer support', score: 1.0, careerWeights: { Technology: 0, Engineering: 0, Medical: 2, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 3, Law: 1 } },
-            { text: 'Give practical advice on what to do', score: 0.6, careerWeights: { Technology: 0, Engineering: 0, Medical: 1, Agriculture: 0, Commerce: 1, Business: 2, 'Arts & Design': 0, Media: 0, Education: 1, Law: 2 } },
-            { text: 'Connect them with a professional', score: 0.7, careerWeights: { Technology: 0, Engineering: 0, Medical: 1, Agriculture: 0, Commerce: 0, Business: 1, 'Arts & Design': 0, Media: 0, Education: 2, Law: 0 } },
-            { text: 'Distract them with fun activities', score: 0.4, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 1, Media: 2, Education: 1, Law: 0 } },
-            { text: 'I prefer logical problems to emotional ones', score: 0.0, careerWeights: { Technology: 2, Engineering: 2, Medical: 0, Agriculture: 0, Commerce: 1, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
+            { text: 'Listen patiently and offer support', score: 1.0, careerWeights: { Education: 3, Medical: 2 } },
+            { text: 'Give practical advice on what to do', score: 0.6, careerWeights: { Law: 3, Business: 2 } },
+            { text: 'Connect them with a professional', score: 0.7, careerWeights: { Commerce: 2, Education: 3 } },
+            { text: 'Distract them with fun activities', score: 0.4, careerWeights: { Media: 3, 'Arts & Design': 2 } },
+            { text: 'I prefer logical problems to emotional ones', score: 0.0, careerWeights: { Technology: 2, Engineering: 3 } },
         ]
     },
     {
         id: 5, question: 'In a group project, which role do you naturally fall into?', category: 'leadership', type: 'scenario',
         options: [
-            { text: 'The leader who sets direction', score: 1.0, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 1, Business: 3, 'Arts & Design': 0, Media: 0, Education: 1, Law: 1 } },
-            { text: 'The researcher who gathers data', score: 0.6, careerWeights: { Technology: 2, Engineering: 1, Medical: 1, Agriculture: 1, Commerce: 1, Business: 0, 'Arts & Design': 0, Media: 1, Education: 1, Law: 1 } },
-            { text: 'The creative who designs outputs', score: 0.5, careerWeights: { Technology: 0, Engineering: 0, Medical: 0, Agriculture: 0, Commerce: 0, Business: 1, 'Arts & Design': 3, Media: 2, Education: 0, Law: 0 } },
-            { text: 'The fixer when things go wrong', score: 0.7, careerWeights: { Technology: 3, Engineering: 2, Medical: 1, Agriculture: 0, Commerce: 0, Business: 0, 'Arts & Design': 0, Media: 0, Education: 0, Law: 0 } },
-            { text: 'The mediator who keeps harmony', score: 0.8, careerWeights: { Technology: 0, Engineering: 0, Medical: 1, Agriculture: 0, Commerce: 0, Business: 1, 'Arts & Design': 0, Media: 0, Education: 2, Law: 2 } },
+            { text: 'The leader who sets direction', score: 1.0, careerWeights: { Business: 3, Commerce: 2 } },
+            { text: 'The researcher who gathers data', score: 0.6, careerWeights: { Education: 2, Technology: 2, Law: 1 } },
+            { text: 'The creative who designs outputs', score: 0.5, careerWeights: { 'Arts & Design': 3, Media: 2 } },
+            { text: 'The fixer when things go wrong', score: 0.7, careerWeights: { Engineering: 3, Technology: 2 } },
+            { text: 'The mediator who keeps harmony', score: 0.8, careerWeights: { Law: 2, Education: 3 } },
         ]
     },
 ];
+
 
 // ── CATEGORY ICONS ───────────────────────────────────────────────────────────
 const CATEGORY_ICONS: Record<string, string> = {
@@ -112,10 +114,10 @@ const CATEGORY_ICONS: Record<string, string> = {
     leadership: '🏆',
 };
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// STAGE 2 — Skills Self-Rating Grid
-// ═══════════════════════════════════════════════════════════════════════════════
+import { useLanguage } from '../context/LanguageContext';
+
 const SkillRating = ({ onComplete, onBack }: { onComplete: (ratings: Record<string, number>) => void, onBack: () => void }) => {
+    const { t } = useLanguage();
     const [ratings, setRatings] = useState<Record<string, number>>({});
     const [submitting, setSubmitting] = useState(false);
 
@@ -136,16 +138,16 @@ const SkillRating = ({ onComplete, onBack }: { onComplete: (ratings: Record<stri
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
                 <div className="flex items-center justify-center gap-3 mb-3">
                     <button onClick={onBack} className="text-gray-400 hover:text-[#0A2540] text-sm font-bold flex items-center gap-1">
-                        ← Back
+                        ← {t('quiz.back')}
                     </button>
                     <div className="inline-block bg-gradient-to-r from-[#0A2540] to-[#00D4FF] text-white text-xs font-bold px-4 py-1.5 rounded-full tracking-widest uppercase">
-                        Stage 2 of 2 — Skills Rating
+                        {t('quiz.stage2Label')}
                     </div>
                 </div>
                 <h2 className="text-2xl font-extrabold text-[#0A2540] leading-snug">
-                    Rate your current skill level
+                    {t('quiz.rateTitle')}
                 </h2>
-                <p className="text-sm text-gray-500 mt-2">Be honest — this helps us find your best career matches and skill gaps.</p>
+                <p className="text-sm text-gray-500 mt-2">{t('quiz.rateDesc')}</p>
             </motion.div>
 
             {/* Skills grid */}
@@ -160,7 +162,7 @@ const SkillRating = ({ onComplete, onBack }: { onComplete: (ratings: Record<stri
                     >
                         <div className="flex items-center gap-2 mb-3">
                             <span className="text-xl">{skill.icon}</span>
-                            <span className="font-semibold text-[#0A2540] text-sm">{skill.label}</span>
+                            <span className="font-semibold text-[#0A2540] text-sm">{t(`skills.${skill.id}`)}</span>
                         </div>
                         {/* Rating buttons 0–4 */}
                         <div className="flex gap-1.5">
@@ -194,8 +196,8 @@ const SkillRating = ({ onComplete, onBack }: { onComplete: (ratings: Record<stri
             <div className="text-center">
                 <p className="text-xs text-gray-400 mb-4">
                     {allRated
-                        ? '✅ All skills rated! Ready to see your results.'
-                        : `Rate ${SKILL_ITEMS.length - Object.keys(ratings).length} more skill(s) to continue`}
+                        ? `✅ ${t('quiz.allRated')}`
+                        : t('quiz.rateMore', { n: SKILL_ITEMS.length - Object.keys(ratings).length })}
                 </p>
                 <motion.button
                     whileHover={allRated ? { scale: 1.03 } : {}}
@@ -207,7 +209,7 @@ const SkillRating = ({ onComplete, onBack }: { onComplete: (ratings: Record<stri
                         : 'bg-gray-300 cursor-not-allowed'
                         }`}
                 >
-                    {submitting ? 'Analysing...' : '🎯 Get My Career Matches'}
+                    {submitting ? t('quiz.analyzing') : `🎯 ${t('quiz.getMatches')}`}
                 </motion.button>
             </div>
         </div>

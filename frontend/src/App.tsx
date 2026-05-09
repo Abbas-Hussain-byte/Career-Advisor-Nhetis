@@ -45,10 +45,13 @@ const AuthenticatedChat = () => {
   return user ? <ChatWidget /> : null;
 };
 
+import { LanguageProvider } from './context/LanguageContext';
+
 function App() {
   return (
     <AuthProvider>
-      <OfflineProvider>
+      <LanguageProvider>
+        <OfflineProvider>
         <Router>
           <Routes>
             {/* Public Routes */}
@@ -70,7 +73,8 @@ function App() {
           </Routes>
           <AuthenticatedChat />
         </Router>
-      </OfflineProvider>
+        </OfflineProvider>
+      </LanguageProvider>
     </AuthProvider>
   );
 }

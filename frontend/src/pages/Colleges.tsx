@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import API from '../api';
 import CollegeMap from '../components/CollegeMap';
+import SharedNavbar from '../components/SharedNavbar';
 
 // ── Career category → relevant college programs mapping ──────────────────────
 const CATEGORY_PROGRAMS_MAP: Record<string, string[]> = {
@@ -40,8 +41,7 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 export default function Colleges() {
-    const { user, logoutUser } = useAuth();
-    const navigate = useNavigate();
+    const { user } = useAuth();
     const userStream = user?.profile?.stream || '';
     const userAssessment = user?.assessment;
     const hasAssessment = !!(userAssessment?.results?.length);
@@ -159,22 +159,7 @@ export default function Colleges() {
     return (
         <div className="min-h-screen bg-[#F6F9FC]">
             {/* Navbar */}
-            <nav className="bg-[#0A2540] text-white px-6 py-4 sticky top-0 z-50 shadow-lg">
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <Link to="/" className="text-xl font-extrabold"><span className="text-[#00D4FF]">N</span>HETIS</Link>
-                    <div className="hidden md:flex items-center gap-6 text-sm">
-                        <Link to="/dashboard" className="hover:text-[#00D4FF] transition">Dashboard</Link>
-                        <Link to="/careers" className="hover:text-[#00D4FF] transition">Careers</Link>
-                        <Link to="/colleges" className="text-[#00D4FF] font-semibold">Colleges</Link>
-                        <Link to="/insights" className="hover:text-[#00D4FF] transition">Insights</Link>
-                        <Link to="/profile" className="hover:text-[#00D4FF] transition">Profile</Link>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <span className="hidden md:block text-sm text-gray-300">{user?.name}</span>
-                        <button onClick={handleLogout} className="bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-white/20 transition">Logout</button>
-                    </div>
-                </div>
-            </nav>
+            <SharedNavbar activePage="colleges" />
 
             <main className="max-w-7xl mx-auto px-6 py-8">
                 <div className="mb-6">
@@ -283,9 +268,31 @@ export default function Colleges() {
                 </div>
 
                 {loading ? (
-                    <div className="text-center py-20">
-                        <div className="spinner mx-auto mb-3"></div>
-                        <p className="text-gray-500">Finding colleges...</p>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {Array.from({ length: 6 }).map((_, idx) => (
+                            <div key={idx} className="glass rounded-2xl p-6 stable-card">
+                                <div className="stable-card-body">
+                                    <div className="flex justify-between items-start mb-3 gap-2">
+                                        <div className="skeleton h-5 w-3/4" />
+                                        <div className="skeleton h-4 w-16" />
+                                    </div>
+                                    <div className="skeleton h-4 w-1/2 mb-2" />
+                                    <div className="flex gap-2 mb-3">
+                                        <div className="skeleton h-4 w-20" />
+                                        <div className="skeleton h-4 w-24" />
+                                    </div>
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        <div className="skeleton h-4 w-20" />
+                                        <div className="skeleton h-4 w-20" />
+                                        <div className="skeleton h-4 w-20" />
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        <div className="skeleton h-4 w-16" />
+                                        <div className="skeleton h-4 w-16" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     <>
@@ -322,63 +329,70 @@ export default function Colleges() {
                                             return (
                                                 <motion.div
                                                     key={college._id || i}
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: i * 0.04 }}
-                                                    className="glass rounded-2xl p-6 card-hover"
+                                                    initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                                                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                                                    viewport={{ once: true, margin: "-40px" }}
+                                                    transition={{ duration: 0.4, delay: (i % 6) * 0.05 }}
+                                                    className="glass rounded-2xl p-6 card-hover stable-card"
                                                 >
-                                                    <div className="flex justify-between items-start mb-3">
-                                                        <h3 className="text-base font-bold text-[#0A2540] leading-tight">{college.name}</h3>
-                                                        <div className="flex flex-col items-end gap-1 ml-2 shrink-0">
-                                                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${college.type === 'Government' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                                                                }`}>{college.type}</span>
-                                                            {isRelevant && (
-                                                                <span className="text-xs bg-[#635BFF]/10 text-[#635BFF] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
-                                                                    ✓ Matches
+                                                    <div className="stable-card-body">
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <h3 className="text-base font-bold text-[#0A2540] leading-tight min-h-[48px]">{college.name}</h3>
+                                                            <div className="flex flex-col items-end gap-1 ml-2 shrink-0">
+                                                                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${college.type === 'Government' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                                                                    }`}>{college.type}</span>
+                                                                {isRelevant && (
+                                                                    <span className="text-xs bg-[#635BFF]/10 text-[#635BFF] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
+                                                                        ✓ Matches
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <p className="text-gray-400 text-xs mb-2 min-h-[16px]">📍 {college.address || college.state}</p>
+
+                                                        {/* Ranking + Distance row */}
+                                                        <div className="flex items-center gap-3 mb-3 min-h-[24px]">
+                                                            {college.ranking && (
+                                                                <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                                                                    🏆 Rank #{college.ranking}
+                                                                </span>
+                                                            )}
+                                                            {college._distance != null && (
+                                                                <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                                                                    📍 {college._distance} km away
                                                                 </span>
                                                             )}
                                                         </div>
-                                                    </div>
-                                                    <p className="text-gray-400 text-xs mb-2">📍 {college.address || college.state}</p>
 
-                                                    {/* Ranking + Distance row */}
-                                                    <div className="flex items-center gap-3 mb-3">
-                                                        {college.ranking && (
-                                                            <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
-                                                                🏆 Rank #{college.ranking}
-                                                            </span>
-                                                        )}
-                                                        {college._distance != null && (
-                                                            <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-                                                                📍 {college._distance} km away
-                                                            </span>
-                                                        )}
-                                                    </div>
-
-                                                    {/* Programs */}
-                                                    <div className="flex flex-wrap gap-1 mb-4">
-                                                        {college.programs?.slice(0, 4).map((p: string) => {
-                                                            const isMatching = [...assessmentPrograms].some(kw => p.toLowerCase().includes(kw.toLowerCase()));
-                                                            return (
-                                                                <span key={p} className={`text-xs px-2 py-0.5 rounded ${isMatching
-                                                                    ? 'bg-[#635BFF]/10 text-[#635BFF] font-medium'
-                                                                    : 'bg-blue-50 text-blue-700'
-                                                                    }`}>{p}</span>
-                                                            );
-                                                        })}
-                                                        {college.programs?.length > 4 && (
-                                                            <span className="text-xs text-gray-400">+{college.programs.length - 4} more</span>
-                                                        )}
-                                                    </div>
-
-                                                    {/* Facilities */}
-                                                    {college.facilities?.length > 0 && (
-                                                        <div className="flex flex-wrap gap-1">
-                                                            {college.facilities.slice(0, 3).map((f: string) => (
-                                                                <span key={f} className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded">{f}</span>
+                                                        {/* Programs */}
+                                                        <div className="flex flex-wrap gap-1.5 mb-4 min-h-[52px] content-start">
+                                                            {college.programs?.slice(0, 4).map((programName: string) => (
+                                                                <span
+                                                                    key={programName}
+                                                                    className={`text-xs px-2.5 py-1 rounded-full border shadow-sm ${[...assessmentPrograms].some(kw => programName.toLowerCase().includes(kw.toLowerCase()))
+                                                                        ? 'bg-[#635BFF]/10 text-[#635BFF] border-[#635BFF]/20 font-semibold'
+                                                                        : 'bg-white text-gray-700 border-gray-200'
+                                                                        }`}
+                                                                >
+                                                                    {programName}
+                                                                </span>
                                                             ))}
+                                                            {college.programs?.length > 4 && (
+                                                                <span className="text-xs text-gray-400">+{college.programs.length - 4} more</span>
+                                                            )}
                                                         </div>
-                                                    )}
+
+                                                        {/* Facilities */}
+                                                        <div className="stable-card-footer">
+                                                            {college.facilities?.length > 0 && (
+                                                                <div className="flex flex-wrap gap-1">
+                                                                    {college.facilities.slice(0, 3).map((f: string) => (
+                                                                        <span key={f} className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded">{f}</span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </motion.div>
                                             );
                                         })

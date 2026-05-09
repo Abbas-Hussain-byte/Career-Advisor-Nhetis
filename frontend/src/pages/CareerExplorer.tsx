@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import API from '../api';
+import { useLanguage } from '../context/LanguageContext';
+import SharedNavbar from '../components/SharedNavbar';
 
 const CATEGORIES = ['All', 'Technology', 'Medical', 'Engineering', 'Commerce', 'Arts & Design', 'Education', 'Agriculture', 'Business', 'Media'];
 
@@ -21,6 +23,7 @@ const streamColors: Record<string, string> = {
 export default function CareerExplorer() {
     const { user, logoutUser } = useAuth();
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const profile = user?.profile || {};
     const assessment = user?.assessment;
 
@@ -51,10 +54,12 @@ export default function CareerExplorer() {
         if (!careers.length) return [];
         // If quiz taken, use those results
         if (assessment?.results?.length) {
-            const titles = new Set((assessment.results || []).map((r: any) => r.careerTitle));
-            return careers.filter(c => titles.has(c.title)).slice(0, 4);
+            // Case-insensitive matching to handle DB variations
+            const resultTitles = (assessment.results || []).map((r: any) => r.careerTitle.toLowerCase().trim());
+            const matched = careers.filter(c => resultTitles.includes(c.title.toLowerCase().trim()));
+            if (matched.length > 0) return matched.slice(0, 4);
         }
-        // Else filter by stream + interests
+        // Else filter by stream + interests (Fallback only if NO assessment or NO matches in DB)
         const streamMap: Record<string, string[]> = {
             'Science-PCM': ['Technology', 'Engineering'],
             'Science-PCB': ['Medical', 'Agriculture'],
@@ -108,36 +113,21 @@ export default function CareerExplorer() {
     return (
         <div className="min-h-screen bg-[#F6F9FC]">
             {/* Navbar */}
-            <nav className="bg-[#0A2540] text-white px-6 py-4 sticky top-0 z-50 shadow-lg">
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <Link to="/" className="text-xl font-extrabold"><span className="text-[#00D4FF]">N</span>HETIS</Link>
-                    <div className="hidden md:flex items-center gap-6 text-sm">
-                        <Link to="/dashboard" className="hover:text-[#00D4FF] transition">Dashboard</Link>
-                        <Link to="/careers" className="text-[#00D4FF] font-semibold">Careers</Link>
-                        <Link to="/colleges" className="hover:text-[#00D4FF] transition">Colleges</Link>
-                        <Link to="/insights" className="hover:text-[#00D4FF] transition">Insights</Link>
-                        <Link to="/profile" className="hover:text-[#00D4FF] transition">Profile</Link>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <span className="hidden md:block text-sm text-gray-300">{user?.name}</span>
-                        <button onClick={handleLogout} className="bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-white/20 transition">Logout</button>
-                    </div>
-                </div>
-            </nav>
+            <SharedNavbar activePage="careers" />
 
             <main className="max-w-7xl mx-auto px-6 py-8">
                 <div className="mb-6">
-                    <h1 className="text-4xl font-extrabold text-[#0A2540]">Career Explorer</h1>
-                    <p className="text-gray-500 mt-2">Browse {careers.length} career paths with roadmaps and salary data</p>
+                    <h1 className="text-4xl font-extrabold text-[#0A2540]">{t('career.title')}</h1>
+                    <p className="text-gray-500 mt-2">{t('career.subtitle', { n: careers.length })}</p>
                 </div>
 
                 {/* Recommended for You */}
                 {recommended.length > 0 && (
                     <div className="mb-8">
                         <h2 className="text-lg font-bold text-[#0A2540] mb-3">
-                            ⭐ Recommended for You
+                            ⭐ {t('career.recommended')}
                             <span className="ml-2 text-xs font-normal text-gray-400">
-                                {assessment?.results?.length ? 'Based on your quiz results' : `Based on your stream & interests`}
+                                {assessment?.results?.length ? t('career.basedOnQuiz') : t('career.basedOnStream')}
                             </span>
                         </h2>
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -147,7 +137,8 @@ export default function CareerExplorer() {
                                     <motion.div
                                         key={career._id || i}
                                         initial={{ opacity: 0, y: 16 }}
-                                        animate={{ opacity: 1, y: 0 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true, margin: "-20px" }}
                                         transition={{ delay: i * 0.08 }}
                                         className="bg-gradient-to-br from-[#0A2540] to-[#1a3d66] text-white rounded-2xl p-5 cursor-pointer hover:shadow-xl transition"
                                         onClick={() => setSelected(selected?._id === career._id ? null : career)}
@@ -164,7 +155,7 @@ export default function CareerExplorer() {
                                         <p className="text-xs text-[#00D4FF] font-semibold">
                                             ₹{Math.round((career.salary?.min || 0) / 100000)}L – ₹{Math.round((career.salary?.max || 0) / 100000)}L / yr
                                         </p>
-                                        <p className="text-xs text-gray-400 mt-2">▼ View roadmap</p>
+                                        <p className="text-xs text-gray-400 mt-2">{selected?._id === career._id ? t('career.hideRoadmap') : t('career.viewRoadmap')}</p>
                                         {selected?._id === career._id && career.roadmap?.length > 0 && (
                                             <div className="mt-4 border-t border-white/20 pt-3 space-y-2">
                                                 {career.roadmap.map((step: any, idx: number) => (
@@ -184,7 +175,7 @@ export default function CareerExplorer() {
 
                 {!recommended.length && !loading && (
                     <div className="mb-6 bg-blue-50 border border-blue-100 rounded-xl px-5 py-4 text-sm text-blue-700">
-                        💡 Set your <Link to="/profile" className="font-bold underline">stream and interests in Profile</Link> to see personalised career recommendations at the top.
+                        💡 {t('career.setProfile')} <Link to="/profile" className="font-bold underline">Profile</Link>
                     </div>
                 )}
 
@@ -192,7 +183,7 @@ export default function CareerExplorer() {
                 <div className="flex flex-col md:flex-row gap-4 mb-8">
                     <input
                         type="text"
-                        placeholder="Search careers..."
+                        placeholder={t('career.searchPlaceholder')}
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         className="border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition flex-1"
@@ -207,7 +198,7 @@ export default function CareerExplorer() {
                                     : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-[#0A2540]'
                                     }`}
                             >
-                                {cat}
+                                {t(`career.categories.${cat}` as any)}
                             </button>
                         ))}
                     </div>
@@ -216,27 +207,28 @@ export default function CareerExplorer() {
                 {loading ? (
                     <div className="text-center py-20">
                         <div className="spinner mx-auto mb-3"></div>
-                        <p className="text-gray-500">Loading careers...</p>
+                        <p className="text-gray-500">{t('career.loading')}</p>
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="text-center py-20">
-                        <p className="text-gray-400 text-lg">No careers found. Try different filters.</p>
+                        <p className="text-gray-400 text-lg">{t('career.noCareers')}</p>
                     </div>
                 ) : (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filtered.map((career, i) => (
                             <motion.div
                                 key={career._id || i}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: i * 0.06 }}
-                                className="glass rounded-2xl p-6 card-hover cursor-pointer"
+                                initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ duration: 0.4, delay: (i % 6) * 0.05 }}
+                                className="glass rounded-2xl p-6 card-hover cursor-pointer min-h-[280px] flex flex-col"
                                 onClick={() => setSelected(selected?._id === career._id ? null : career)}
                             >
                                 <div className="flex justify-between items-start mb-3">
                                     <h3 className="text-lg font-bold text-[#0A2540] leading-tight">{career.title}</h3>
-                                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ml-2 whitespace-nowrap ${streamColors[career.category] || 'bg-gray-100 text-gray-700'}`}>
-                                        {career.category}
+                                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ml-2 whitespace-nowrap ${streamColors[career.category] || 'bg-gray-100 text-gray-700'}`}>
+                                        {t(`career.categories.${career.category}` as any)}
                                     </span>
                                 </div>
                                 <p className="text-gray-500 text-sm mb-4 leading-relaxed">{career.description}</p>
@@ -251,7 +243,7 @@ export default function CareerExplorer() {
                                 {/* Salary */}
                                 <div className="flex justify-between items-center border-t pt-3">
                                     <div>
-                                        <p className="text-xs text-gray-400 font-medium">Annual Salary</p>
+                                        <p className="text-xs text-gray-400 font-medium">{t('career.annualSalary')}</p>
                                         <p className="text-green-600 font-bold text-sm">
                                             ₹{(career.salary?.min / 100000).toFixed(0)}L – ₹{(career.salary?.max / 100000).toFixed(0)}L
                                         </p>
@@ -266,7 +258,7 @@ export default function CareerExplorer() {
                                         animate={{ opacity: 1, height: 'auto' }}
                                         className="mt-4 border-t pt-4"
                                     >
-                                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Career Roadmap</p>
+                                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">{t('career.roadmap')}</p>
                                         <div className="space-y-2">
                                             {career.roadmap.map((step: any, idx: number) => (
                                                 <div key={idx} className="flex gap-3 items-start">
@@ -282,7 +274,7 @@ export default function CareerExplorer() {
                                         </div>
                                         {career.outcome && (
                                             <div className="mt-3 bg-green-50 rounded-lg p-3">
-                                                <p className="text-xs font-bold text-green-700">Outcome: {career.outcome}</p>
+                                                <p className="text-xs font-bold text-green-700">{t('career.outcome')}: {career.outcome}</p>
                                             </div>
                                         )}
                                     </motion.div>
@@ -298,10 +290,10 @@ export default function CareerExplorer() {
                                                 : 'border-gray-200 text-gray-500 hover:border-[#635BFF] hover:text-[#635BFF]'
                                         }`}
                                     >
-                                        {compareList.find(c => c._id === career._id) ? '✓ In Compare' : '+ Compare'}
+                                        {compareList.find(c => c._id === career._id) ? t('career.inCompare') : t('career.compare')}
                                     </button>
                                     <p className="text-xs text-[#635BFF] font-medium">
-                                        {selected?._id === career._id ? '▲ Hide roadmap' : '▼ View roadmap'}
+                                        {selected?._id === career._id ? t('career.hideRoadmap') : t('career.viewRoadmap')}
                                     </p>
                                 </div>
                             </motion.div>
@@ -318,18 +310,18 @@ export default function CareerExplorer() {
                             exit={{ y: 100, opacity: 0 }}
                             className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#0A2540] text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-4 z-50"
                         >
-                            <span className="text-sm font-medium">{compareList.length} careers selected</span>
+                            <span className="text-sm font-medium">{t('career.selectedCount', { n: compareList.length })}</span>
                             <button
                                 onClick={() => setShowCompare(true)}
                                 className="bg-[#00D4FF] text-[#0A2540] font-bold px-5 py-2 rounded-xl text-sm hover:brightness-110 transition"
                             >
-                                Compare Now →
+                                {t('career.compareNow')}
                             </button>
                             <button
                                 onClick={() => setCompareList([])}
                                 className="text-xs text-gray-400 hover:text-white transition"
                             >
-                                Clear
+                                {t('career.clear')}
                             </button>
                         </motion.div>
                     )}
@@ -353,7 +345,7 @@ export default function CareerExplorer() {
                                 onClick={e => e.stopPropagation()}
                             >
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-2xl font-extrabold text-[#0A2540]">Career Comparison</h2>
+                                    <h2 className="text-2xl font-extrabold text-[#0A2540]">{t('career.comparisonTitle')}</h2>
                                     <button onClick={() => setShowCompare(false)} className="text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
                                 </div>
 
@@ -361,7 +353,7 @@ export default function CareerExplorer() {
                                     <table className="w-full text-sm border-collapse">
                                         <thead>
                                             <tr className="border-b-2 border-gray-100">
-                                                <th className="text-left py-3 pr-4 text-gray-500 font-semibold w-32">Criteria</th>
+                                                <th className="text-left py-3 pr-4 text-gray-500 font-semibold w-32">{t('career.criteria')}</th>
                                                 {compareList.map(c => (
                                                     <th key={c._id} className="text-left py-3 px-3">
                                                         <span className="font-bold text-[#0A2540]">{c.title}</span>
@@ -376,7 +368,7 @@ export default function CareerExplorer() {
                                         <tbody>
                                             {/* Salary Range */}
                                             <tr className="border-b border-gray-50">
-                                                <td className="py-3 pr-4 text-gray-500 font-medium">💰 Salary</td>
+                                                <td className="py-3 pr-4 text-gray-500 font-medium">💰 {t('career.salary')}</td>
                                                 {compareList.map(c => {
                                                     const minL = Math.round((c.salary?.min || 0) / 100000);
                                                     const maxL = Math.round((c.salary?.max || 0) / 100000);
@@ -394,14 +386,14 @@ export default function CareerExplorer() {
                                             </tr>
                                             {/* Required Stream */}
                                             <tr className="border-b border-gray-50">
-                                                <td className="py-3 pr-4 text-gray-500 font-medium">🎓 Stream</td>
+                                                <td className="py-3 pr-4 text-gray-500 font-medium">🎓 {t('career.stream')}</td>
                                                 {compareList.map(c => (
                                                     <td key={c._id} className="py-3 px-3 font-semibold text-[#0A2540]">{c.requiredStream || 'Any'}</td>
                                                 ))}
                                             </tr>
                                             {/* Skills */}
                                             <tr className="border-b border-gray-50">
-                                                <td className="py-3 pr-4 text-gray-500 font-medium">🛠️ Skills</td>
+                                                <td className="py-3 pr-4 text-gray-500 font-medium">🛠️ {t('career.skills')}</td>
                                                 {compareList.map(c => (
                                                     <td key={c._id} className="py-3 px-3">
                                                         <div className="flex flex-wrap gap-1">
@@ -414,7 +406,7 @@ export default function CareerExplorer() {
                                             </tr>
                                             {/* Roadmap */}
                                             <tr className="border-b border-gray-50">
-                                                <td className="py-3 pr-4 text-gray-500 font-medium align-top">📍 Roadmap</td>
+                                                <td className="py-3 pr-4 text-gray-500 font-medium align-top">📍 {t('career.roadmap')}</td>
                                                 {compareList.map(c => (
                                                     <td key={c._id} className="py-3 px-3">
                                                         <div className="space-y-1">
@@ -430,7 +422,7 @@ export default function CareerExplorer() {
                                             </tr>
                                             {/* Outcome */}
                                             <tr className="border-b border-gray-50">
-                                                <td className="py-3 pr-4 text-gray-500 font-medium">🎯 Outcome</td>
+                                                <td className="py-3 pr-4 text-gray-500 font-medium">🎯 {t('career.outcome')}</td>
                                                 {compareList.map(c => (
                                                     <td key={c._id} className="py-3 px-3 text-green-700 font-medium">{c.outcome || '—'}</td>
                                                 ))}
@@ -438,7 +430,7 @@ export default function CareerExplorer() {
                                             {/* Required Exam */}
                                             {compareList.some(c => c.requiredExam) && (
                                                 <tr className="border-b border-gray-50">
-                                                    <td className="py-3 pr-4 text-gray-500 font-medium">📝 Exam</td>
+                                                    <td className="py-3 pr-4 text-gray-500 font-medium">📝 {t('career.exam')}</td>
                                                     {compareList.map(c => (
                                                         <td key={c._id} className="py-3 px-3 text-blue-600 font-medium">{c.requiredExam || 'None required'}</td>
                                                     ))}
@@ -455,7 +447,7 @@ export default function CareerExplorer() {
                                                                 {result ? (
                                                                     <span className="bg-[#635BFF] text-white font-bold px-3 py-1 rounded-full text-xs">{result.score}% match</span>
                                                                 ) : (
-                                                                    <span className="text-gray-400 text-xs">Not in your results</span>
+                                                                    <span className="text-gray-400 text-xs">{t('career.matchNote')}</span>
                                                                 )}
                                                             </td>
                                                         );

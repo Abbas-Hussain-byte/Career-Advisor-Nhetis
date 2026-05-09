@@ -57,6 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
             role: user.role,
             profile: user.profile,
             assessment: user.assessment,
+            preferredLanguage: user.preferredLanguage,
             token: generateToken(user._id),
         });
     } else {
@@ -87,6 +88,7 @@ const authUser = asyncHandler(async (req, res) => {
             role: user.role,
             profile: user.profile,
             assessment: user.assessment,
+            preferredLanguage: user.preferredLanguage,
             token: generateToken(user._id),
         });
     } else {
@@ -110,6 +112,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
             role: user.role,
             profile: user.profile,
             assessment: user.assessment,
+            preferredLanguage: user.preferredLanguage,
         });
     } else {
         res.status(404);
@@ -124,6 +127,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
+        if (req.body.preferredLanguage) user.preferredLanguage = req.body.preferredLanguage;
         user.name = req.body.name || user.name;
         user.email = req.body.email || user.email;
 
@@ -133,6 +137,15 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         if (req.body.interests) user.profile.interests = req.body.interests;
         if (req.body.academicScore !== undefined) user.profile.academicScore = req.body.academicScore;
         if (req.body.location) user.profile.location = req.body.location;
+        if (req.body.longTermGoal !== undefined) user.profile.longTermGoal = req.body.longTermGoal;
+        if (req.body.aspirationTrack) user.profile.aspirationTrack = req.body.aspirationTrack;
+        if (req.body.coreValues) user.profile.coreValues = req.body.coreValues;
+        if (req.body.constraints) {
+            user.profile.constraints = {
+                ...(user.profile.constraints || {}),
+                ...req.body.constraints,
+            };
+        }
 
         if (req.body.password) {
             user.password = req.body.password;
@@ -147,6 +160,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
             role: updatedUser.role,
             profile: updatedUser.profile,
             assessment: updatedUser.assessment,
+            preferredLanguage: updatedUser.preferredLanguage,
             token: generateToken(updatedUser._id),
         });
     } else {
@@ -159,18 +173,32 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 // @route   PUT /api/users/assessment
 // @access  Private
 const saveAssessment = asyncHandler(async (req, res) => {
-    const { vector, results } = req.body;
+    const { vector, results, recommendedStreams = [], studentSignals = {} } = req.body;
     if (!vector || !results) {
         res.status(400);
         throw new Error('vector and results are required');
     }
     const user = await User.findByIdAndUpdate(
         req.user._id,
-        { assessment: { vector, results, takenAt: new Date() } },
-        { new: true }
+        { assessment: { vector, results, recommendedStreams, studentSignals, takenAt: new Date() } },
+        { returnDocument: 'after' }
     );
     if (!user) { res.status(404); throw new Error('User not found'); }
     res.json({ message: 'Assessment saved', assessment: user.assessment });
 });
 
-module.exports = { registerUser, authUser, getUserProfile, updateUserProfile, saveAssessment };
+// @desc    Update only language
+// @route   PUT /api/users/language
+// @access  Private
+const updateLanguage = asyncHandler(async (req, res) => {
+    const { language } = req.body;
+    if (!language || !['en', 'hi', 'te'].includes(language)) {
+        res.status(400);
+        throw new Error('Valid language required (en, hi, or te)');
+    }
+    const user = await User.findByIdAndUpdate(req.user._id, { preferredLanguage: language }, { returnDocument: 'after' });
+    if (!user) { res.status(404); throw new Error('User not found'); }
+    res.json({ message: 'Language updated', preferredLanguage: user.preferredLanguage });
+});
+
+module.exports = { registerUser, authUser, getUserProfile, updateUserProfile, saveAssessment, updateLanguage };

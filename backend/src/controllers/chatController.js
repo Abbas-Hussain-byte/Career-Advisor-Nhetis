@@ -1,8 +1,9 @@
 const asyncHandler = require('express-async-handler');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const CareerPath = require('../models/careerPathModel');
 
 // ── Build a rich system prompt from the user's saved profile ─────────────────
-function buildSystemPrompt(user) {
+function buildSystemPrompt(user, sessionLanguage = 'English') {
     const profile = user?.profile || {};
     const assess = user?.assessment || {};
     const results = assess.results || [];
@@ -42,6 +43,9 @@ function buildSystemPrompt(user) {
 - **Aptitude Profile:** ${aptitude}
 - **Skill Self-Ratings:** ${skillRatings}
 
+## Current Session Language
+- **Language:** ${sessionLanguage} (Respond PRIMARILY in this language)
+
 ## Your Role
 You guide this specific student based solely on their profile above. Your advice must be:
 1. **Hyper-personalised** — always connect your answers to their stream, interests, aptitude, and matched careers.
@@ -49,7 +53,14 @@ You guide this specific student based solely on their profile above. Your advice
 3. **Actionable** — give specific steps, timelines, and resources, not vague advice.
 4. **Honest** — if their aptitude scores suggest a career is a poor fit, say so kindly and redirect them.
 5. **Well-Formatted** — Use Markdown (**bold**, *lists*, # headers) to make your answers easy to read. NEVER return raw code blocks or special symbols that aren't markdown.
-6. **Complete** — Provide full, detailed answers. Do NOT cut off mid-sentence.
+6. **Complete** — Provide full, detailed answers. Do NOT cut off mid-sentence. Ensure the response is logically concluded.
+7. **Multi-lingual Awareness** — You are responding in ${sessionLanguage}. 
+   **CRITICAL RULE:** If the language is Hindi, you MUST write exclusively in the native Devanagari script (e.g. नमस्ते, आप कैसे हैं?). Do NOT use Hinglish or Latin characters. If the language is Telugu, use native Telugu script.
+
+## Dynamic Profile Updating
+If during the conversation the student explicitly shows interest in, or decides on, a specific new career path that differs from their top matches (e.g., they say "I want to be a Hardware Engineer" or "Tell me about being an Entrepreneur"), you MUST append this exact tag at the very end of your response:
+||UPDATE_GOAL: <Career Title>||
+Replace <Career Title> with a generalized title (e.g., "Hardware Engineer", "Entrepreneur", "Doctor", "Software Engineer").
 
 ## Personality
 Be warm, encouraging, and direct — like a knowledgeable senior who genuinely cares. Avoid generic motivational fluff. Start responses conversationally.`;
@@ -61,18 +72,16 @@ function getModel(systemPrompt) {
     if (!apiKey) throw new Error('GEMINI_API_KEY not set in .env');
     const genAI = new GoogleGenerativeAI(apiKey);
     return genAI.getGenerativeModel({
-        model: 'gemini-2.5-flash',
-        // In the @google/generative-ai SDK, system instruction must be passed here, 
-        // formatted as a Content object or a properly parsed string parts array.
+        model: 'gemini-flash-latest',
         systemInstruction: {
             role: "system",
             parts: [{ text: systemPrompt }]
         },
         generationConfig: {
-            temperature: 0.75,
+            temperature: 0.7,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 1500,
+            maxOutputTokens: 2048,
         },
     });
 }
@@ -80,7 +89,7 @@ function getModel(systemPrompt) {
 // ── POST /api/chat ─────────────────────────────────────────────────────────────
 // Body: { message: string, history: [{ role: 'user'|'model', parts: [{ text }] }] }
 const chat = asyncHandler(async (req, res) => {
-    const { message, history = [] } = req.body;
+    const { message, history = [], language = 'English' } = req.body;
     const user = req.user;
 
     if (!message?.trim()) {
@@ -88,7 +97,7 @@ const chat = asyncHandler(async (req, res) => {
         throw new Error('Message is required');
     }
 
-    const systemPrompt = buildSystemPrompt(user);
+    const systemPrompt = buildSystemPrompt(user, language);
     const model = getModel(systemPrompt);
 
     // Sanitize incoming history: Gemini strictly requires roles to be 'user' or 'model'
@@ -117,9 +126,45 @@ const chat = asyncHandler(async (req, res) => {
     });
 
     const result = await chatSession.sendMessage(message);
-    const reply = result.response.text();
+    let reply = result.response.text();
+    let profileUpdated = false;
 
-    res.json({ reply, role: 'model' });
+    // Intercept dynamic goal updates
+    const updateMatch = reply.match(/\|\|UPDATE_GOAL:\s*(.*?)\|\|/i);
+    if (updateMatch) {
+        const newGoal = updateMatch[1].trim();
+        reply = reply.replace(updateMatch[0], '').trim(); // Remove tag from user view
+
+        try {
+            // Find a matching career in the database
+            const career = await CareerPath.findOne({ title: { $regex: newGoal, $options: 'i' } });
+            if (career) {
+                // Ensure assessment object exists
+                if (!user.assessment) user.assessment = { results: [], vector: {} };
+                if (!user.assessment.results) user.assessment.results = [];
+                
+                // Remove if it already exists to avoid duplicates
+                user.assessment.results = user.assessment.results.filter(r => r.careerTitle !== career.title);
+                
+                // Add to the top of results with a high score
+                user.assessment.results.unshift({
+                    careerTitle: career.title,
+                    score: 0.95,
+                    category: career.category,
+                    skills: career.skills || []
+                });
+                
+                // Keep only top 5
+                user.assessment.results = user.assessment.results.slice(0, 5);
+                await user.save();
+                profileUpdated = true;
+            }
+        } catch (e) {
+            console.error('Failed to update goal from chat:', e);
+        }
+    }
+
+    res.json({ reply, role: 'model', profileUpdated });
 });
 
 module.exports = { chat };

@@ -5,46 +5,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import API from '../api';
 import Quiz from '../components/Quiz';
 import CollegeMap from '../components/CollegeMap';
-
-const Navbar = ({ user, logoutUser }: any) => {
-    const [open, setOpen] = useState(false);
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        logoutUser();
-        navigate('/');
-    };
-
-    return (
-        <nav className="bg-[#0A2540] text-white px-6 py-4 sticky top-0 z-50 shadow-lg">
-            <div className="max-w-7xl mx-auto flex justify-between items-center">
-                <Link to="/" className="text-xl font-extrabold">
-                    <span className="text-[#00D4FF]">N</span>HETIS
-                </Link>
-                <div className="hidden md:flex items-center gap-6 text-sm">
-                    <Link to="/dashboard" className="hover:text-[#00D4FF] transition font-medium">Dashboard</Link>
-                    <Link to="/careers" className="hover:text-[#00D4FF] transition font-medium">Careers</Link>
-                    <Link to="/colleges" className="hover:text-[#00D4FF] transition font-medium">Colleges</Link>
-                    <Link to="/scholarships" className="hover:text-[#00D4FF] transition font-medium">Scholarships</Link>
-                    <Link to="/resources" className="hover:text-[#00D4FF] transition font-medium">Resources</Link>
-                    <Link to="/insights" className="hover:text-[#00D4FF] transition font-medium">Insights</Link>
-                    <Link to="/profile" className="hover:text-[#00D4FF] transition font-medium">Profile</Link>
-                </div>
-                <div className="flex items-center gap-3">
-                    <span className="hidden md:block text-sm text-gray-300">{user?.name}</span>
-                    <button
-                        onClick={handleLogout}
-                        className="bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-white/20 transition"
-                    >
-                        Logout
-                    </button>
-                </div>
-            </div>
-        </nav>
-    );
-};
+import SharedNavbar from '../components/SharedNavbar';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Dashboard() {
+    const { t } = useLanguage();
     const { user, logoutUser, refreshUser } = useAuth();
     const [view, setView] = useState<'home' | 'quiz' | 'results'>('home');
     const [recommendations, setRecommendations] = useState<any>(null);
@@ -86,11 +51,16 @@ export default function Dashboard() {
                 academicScore: user?.profile?.academicScore || null,
                 location: locationData,
                 careerCategoryScores: scores._careerCategoryScores || {},
+                longTermGoal: user?.profile?.longTermGoal || '',
+                aspirationTrack: user?.profile?.aspirationTrack || 'Undecided',
+                coreValues: user?.profile?.coreValues || [],
+                constraints: user?.profile?.constraints || {},
             });
             setRecommendations(data);
             setView('results');
 
             // Also get stream recommendation (critical for Class 10 students)
+            let streamRecommendations: any[] = [];
             try {
                 const { data: streamData } = await API.post('/careers/recommend-stream', {
                     careerCategoryScores: scores._careerCategoryScores || {},
@@ -99,6 +69,7 @@ export default function Dashboard() {
                     grade: user?.profile?.grade || '12',
                 });
                 setStreamRec(streamData);
+                streamRecommendations = streamData?.recommendations?.slice(0, 3) || [];
             } catch {
                 // Stream recommendation is supplementary; don't break the flow
             }
@@ -113,11 +84,17 @@ export default function Dashboard() {
                         category: c.category,
                         skills: c.skills || [],
                     })),
-                    recommendedStreams: streamRec?.recommendations?.slice(0, 3).map((s: any) => ({
+                    recommendedStreams: streamRecommendations.map((s: any) => ({
                         stream: s.stream,
                         confidence: s.confidence,
                         reasoning: s.reasoning,
-                    })) || [],
+                    })),
+                    studentSignals: {
+                        longTermGoal: user?.profile?.longTermGoal || '',
+                        aspirationTrack: user?.profile?.aspirationTrack || 'Undecided',
+                        coreValues: user?.profile?.coreValues || [],
+                        constraints: user?.profile?.constraints || {},
+                    },
                 });
                 await refreshUser(); // Update AuthContext so Insights sees new assessment immediately
             } catch {
@@ -136,10 +113,10 @@ export default function Dashboard() {
             <div className="text-center py-12">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                     <h2 className="text-5xl font-extrabold text-[#0A2540] leading-tight">
-                        Welcome back, <span className="text-[#00D4FF]">{user?.name?.split(' ')[0]}</span>! 👋
+                        {t('dashboard.welcome')} <span className="text-[#00D4FF]">{user?.name?.split(' ')[0]}</span>! 👋
                     </h2>
                     <p className="text-gray-500 mt-3 text-lg max-w-xl mx-auto">
-                        Your personalized career guidance awaits. Take the quiz to get recommendations.
+                        {t('dashboard.subtitle')}
                     </p>
                 </motion.div>
             </div>
@@ -159,15 +136,15 @@ export default function Dashboard() {
                     className="glass rounded-2xl p-8 card-hover text-center col-span-1 md:col-span-2 lg:col-span-1"
                 >
                     <div className="text-5xl mb-4">🧠</div>
-                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">Discover Your Path</h3>
+                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">{t('dashboard.discoverPath')}</h3>
                     <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-                        Take our AI-powered aptitude test to find the best career streams and colleges for you.
+                        {t('dashboard.discoverDesc')}
                     </p>
                     <button
                         onClick={() => setView('quiz')}
                         className="w-full bg-[#0A2540] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#1a3d66] transition"
                     >
-                        Start Assessment →
+                        {t('dashboard.startQuiz')}
                     </button>
                 </motion.div>
 
@@ -179,15 +156,15 @@ export default function Dashboard() {
                     className="glass rounded-2xl p-8 card-hover text-center"
                 >
                     <div className="text-5xl mb-4">🚀</div>
-                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">Career Explorer</h3>
+                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">{t('dashboard.careerExplorer')}</h3>
                     <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-                        Browse all 10+ career paths with roadmaps, skills, and salary data.
+                        {t('dashboard.careerDesc')}
                     </p>
                     <Link
                         to="/careers"
                         className="block w-full bg-[#635BFF] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#564fe5] transition text-center"
                     >
-                        Explore Careers →
+                        {t('dashboard.exploreCareers')}
                     </Link>
                 </motion.div>
 
@@ -199,15 +176,15 @@ export default function Dashboard() {
                     className="glass rounded-2xl p-8 card-hover text-center"
                 >
                     <div className="text-5xl mb-4">🗺️</div>
-                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">Find Colleges</h3>
+                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">{t('dashboard.findColleges')}</h3>
                     <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-                        Locate government colleges near you on an interactive map.
+                        {t('dashboard.collegeDesc')}
                     </p>
                     <Link
                         to="/colleges"
                         className="block w-full bg-[#00D4FF] text-[#0A2540] py-3 rounded-xl font-bold text-sm hover:brightness-110 transition text-center"
                     >
-                        Open College Map →
+                        {t('dashboard.openMap')}
                     </Link>
                 </motion.div>
 
@@ -219,15 +196,15 @@ export default function Dashboard() {
                     className="glass rounded-2xl p-8 card-hover text-center"
                 >
                     <div className="text-5xl mb-4">🎓</div>
-                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">Scholarships</h3>
+                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">{t('dashboard.scholarships')}</h3>
                     <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-                        Discover verified government scholarships matched to your profile.
+                        {t('dashboard.scholarshipDesc')}
                     </p>
                     <Link
                         to="/scholarships"
                         className="block w-full bg-[#635BFF] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#564fe5] transition text-center"
                     >
-                        Find Scholarships →
+                        {t('dashboard.findScholarships')}
                     </Link>
                 </motion.div>
 
@@ -239,15 +216,15 @@ export default function Dashboard() {
                     className="glass rounded-2xl p-8 card-hover text-center"
                 >
                     <div className="text-5xl mb-4">📖</div>
-                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">Study Resources</h3>
+                    <h3 className="text-xl font-bold text-[#0A2540] mb-2">{t('dashboard.resources')}</h3>
                     <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-                        Free courses from NPTEL, SWAYAM, Khan Academy & exam prep links.
+                        {t('dashboard.resourceDesc')}
                     </p>
                     <Link
                         to="/resources"
                         className="block w-full bg-[#0A2540] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#1a3d66] transition text-center"
                     >
-                        Explore Resources →
+                        {t('dashboard.exploreResources')}
                     </Link>
                 </motion.div>
             </div>
@@ -261,17 +238,17 @@ export default function Dashboard() {
                     className="mt-8 glass rounded-2xl p-6"
                 >
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-bold text-[#0A2540]">Your Profile</h3>
-                        <Link to="/profile" className="text-sm text-[#635BFF] font-semibold hover:underline">Edit →</Link>
+                        <h3 className="text-lg font-bold text-[#0A2540]">{t('dashboard.yourProfile')}</h3>
+                        <Link to="/profile" className="text-sm text-[#635BFF] font-semibold hover:underline">{t('dashboard.edit')}</Link>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
-                            <p className="text-gray-500 text-xs">Grade</p>
-                            <p className="font-bold text-[#0A2540]">Class {user.profile.grade || 'Not set'}</p>
+                            <p className="text-gray-500 text-xs">{t('dashboard.grade')}</p>
+                            <p className="font-bold text-[#0A2540]">{t('dashboard.class')} {user.profile.grade || t('dashboard.notSet')}</p>
                         </div>
                         <div>
-                            <p className="text-gray-500 text-xs">Stream</p>
-                            <p className="font-bold text-[#0A2540]">{user.profile.stream || 'Not set'}</p>
+                            <p className="text-gray-500 text-xs">{t('dashboard.stream')}</p>
+                            <p className="font-bold text-[#0A2540]">{user.profile.stream || t('dashboard.notSet')}</p>
                         </div>
                         <div>
                             <p className="text-gray-500 text-xs">Phone</p>
@@ -340,14 +317,14 @@ export default function Dashboard() {
         <div className="space-y-8">
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-3xl font-extrabold text-[#0A2540]">Your Recommendations</h2>
-                    <p className="text-gray-500 text-sm mt-1">Based on your aptitude profile</p>
+                    <h2 className="text-3xl font-extrabold text-[#0A2540]">{t('dashboard.resultsTitle')}</h2>
+                    <p className="text-gray-500 text-sm mt-1">{t('dashboard.resultsSubtitle')}</p>
                 </div>
                 <button
                     onClick={() => setView('home')}
                     className="border-2 border-[#0A2540] text-[#0A2540] px-5 py-2 rounded-xl text-sm font-semibold hover:bg-[#0A2540] hover:text-white transition"
                 >
-                    ← New Assessment
+                    {t('dashboard.newAssessment')}
                 </button>
             </div>
 
@@ -475,7 +452,7 @@ export default function Dashboard() {
 
             {/* Career Cards */}
             <div>
-                <h3 className="text-lg font-bold text-[#0A2540] mb-4">🚀 Top Career Matches</h3>
+                <h3 className="text-lg font-bold text-[#0A2540] mb-4">🚀 {t('dashboard.topCareers')}</h3>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {recommendations?.recommendedCareers?.map((career: any, idx: number) => (
                         <motion.div
@@ -492,6 +469,15 @@ export default function Dashboard() {
                                 </span>
                             </div>
                             <p className="text-gray-500 text-sm mb-4 leading-relaxed">{career.description}</p>
+                            {!!career.reasoningTags?.length && (
+                                <div className="flex flex-wrap gap-1.5 mb-4">
+                                    {career.reasoningTags.map((tag: string) => (
+                                        <span key={tag} className="bg-[#635BFF]/10 text-[#635BFF] text-[11px] px-2 py-0.5 rounded-full font-medium">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                             <div className="flex flex-wrap gap-1 mb-4">
                                 {career.skills?.slice(0, 3).map((s: string) => (
                                     <span key={s} className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded">
@@ -533,8 +519,8 @@ export default function Dashboard() {
                 return (
                     <div>
                         <div className="flex items-baseline gap-3 mb-4">
-                            <h3 className="text-lg font-bold text-[#0A2540]">🗺️ Colleges for Your Career Path</h3>
-                            <span className="text-xs text-gray-400">Sorted by program relevance to your results</span>
+                            <h3 className="text-lg font-bold text-[#0A2540]">🗺️ {t('dashboard.collegesTitle')}</h3>
+                            <span className="text-xs text-gray-400">{t('dashboard.collegesSubtitle')}</span>
                         </div>
                         <CollegeMap colleges={recommendations.nearbyColleges} />
                         <div className="grid md:grid-cols-3 gap-4 mt-4">
@@ -583,7 +569,7 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen bg-[#F6F9FC]">
-            <Navbar user={user} logoutUser={logoutUser} />
+            <SharedNavbar activePage="dashboard" />
 
             <main className="max-w-7xl mx-auto px-6 py-8">
                 <AnimatePresence mode="wait">
@@ -600,17 +586,17 @@ export default function Dashboard() {
                                     onClick={() => setView('home')}
                                     className="text-sm text-gray-500 hover:text-gray-700 mb-6 flex items-center gap-1"
                                 >
-                                    ← Cancel Assessment
+                                    {t('dashboard.cancelAssessment')}
                                 </button>
                                 <div className="text-center mb-8">
-                                    <h2 className="text-3xl font-extrabold text-[#0A2540]">Aptitude Assessment</h2>
-                                    <p className="text-gray-500 mt-2">Answer honestly — there are no right or wrong answers</p>
+                                    <h2 className="text-3xl font-extrabold text-[#0A2540]">{t('dashboard.assessmentTitle')}</h2>
+                                    <p className="text-gray-500 mt-2">{t('dashboard.assessmentDesc')}</p>
                                 </div>
                                 {loadingResults ? (
                                     <div className="text-center py-20">
                                         <div className="spinner mx-auto mb-4"></div>
-                                        <p className="text-gray-600 font-medium">Analyzing your responses...</p>
-                                        <p className="text-gray-400 text-sm mt-1">Finding the best careers & colleges for you</p>
+                                        <p className="text-gray-600 font-medium">{t('dashboard.analyzingResponses')}</p>
+                                        <p className="text-gray-400 text-sm mt-1">{t('dashboard.findingBest')}</p>
                                     </div>
                                 ) : (
                                     <Quiz onComplete={handleQuizComplete} />

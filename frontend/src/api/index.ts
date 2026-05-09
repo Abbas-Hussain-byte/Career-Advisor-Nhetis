@@ -17,6 +17,7 @@ export const login = (formData: any) => API.post('/users/login', formData);
 export const register = (formData: any) => API.post('/users', formData);
 export const fetchProfile = () => API.get('/users/profile');
 export const updateProfile = (data: any) => API.put('/users/profile', data);
+export const updateLanguage = (language: string) => API.put('/users/language', { language });
 
 // Careers
 export const getCareers = (params?: any) => API.get('/careers', { params });

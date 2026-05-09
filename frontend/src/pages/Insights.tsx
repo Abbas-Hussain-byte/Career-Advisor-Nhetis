@@ -9,6 +9,8 @@ import {
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     Cell
 } from 'recharts';
+import { useLanguage } from '../context/LanguageContext';
+import SharedNavbar from '../components/SharedNavbar';
 
 // ── Color palette ──────────────────────────────────────────────────
 const CATEGORY_COLORS: Record<string, string> = {
@@ -60,6 +62,7 @@ const Section = ({ title, subtitle, children }: { title: string; subtitle: strin
 
 export default function Insights() {
     const { user, logoutUser } = useAuth();
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const [allCareers, setAllCareers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -111,31 +114,49 @@ export default function Insights() {
             'Arts / Humanities': ['Arts & Design', 'Media', 'Education', 'Law'],
             'Vocational': ['Engineering', 'Agriculture'],
         };
-        const relevantCategories = new Set<string>(streamMap[profile.stream] || []);
+        const streamCats = streamMap[profile.stream] || [];
+        const interestCats = new Set<string>();
+        const catMap: Record<string, string[]> = {
+            Technology: ['Technology'], Science: ['Technology', 'Medical', 'Agriculture'],
+            Mathematics: ['Technology', 'Engineering', 'Commerce'], Medicine: ['Medical'],
+            Arts: ['Arts & Design', 'Media'], Design: ['Arts & Design'],
+            Business: ['Business', 'Commerce'], Commerce: ['Commerce', 'Business'],
+            Agriculture: ['Agriculture'], Education: ['Education'], Sports: ['Education'],
+            Writing: ['Media', 'Education'], Engineering: ['Engineering', 'Technology'],
+            Law: ['Law'],
+        };
         (profile.interests || []).forEach((interest: string) => {
-            const catMap: Record<string, string[]> = {
-                Technology: ['Technology'], Science: ['Technology', 'Medical', 'Agriculture'],
-                Mathematics: ['Technology', 'Engineering', 'Commerce'], Medicine: ['Medical'],
-                Arts: ['Arts & Design', 'Media'], Design: ['Arts & Design'],
-                Business: ['Business', 'Commerce'], Commerce: ['Commerce', 'Business'],
-                Agriculture: ['Agriculture'], Education: ['Education'], Sports: ['Education'],
-                Writing: ['Media', 'Education'], Engineering: ['Engineering', 'Technology'],
-                Law: ['Law'],
-            };
-            (catMap[interest] || []).forEach(c => relevantCategories.add(c));
+            (catMap[interest] || []).forEach(c => interestCats.add(c));
         });
-        const filtered = relevantCategories.size > 0
-            ? allCareers.filter(c => relevantCategories.has(c.category))
-            : allCareers;
-        return filtered.slice(0, 6);
+
+        // Score each career based on stream (1pt) and interest (2pts)
+        const scored = allCareers.map(c => {
+            let s = 0;
+            if (streamCats.includes(c.category)) s += 1;
+            if (interestCats.has(c.category)) s += 2;
+            return { ...c, _s: s };
+        });
+
+        // Sort by score (desc), then by title length (to avoid tech bias from seed order)
+        const sorted = scored
+            .filter(c => c._s > 0)
+            .sort((a, b) => {
+                if (b._s !== a._s) return b._s - a._s;
+                return (a.title?.length || 0) - (b.title?.length || 0);
+            });
+
+        return sorted.slice(0, 6);
     }, [allCareers, hasAssessment, assessment, profile]);
 
     // Auto-select top matched career and fetch Adzuna market data when careers load
     useEffect(() => {
-        if (matchedCareers.length > 0 && !selectedCareer) {
-            setSelectedCareer(matchedCareers[0]?.title || 'software engineer');
+        if (matchedCareers.length > 0) {
+            // Only auto-select if nothing selected OR if current selection is not in matched list
+            if (!selectedCareer || !matchedCareers.find(c => c.title === selectedCareer)) {
+                setSelectedCareer(matchedCareers[0]?.title);
+            }
         }
-    }, [matchedCareers, selectedCareer]);
+    }, [matchedCareers]);
 
     useEffect(() => {
         if (!selectedCareer) return;
@@ -152,10 +173,10 @@ export default function Insights() {
         const vec = assessment?.vector;
         if (vec && (vec.logic || vec.creativity || vec.technical || vec.social)) {
             return [
-                { dim: 'Logic', value: Math.round(vec.logic * 100), fullMark: 100 },
-                { dim: 'Creativity', value: Math.round(vec.creativity * 100), fullMark: 100 },
-                { dim: 'Technical', value: Math.round(vec.technical * 100), fullMark: 100 },
-                { dim: 'Social', value: Math.round(vec.social * 100), fullMark: 100 },
+                { dim: t('insights.logic'), value: Math.round(vec.logic * 100), fullMark: 100 },
+                { dim: t('insights.creativity'), value: Math.round(vec.creativity * 100), fullMark: 100 },
+                { dim: t('insights.technical'), value: Math.round(vec.technical * 100), fullMark: 100 },
+                { dim: t('insights.social'), value: Math.round(vec.social * 100), fullMark: 100 },
             ];
         }
         // Estimate from profile stream
@@ -166,14 +187,14 @@ export default function Insights() {
             'Arts / Humanities': [45, 80, 30, 80],
             'Vocational': [60, 60, 75, 50],
         };
-        const [l, cr, t, s] = estimates[profile.stream] || [50, 50, 50, 50];
+        const [l, cr, t_val, s] = estimates[profile.stream] || [50, 50, 50, 50];
         return [
-            { dim: 'Logic', value: l, fullMark: 100 },
-            { dim: 'Creativity', value: cr, fullMark: 100 },
-            { dim: 'Technical', value: t, fullMark: 100 },
-            { dim: 'Social', value: s, fullMark: 100 },
+            { dim: t('insights.logic'), value: l, fullMark: 100 },
+            { dim: t('insights.creativity'), value: cr, fullMark: 100 },
+            { dim: t('insights.technical'), value: t_val, fullMark: 100 },
+            { dim: t('insights.social'), value: s, fullMark: 100 },
         ];
-    }, [assessment, profile.stream]);
+    }, [assessment, profile.stream, t]);
 
     // ── Skills gap: skills needed by matched careers vs. what user has ──
     const skillsGap = React.useMemo(() => {
@@ -218,7 +239,7 @@ export default function Insights() {
             <div className="min-h-screen flex items-center justify-center bg-[#F6F9FC]">
                 <div className="text-center">
                     <div className="spinner mx-auto mb-4" />
-                    <p className="text-gray-600 font-medium">Loading your personalized insights…</p>
+                    <p className="text-gray-600 font-medium">{t('insights.fetching')}</p>
                 </div>
             </div>
         );
@@ -226,34 +247,15 @@ export default function Insights() {
 
     return (
         <div className="min-h-screen bg-[#F6F9FC]">
-            {/* Navbar */}
-            <nav className="bg-[#0A2540] text-white px-6 py-4 sticky top-0 z-50 shadow-lg">
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <Link to="/" className="text-xl font-extrabold">
-                        <span className="text-[#00D4FF]">N</span>HETIS
-                    </Link>
-                    <div className="hidden md:flex items-center gap-6 text-sm">
-                        <Link to="/dashboard" className="hover:text-[#00D4FF] transition font-medium">Dashboard</Link>
-                        <Link to="/careers" className="hover:text-[#00D4FF] transition font-medium">Careers</Link>
-                        <Link to="/colleges" className="hover:text-[#00D4FF] transition font-medium">Colleges</Link>
-                        <Link to="/insights" className="text-[#00D4FF] font-bold border-b-2 border-[#00D4FF] pb-0.5">Insights</Link>
-                        <Link to="/profile" className="hover:text-[#00D4FF] transition font-medium">Profile</Link>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <span className="hidden md:block text-sm text-gray-300">{user?.name}</span>
-                        <button onClick={handleLogout} className="bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-white/20 transition">Logout</button>
-                    </div>
-                </div>
-            </nav>
-
+            <SharedNavbar activePage="insights" />
             <main className="max-w-7xl mx-auto px-6 py-8">
                 {/* Header */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
                     <h1 className="text-4xl font-extrabold text-[#0A2540]">
-                        Your Career <span className="text-[#00D4FF]">Insights</span>
+                        {t('insights.title').split('Insights')[0]} <span className="text-[#00D4FF]">{t('insights.title').includes('Insights') ? 'Insights' : ''}</span>
                     </h1>
                     <p className="text-gray-500 mt-2 max-w-xl">
-                        Personalized for <strong>{user?.name}</strong>
+                        {t('insights.personalizedFor', { name: user?.name || '' })}
                         {profile.stream ? ` · ${profile.stream}` : ''}
                         {profile.grade ? ` · Grade ${profile.grade}` : ''}
                     </p>
@@ -266,14 +268,13 @@ export default function Insights() {
                         className="bg-gradient-to-r from-[#635BFF] to-[#00D4FF] text-white rounded-2xl px-6 py-5 mb-8 flex flex-col md:flex-row items-center justify-between gap-4"
                     >
                         <div>
-                            <h3 className="font-bold text-lg">🧠 Take the Aptitude Assessment</h3>
+                            <h3 className="font-bold text-lg">🧠 {t('insights.takeAssessment')}</h3>
                             <p className="text-sm text-white/80 mt-1">
-                                Your charts below are based on your profile stream &amp; interests.
-                                Complete the quiz to unlock your precise aptitude radar and exact career matches.
+                                {t('insights.assessmentSubtitle')}
                             </p>
                         </div>
                         <Link to="/dashboard" className="shrink-0 bg-white text-[#635BFF] font-bold px-6 py-2.5 rounded-xl text-sm hover:opacity-90 transition">
-                            Start Quiz →
+                            {t('insights.startQuiz')}
                         </Link>
                     </motion.div>
                 )}
@@ -282,7 +283,7 @@ export default function Insights() {
                 {hasAssessment && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-wrap gap-3 mb-8">
                         <span className="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-1.5 rounded-full font-medium">
-                            ✅ Assessment completed {assessment.takenAt ? `on ${new Date(assessment.takenAt).toLocaleDateString('en-IN')}` : ''}
+                            ✅ {t('insights.completedOn', { date: assessment.takenAt ? new Date(assessment.takenAt).toLocaleDateString() : '' })}
                         </span>
                         {(assessment.results || []).slice(0, 3).map((r: any) => (
                             <span key={r.careerTitle}
@@ -296,10 +297,10 @@ export default function Insights() {
 
                 {/* ── 1. YOUR APTITUDE PROFILE (RADAR) ─────────────── */}
                 <Section
-                    title="🎯 Your Aptitude Profile"
+                    title={`🎯 ${t('insights.aptitudeTitle')}`}
                     subtitle={hasAssessment
-                        ? "Based on your quiz results — your actual aptitude dimensions"
-                        : `Estimated from your stream (${profile.stream || 'not set'}) — take the quiz for exact results`}
+                        ? t('insights.aptitudeSubtitle')
+                        : t('insights.aptitudeEstimated', { stream: profile.stream || 'not set' })}
                 >
                     <div className="flex flex-col md:flex-row items-center gap-8">
                         <div className="w-full md:w-1/2" style={{ height: 280 }}>
@@ -317,7 +318,7 @@ export default function Insights() {
                             </ResponsiveContainer>
                         </div>
                         <div className="w-full md:w-1/2 space-y-3">
-                            <h3 className="font-bold text-[#0A2540]">What this means for you</h3>
+                            <h3 className="font-bold text-[#0A2540]">{t('insights.whatThisMeans')}</h3>
                             {radarData.map(d => (
                                 <div key={d.dim}>
                                     <div className="flex justify-between text-sm mb-1">
@@ -341,10 +342,10 @@ export default function Insights() {
 
                 {/* ── 2. CAREERS MATCHED TO YOU ─────────────────────── */}
                 <Section
-                    title="⭐ Careers Matched to You"
+                    title={`⭐ ${t('insights.matchedTitle')}`}
                     subtitle={hasAssessment
-                        ? `Your top ${matchedCareers.length} career matches from your assessment — sorted by compatibility`
-                        : `Top careers for ${profile.stream || 'your stream'} + your interests`}
+                        ? t('insights.matchedSubtitleAssessment', { n: matchedCareers.length })
+                        : t('insights.matchedSubtitleStream', { stream: profile.stream || '' })}
                 >
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {matchedCareers.map((career, idx) => {
@@ -389,15 +390,15 @@ export default function Insights() {
                     </div>
                     {matchedCareers.length === 0 && (
                         <p className="text-center text-gray-400 py-8">
-                            Set your stream and interests in <Link to="/profile" className="text-[#635BFF] font-semibold">Profile</Link> to see personalized career matches.
+                            {t('insights.noMatches')}
                         </p>
                     )}
                 </Section>
 
                 {/* ── 3. SKILLS GAP ANALYSIS ───────────────────────── */}
                 <Section
-                    title="🛠️ Skills You Need to Develop"
-                    subtitle="Skills your matched careers require — green = you already have this (from your interests), red = skill gap to work on"
+                    title={`🛠️ ${t('insights.skillsGapTitle')}`}
+                    subtitle={t('insights.skillsGapSubtitle')}
                 >
                     <div className="flex flex-wrap gap-3">
                         {skillsGap.map(({ skill, count, have }) => (
@@ -418,7 +419,7 @@ export default function Insights() {
                     </div>
                     {skillsGap.some(s => !s.have) && (
                         <div className="mt-4 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-600">
-                            💡 Focus on the highlighted skills above — adding these to your interests will strengthen your career roadmap.
+                            💡 {t('insights.skillsNote')}
                         </div>
                     )}
                 </Section>
@@ -426,8 +427,8 @@ export default function Insights() {
                 {/* ── 4. JOB DEMAND (YOUR MATCHED CAREERS) ─────────── */}
                 {demandData.length > 0 && (
                     <Section
-                        title="📈 Job Demand for Your Career Matches"
-                        subtitle="Estimated annual job openings in India (2024) for careers matched to your profile"
+                        title={`📈 ${t('insights.demandTitle')}`}
+                        subtitle={t('insights.demandSubtitle')}
                     >
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={demandData} margin={{ top: 10, right: 20, left: 10, bottom: 60 }}>
@@ -435,9 +436,9 @@ export default function Insights() {
                                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} angle={-35} textAnchor="end" interval={0} />
                                 <YAxis tickFormatter={v => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v}
                                     tick={{ fontSize: 11, fill: '#64748b' }}
-                                    label={{ value: 'Openings/yr', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#94a3b8', dx: -5 }} />
+                                    label={{ value: t('insights.openings'), angle: -90, position: 'insideLeft', fontSize: 11, fill: '#94a3b8', dx: -5 }} />
                                 <Tooltip content={<CustomTooltip />} />
-                                <Bar dataKey="openings" name="Openings/yr" radius={[6, 6, 0, 0]}>
+                                <Bar dataKey="openings" name={t('insights.openings')} radius={[6, 6, 0, 0]}>
                                     {demandData.map((entry, idx) => (
                                         <Cell key={idx} fill={CATEGORY_COLORS[entry.category] || COLORS[idx % COLORS.length]} />
                                     ))}
@@ -451,8 +452,8 @@ export default function Insights() {
                 {/* ── 5. SALARY COMPARISON (YOUR MATCHED CAREERS) ─── */}
                 {salaryData.length > 0 && (
                     <Section
-                        title="💰 Salary Range for Your Career Matches"
-                        subtitle="Annual salary range (₹ Lakhs) in India — showing entry-level Min and experienced Max"
+                        title={`💰 ${t('insights.salaryTitle')}`}
+                        subtitle={t('insights.salarySubtitle')}
                     >
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={salaryData} margin={{ top: 10, right: 20, left: 10, bottom: 60 }}>
@@ -462,16 +463,16 @@ export default function Insights() {
                                     label={{ value: '₹ Lakhs/yr', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#94a3b8', dx: -5 }} />
                                 <Tooltip content={<CustomTooltip />} formatter={(v: any) => `₹${v}L / yr`} />
                                 <Legend wrapperStyle={{ fontSize: 12 }} />
-                                <Bar dataKey="Min" name="Min Salary" fill="#00D4FF" opacity={0.75} radius={[4, 4, 0, 0]} />
-                                <Bar dataKey="Max" name="Max Salary" fill="#635BFF" opacity={0.85} radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="Min" name={t('insights.minSalary')} fill="#00D4FF" opacity={0.75} radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="Max" name={t('insights.maxSalary')} fill="#635BFF" opacity={0.85} radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </Section>
                 )}
                 {/* ── 6. LIVE MARKET TRENDS (Real jobs from Remotive) ── */}
                 <Section
-                    title="🌐 Live Market Trends"
-                    subtitle={jobTrends?.cached ? "Real-time skill demand from current job listings (Remotive · refreshed every 6h)" : "Fetching live job data from Remotive API…"}
+                    title={`🌐 ${t('insights.liveTrendsTitle')}`}
+                    subtitle={t('insights.liveTrendsSubtitle')}
                 >
                     {jobsLoading ? (
                         <div className="flex items-center justify-center py-10 gap-3">
@@ -482,7 +483,7 @@ export default function Insights() {
                         <div className="space-y-8">
                             {/* Skill demand bar chart */}
                             <div>
-                                <h3 className="font-bold text-[#0A2540] text-sm mb-4">🔥 Top In-Demand Skills (from live job listings)</h3>
+                                <h3 className="font-bold text-[#0A2540] text-sm mb-4">🔥 {t('insights.liveSkillsTitle')}</h3>
                                 <ResponsiveContainer width="100%" height={240}>
                                     <BarChart data={jobTrends.skills.slice(0, 12)} layout="vertical" margin={{ left: 80, right: 20 }}>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
@@ -500,7 +501,7 @@ export default function Insights() {
 
                             {/* Sector distribution */}
                             <div>
-                                <h3 className="font-bold text-[#0A2540] text-sm mb-3">🏢 Job Openings by Sector</h3>
+                                <h3 className="font-bold text-[#0A2540] text-sm mb-3">🏢 {t('insights.liveSectorsTitle')}</h3>
                                 <div className="flex flex-wrap gap-3">
                                     {jobTrends.sectors.map((s: any, i: number) => (
                                         <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-white"
@@ -515,7 +516,7 @@ export default function Insights() {
                             {/* Top live job listings */}
                             {jobTrends.topJobs?.length > 0 && (
                                 <div>
-                                    <h3 className="font-bold text-[#0A2540] text-sm mb-3">📋 Sample Live Job Listings</h3>
+                                    <h3 className="font-bold text-[#0A2540] text-sm mb-3">📋 {t('insights.liveJobsTitle')}</h3>
                                     <div className="grid md:grid-cols-2 gap-3">
                                         {jobTrends.topJobs.slice(0, 6).map((job: any, i: number) => (
                                             <a key={i} href={job.url} target="_blank" rel="noopener noreferrer"
@@ -537,19 +538,19 @@ export default function Insights() {
                         </div>
                     ) : (
                         <div className="text-center py-10">
-                            <p className="text-gray-400 text-sm">Live job data temporarily unavailable.</p>
+                            <p className="text-gray-400 text-sm">{t('insights.unavailable')}</p>
                         </div>
                     )}
                 </Section>
 
                 {/* ── 7. ADZUNA MARKET INTELLIGENCE (4 charts) ── */}
                 <Section
-                    title="📊 Market Intelligence (India)"
-                    subtitle="Live data from Adzuna — historical demand, salary spread, top cities, and top hiring companies"
+                    title={`📊 ${t('insights.marketIntelTitle')}`}
+                    subtitle={t('insights.marketIntelSubtitle')}
                 >
                     {/* Career selector pills */}
                     <div className="flex flex-wrap items-center gap-3 mb-6">
-                        <span className="text-sm font-semibold text-gray-500">Showing data for:</span>
+                        <span className="text-sm font-semibold text-gray-500">{t('insights.showingDataFor')}:</span>
                         <div className="flex flex-wrap gap-2">
                             {(matchedCareers.length > 0 ? matchedCareers : allCareers.slice(0, 5)).map((c: any) => (
                                 <button
@@ -575,9 +576,22 @@ export default function Insights() {
                             <p className="text-gray-400 text-sm">Fetching Adzuna market data for “{selectedCareer}”…</p>
                         </div>
                     ) : !marketData ? (
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-800">
-                            <p className="font-bold mb-1">⚠️ Adzuna API credentials not configured</p>
-                            <p className="text-amber-700">Add <code className="bg-amber-100 px-1 rounded">ADZUNA_APP_ID</code> and <code className="bg-amber-100 px-1 rounded">ADZUNA_APP_KEY</code> to <code className="bg-amber-100 px-1 rounded">backend/.env</code> to unlock demand trends, salary distribution, top cities, and hiring companies.</p>
+                        <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-8 text-center shadow-sm">
+                            <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">🔑</div>
+                            <h4 className="text-lg font-bold text-[#0A2540] mb-2">{t('insights.marketIntelTitle')} — Simulation Mode</h4>
+                            <p className="text-gray-500 text-sm max-w-md mx-auto mb-6">
+                                Live Adzuna integration requires API credentials. To unlock real-time demand charts, salary distribution, and hiring trends for <span className="font-bold text-[#635BFF]">{selectedCareer}</span>, please configure your keys.
+                            </p>
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                                <div className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm">
+                                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                                    <span className="text-xs font-mono text-gray-400">ADZUNA_APP_ID missing</span>
+                                </div>
+                                <div className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm">
+                                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                                    <span className="text-xs font-mono text-gray-400">ADZUNA_APP_KEY missing</span>
+                                </div>
+                            </div>
                         </div>
                     ) : (
                         <div className="space-y-10">
@@ -585,8 +599,8 @@ export default function Insights() {
                             {/* Chart 1: Historical Demand Trend (Line chart) */}
                             {marketData.history?.length > 0 && (
                                 <div>
-                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">📈 Job Demand Trend — Last 12 Months</h3>
-                                    <p className="text-xs text-gray-400 mb-4">How many jobs were posted monthly in India for “{selectedCareer}”</p>
+                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">📈 {t('insights.demandTrendTitle')}</h3>
+                                    <p className="text-xs text-gray-400 mb-4">{t('insights.demandTrendSubtitle', { career: selectedCareer })}</p>
                                     <ResponsiveContainer width="100%" height={220}>
                                         <LineChart data={marketData.history} margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -602,8 +616,8 @@ export default function Insights() {
                             {/* Chart 2: Salary Histogram (Bar chart) */}
                             {marketData.histogram?.length > 0 && (
                                 <div>
-                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">💰 Salary Distribution</h3>
-                                    <p className="text-xs text-gray-400 mb-4">Number of job listings at each annual salary bracket (₹ Lakhs) in India</p>
+                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">💰 {t('insights.salaryDistTitle')}</h3>
+                                    <p className="text-xs text-gray-400 mb-4">{t('insights.salaryDistSubtitle')}</p>
                                     <ResponsiveContainer width="100%" height={220}>
                                         <BarChart data={marketData.histogram} margin={{ left: 10, right: 20, bottom: 30 }}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -623,8 +637,8 @@ export default function Insights() {
                             {/* Chart 3: Regional / Top Cities (Horizontal bar) */}
                             {marketData.regional?.length > 0 && (
                                 <div>
-                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">🇳🇮 Top Cities Hiring in India</h3>
-                                    <p className="text-xs text-gray-400 mb-4">Where the most “{selectedCareer}” roles are posted right now</p>
+                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">🇳🇮 {t('insights.topCitiesTitle')}</h3>
+                                    <p className="text-xs text-gray-400 mb-4">{t('insights.topCitiesSubtitle', { career: selectedCareer })}</p>
                                     <ResponsiveContainer width="100%" height={280}>
                                         <BarChart data={marketData.regional} layout="vertical" margin={{ left: 100, right: 30 }}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
@@ -644,8 +658,8 @@ export default function Insights() {
                             {/* Chart 4: Top Companies (Grid of company pills) */}
                             {marketData.topCompanies?.length > 0 && (
                                 <div>
-                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">🏢 Top Hiring Companies</h3>
-                                    <p className="text-xs text-gray-400 mb-4">Companies currently posting the most “{selectedCareer}” roles in India — great targets for your job search</p>
+                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">🏢 {t('insights.topCompaniesTitle')}</h3>
+                                    <p className="text-xs text-gray-400 mb-4">{t('insights.topCompaniesSubtitle', { career: selectedCareer })}</p>
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                                         {marketData.topCompanies.map((co: any, i: number) => (
                                             <div key={i}

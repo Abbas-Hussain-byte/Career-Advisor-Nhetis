@@ -1,72 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import API from '../api';
-
-const TYPE_LABELS: Record<string, string> = {
-    course: 'Course',
-    article: 'Article',
-    video: 'Video',
-    ebook: 'E-Book',
-    tool: 'Tool',
-    'exam-prep': 'Exam Prep',
-    exam: 'Official Exam',
-};
-
-const TYPE_COLORS: Record<string, string> = {
-    exam: 'bg-red-100 text-red-800',
-    'exam-prep': 'bg-orange-100 text-orange-800',
-    course: 'bg-blue-100 text-blue-800',
-    video: 'bg-purple-100 text-purple-800',
-    article: 'bg-green-100 text-green-800',
-    ebook: 'bg-indigo-100 text-indigo-800',
-    tool: 'bg-teal-100 text-teal-800',
-};
-
-const TYPE_ICONS: Record<string, string> = {
-    course: '📚',
-    article: '📰',
-    video: '🎥',
-    ebook: '📖',
-    tool: '🔧',
-    'exam-prep': '📝',
-    exam: '🎯',
-};
-
-const Navbar = ({ user, logoutUser }: any) => {
-    const navigate = useNavigate();
-    return (
-        <nav className="bg-[#0A2540] text-white px-6 py-4 sticky top-0 z-50 shadow-lg">
-            <div className="max-w-7xl mx-auto flex justify-between items-center">
-                <Link to="/" className="text-xl font-extrabold">
-                    <span className="text-[#00D4FF]">N</span>HETIS
-                </Link>
-                <div className="hidden md:flex items-center gap-6 text-sm">
-                    <Link to="/dashboard" className="hover:text-[#00D4FF] transition font-medium">Dashboard</Link>
-                    <Link to="/careers" className="hover:text-[#00D4FF] transition font-medium">Careers</Link>
-                    <Link to="/colleges" className="hover:text-[#00D4FF] transition font-medium">Colleges</Link>
-                    <Link to="/scholarships" className="hover:text-[#00D4FF] transition font-medium">Scholarships</Link>
-                    <Link to="/resources" className="text-[#00D4FF] font-bold">Resources</Link>
-                    <Link to="/insights" className="hover:text-[#00D4FF] transition font-medium">Insights</Link>
-                    <Link to="/profile" className="hover:text-[#00D4FF] transition font-medium">Profile</Link>
-                </div>
-                <div className="flex items-center gap-3">
-                    <span className="hidden md:block text-sm text-gray-300">{user?.name}</span>
-                    <button onClick={() => { logoutUser(); navigate('/'); }} className="bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-white/20 transition">Logout</button>
-                </div>
-            </div>
-        </nav>
-    );
-};
+import { useLanguage } from '../context/LanguageContext';
+import SharedNavbar from '../components/SharedNavbar';
 
 export default function Resources() {
-    const { user, logoutUser } = useAuth();
+    const { user } = useAuth();
+    const { t } = useLanguage();
     const [resources, setResources] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [typeFilter, setTypeFilter] = useState('');
     const [search, setSearch] = useState('');
     const [personalized, setPersonalized] = useState(false);
+
+    const TYPE_LABELS: Record<string, string> = {
+        course: t('resource.types.course'),
+        article: t('resource.types.article'),
+        video: t('resource.types.video'),
+        ebook: t('resource.types.ebook'),
+        tool: t('resource.types.tool'),
+        'exam-prep': t('resource.types.exam-prep'),
+        exam: t('resource.types.exam'),
+    };
+
+    const TYPE_ICONS: Record<string, string> = {
+        course: '📚',
+        article: '📰',
+        video: '🎥',
+        ebook: '📖',
+        tool: '🔧',
+        'exam-prep': '📝',
+        exam: '🎯',
+    };
 
     useEffect(() => {
         fetchResources();
@@ -107,13 +73,13 @@ export default function Resources() {
 
     return (
         <div className="min-h-screen bg-[#F6F9FC]">
-            <Navbar user={user} logoutUser={logoutUser} />
+            <SharedNavbar activePage="resources" />
             <main className="max-w-7xl mx-auto px-6 py-8">
                 {/* Header */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
-                    <h1 className="text-4xl font-extrabold text-[#0A2540]">📖 Study Resources</h1>
+                    <h1 className="text-4xl font-extrabold text-[#0A2540]">{t('resource.title')}</h1>
                     <p className="text-gray-500 mt-2 max-w-xl mx-auto">
-                        Curated free resources from NPTEL, SWAYAM, Khan Academy, NTA & more — matched to your career path
+                        {t('resource.subtitle')}
                     </p>
                 </motion.div>
 
@@ -124,7 +90,7 @@ export default function Resources() {
                             onClick={() => setPersonalized(!personalized)}
                             className={`px-4 py-2 rounded-xl text-sm font-bold transition border-2 ${personalized ? 'bg-[#635BFF] text-white border-[#635BFF]' : 'border-gray-200 text-gray-600 hover:border-[#635BFF]'}`}
                         >
-                            {personalized ? '✓ Personalized for me' : '🎯 Show recommended'}
+                            {personalized ? t('scholarship.personalized') : t('scholarship.showPersonalized')}
                         </button>
                         <select
                             value={typeFilter}
@@ -132,7 +98,7 @@ export default function Resources() {
                             className="border-2 border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-[#635BFF] outline-none bg-white text-gray-900"
                             disabled={personalized}
                         >
-                            <option value="">All Types</option>
+                            <option value="">{t('career.allCategories')}</option>
                             {Object.entries(TYPE_LABELS).map(([k, v]) => (
                                 <option key={k} value={k}>{TYPE_ICONS[k]} {v}</option>
                             ))}
@@ -142,12 +108,12 @@ export default function Resources() {
                                 type="text"
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
-                                placeholder="Search resources..."
+                                placeholder={t('resource.searchPlaceholder')}
                                 className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-[#635BFF] outline-none bg-white text-gray-900"
                                 disabled={personalized}
                             />
                             <button type="submit" className="bg-[#0A2540] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#1a3d66] transition" disabled={personalized}>
-                                Search
+                                {t('common.search')}
                             </button>
                         </form>
                     </div>
@@ -157,12 +123,12 @@ export default function Resources() {
                 {loading ? (
                     <div className="text-center py-16">
                         <div className="spinner mx-auto mb-4" />
-                        <p className="text-gray-500">Loading resources...</p>
+                        <p className="text-gray-500">{t('scholarship.loading')}</p>
                     </div>
                 ) : resources.length === 0 ? (
                     <div className="text-center py-16 glass rounded-2xl">
                         <p className="text-4xl mb-3">📭</p>
-                        <p className="text-gray-500">No resources found</p>
+                        <p className="text-gray-500">{t('resource.noResources')}</p>
                     </div>
                 ) : (
                     <div className="space-y-8">
@@ -182,44 +148,30 @@ export default function Resources() {
                                             initial={{ opacity: 0, y: 16 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: i * 0.04 }}
-                                            className="glass rounded-2xl p-5 card-hover block group"
+                                            className="glass rounded-2xl p-5 card-hover stable-card block group"
                                         >
-                                            <div className="flex items-start justify-between mb-2">
-                                                <h3 className="text-base font-bold text-[#0A2540] leading-tight group-hover:text-[#635BFF] transition pr-2">
-                                                    {r.title}
-                                                </h3>
-                                                {r.type === 'exam' ? (
-                                                    <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">LIVE UPDATE</span>
-                                                ) : r.free && (
-                                                    <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">FREE</span>
-                                                )}
-                                            </div>
-                                            <p className="text-xs text-[#635BFF] font-semibold mb-2">{r.provider}</p>
-                                            <p className="text-gray-500 text-xs mb-3 leading-relaxed">{r.description}</p>
-                                            
-                                            {r.type === 'exam' && (r.examDate || r.registrationDeadline) && (
-                                                <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 mb-3 grid grid-cols-2 gap-2 text-[10px]">
-                                                    <div>
-                                                        <p className="text-gray-400 font-medium">Exam Date</p>
-                                                        <p className="text-[#0A2540] font-bold">{r.examDate ? new Date(r.examDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBA'}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-gray-400 font-medium">Registration</p>
-                                                        <p className="text-[#0A2540] font-bold">{r.registrationDeadline ? (new Date(r.registrationDeadline) < new Date() ? 'CLOSED' : new Date(r.registrationDeadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })) : 'TBA'}</p>
-                                                    </div>
+                                            <div className="stable-card-body">
+                                                <div className="flex items-start justify-between mb-2">
+                                                    <h3 className="text-base font-bold text-[#0A2540] leading-tight group-hover:text-[#635BFF] transition pr-2 min-h-[48px]">
+                                                        {r.title}
+                                                    </h3>
+                                                    {r.type === 'exam' ? (
+                                                        <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{t('resource.liveUpdate')}</span>
+                                                    ) : r.free && (
+                                                        <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{t('resource.free')}</span>
+                                                    )}
                                                 </div>
-                                            )}
+                                                <p className="text-xs text-[#635BFF] font-semibold mb-2 min-h-[16px]">{r.provider}</p>
+                                                <p className="text-gray-500 text-xs mb-3 leading-relaxed min-h-[60px]">{r.description}</p>
 
-                                            <div className="flex flex-wrap gap-1">
-                                                {r.subject && <span className="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded">{r.subject}</span>}
-                                                {(r.stream || []).filter((s: string) => s !== 'All').slice(0, 2).map((s: string) => (
-                                                    <span key={s} className="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded">{s}</span>
-                                                ))}
-                                                {r.type === 'exam' && r.lastVerified && (
-                                                    <span className="text-[9px] text-green-600 font-medium ml-auto self-center">✓ Verified {new Date(r.lastVerified).toLocaleDateString()}</span>
-                                                )}
+                                                <div className="flex flex-wrap gap-1">
+                                                    {r.subject && <span className="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded">{r.subject}</span>}
+                                                    {(r.stream || []).filter((s: string) => s !== 'All').slice(0, 2).map((s: string) => (
+                                                        <span key={s} className="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded">{s}</span>
+                                                    ))}
+                                                </div>
                                             </div>
-                                            <p className="text-[#635BFF] text-xs font-semibold mt-3 group-hover:underline">View Details →</p>
+                                            <p className="stable-card-footer text-[#635BFF] text-xs font-semibold mt-3 group-hover:underline">{t('common.viewDetails')} →</p>
                                         </motion.a>
                                     ))}
                                 </div>

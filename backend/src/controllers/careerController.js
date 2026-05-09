@@ -4,7 +4,7 @@ const College = require('../models/collegeModel');
 
 // Helper: Cosine Similarity
 function cosineSimilarity(vecA, vecB) {
-    const keys = ['logic', 'creativity', 'technical', 'social'];
+    const keys = ['logic', 'creativity', 'technical', 'social', 'leadership'];
     let dot = 0, magA = 0, magB = 0;
     keys.forEach(k => {
         dot += (vecA[k] || 0) * (vecB[k] || 0);
@@ -44,6 +44,22 @@ const STREAM_CAREER_MAP = {
     'Vocational': ['Engineering', 'Agriculture'],
 };
 
+const ASPIRATION_CATEGORY_MAP = {
+    'Higher Studies': ['Technology', 'Engineering', 'Medical', 'Law', 'Education'],
+    'Job Ready': ['Engineering', 'Technology', 'Commerce', 'Agriculture', 'Media'],
+    'Government Exams': ['Law', 'Education', 'Commerce', 'Agriculture'],
+    'Entrepreneurship': ['Business', 'Commerce', 'Technology', 'Media'],
+    'Vocational Skills': ['Engineering', 'Agriculture', 'Technology', 'Arts & Design'],
+};
+
+const VALUE_KEYWORD_MAP = {
+    Stability: ['education', 'government', 'law', 'commerce'],
+    Impact: ['medical', 'education', 'agriculture', 'social'],
+    Creativity: ['design', 'media', 'arts'],
+    Income: ['business', 'technology', 'commerce'],
+    Service: ['medical', 'education', 'law', 'agriculture'],
+};
+
 // Career category → relevant college programs mapping
 const CATEGORY_PROGRAMS_MAP = {
     'Technology': ['B.Tech', 'BE', 'BCA', 'MCA', 'M.Tech', 'BSc IT', 'Diploma in CS', 'Diploma in ECE', 'B.Sc (Research)'],
@@ -61,7 +77,18 @@ const CATEGORY_PROGRAMS_MAP = {
 // @desc    Get recommendations based on quiz results
 // @route   POST /api/careers/recommend
 const getRecommendations = asyncHandler(async (req, res) => {
-    const { quizScores, interests = [], academicScore, location, stream, careerCategoryScores } = req.body;
+    const {
+        quizScores,
+        interests = [],
+        academicScore,
+        location,
+        stream,
+        careerCategoryScores,
+        longTermGoal = '',
+        aspirationTrack = '',
+        coreValues = [],
+        constraints = {},
+    } = req.body;
 
     if (!quizScores) {
         res.status(400);
@@ -79,6 +106,7 @@ const getRecommendations = asyncHandler(async (req, res) => {
 
     // Categories compatible with user stream
     const streamCompatible = new Set(STREAM_CAREER_MAP[stream] || []);
+    const aspirationCategories = new Set(ASPIRATION_CATEGORY_MAP[aspirationTrack] || []);
 
     // ── Normalize careerCategoryScores to 0-100 ──
     const catScores = careerCategoryScores || {};
@@ -86,36 +114,62 @@ const getRecommendations = asyncHandler(async (req, res) => {
 
     const scoredCareers = allCareers.map(career => {
         let score = 0;
+        const reasoningTags = [];
 
-        // ═══ SIGNAL 1: Career-category weights from assessment (60% — max 60 pts) ═══
-        // This is the PRIMARY signal: how much did the student's answers align with this career's category?
+        // ═══ SIGNAL 1: Assessment Quiz (50% weight — max 50 pts) ═══
+        // We use the normalized careerCategoryScores provided by the frontend.
+        // To ensure perfect balance, we normalize the category score relative to the max observed score.
         const categoryWeight = Number(catScores[career.category]) || 0;
-        const normalizedCatWeight = (categoryWeight / maxCatScore) * 60;
+        const normalizedCatWeight = (categoryWeight / maxCatScore) * 50;
         score += normalizedCatWeight;
+        if (normalizedCatWeight > 25) reasoningTags.push('Strong quiz-category alignment');
 
-        // ═══ SIGNAL 2: Cosine similarity on aptitude quiz vector (20% — max 20 pts) ═══
+        // ═══ SIGNAL 2: Aptitude Profile Match (20% weight — max 20 pts) ═══
+        // Cosine similarity on the logic/technical/creativity/social/leadership vector.
         const similarity = cosineSimilarity(quizScores, career.matchVector || {});
         score += similarity * 20;
+        if (similarity > 0.7) reasoningTags.push('Aptitude profile fits this role');
 
-        // ═══ SIGNAL 3: Interest + stream compatibility (20% — max 20 pts) ═══
-        // 3a. Interest-to-category match (max 10 pts)
-        if (boostedCategories.has(career.category)) score += 10;
-
-        // 3b. Stream compatibility boost (max 7 pts)
-        if (stream && streamCompatible.has(career.category)) score += 7;
-
-        // 3c. Skill-level interest keyword match (max 3 pts)
-        const skillMatch = career.skills.some(skill =>
-            interests.map(i => i.toLowerCase()).includes(skill.toLowerCase())
-        );
-        if (skillMatch) score += 3;
-
-        // ═══ BONUS: Academic score multiplier (subtle 0-3% boost for high scorers) ═══
-        if (academicScore && academicScore > 70) {
-            score *= (1 + (academicScore - 70) / 3000);
+        // ═══ SIGNAL 3: Explicit Interests (20% weight — max 20 pts) ═══
+        if (boostedCategories.has(career.category)) {
+            score += 20;
+            reasoningTags.push('Matches your interests');
         }
 
-        return { ...career.toObject(), score: Math.min(100, Math.round(score)) };
+        // ═══ SIGNAL 4: Stream Compatibility (10% weight — max 10 pts) ═══
+        if (stream && streamCompatible.has(career.category)) {
+            score += 10;
+            reasoningTags.push('Compatible with your stream');
+        }
+
+        // ═══ SIGNAL 5: Aspiration + Values + Constraints (Bonus ~10 pts) ═══
+        if (aspirationCategories.has(career.category)) {
+            score += 4;
+            reasoningTags.push('Aligned with your aspiration track');
+        }
+
+        const lcRoleText = `${career.title || ''} ${career.category || ''} ${(career.skills || []).join(' ')}`.toLowerCase();
+        const valueHits = (coreValues || []).reduce((acc, value) => {
+            const keys = VALUE_KEYWORD_MAP[value] || [];
+            const matched = keys.some(k => lcRoleText.includes(k));
+            return acc + (matched ? 1 : 0);
+        }, 0);
+        if (valueHits > 0) {
+            score += Math.min(4, valueHits * 1.5);
+            reasoningTags.push('Supports your personal values');
+        }
+
+        // Constraints and goals
+        const budgetLevel = constraints?.budgetLevel;
+        const isHighCostTrack = ['Medical', 'Business'].includes(career.category);
+        if (budgetLevel === 'high-support-needed' && !isHighCostTrack) score += 2;
+        if (longTermGoal && lcRoleText.includes(longTermGoal.toLowerCase().slice(0, 10))) score += 2;
+
+        return {
+            ...career.toObject(),
+            score: Math.min(100, Math.round(score)),
+            reasoningTags: [...new Set(reasoningTags)].slice(0, 4),
+        };
     });
 
     scoredCareers.sort((a, b) => b.score - a.score);
@@ -501,6 +555,134 @@ const doSeed = async () => {
                     { step: 'NGO / Govt Social Programs', duration: 'Ongoing' },
                 ],
                 outcome: 'Social Worker, NGO Manager, Community Developer, Policy Advisor',
+            },
+            {
+                title: 'Electrician / Electrical Technician',
+                description: 'Install, maintain, and repair electrical systems in homes, industries, and public infrastructure.',
+                category: 'Engineering',
+                requiredStream: 'Vocational',
+                skills: ['Electrical Basics', 'Safety', 'Troubleshooting', 'Hands-on Work'],
+                matchVector: { logic: 0.65, creativity: 0.35, technical: 0.88, social: 0.35 },
+                salary: { min: 220000, max: 800000 },
+                roadmap: [
+                    { step: 'Complete 10th or 12th', duration: '1-2 years' },
+                    { step: 'ITI Electrician / Diploma', duration: '1-2 years' },
+                    { step: 'Apprenticeship with local contractor or DISCOM', duration: '6-12 months' },
+                    { step: 'Technician job or self-employment', duration: 'Ongoing' },
+                ],
+                outcome: 'Electrical Technician, Maintenance Supervisor, Licensed Contractor',
+            },
+            {
+                title: 'Staff Nurse',
+                description: 'Support doctors and deliver direct patient care in hospitals and community health centers.',
+                category: 'Medical',
+                requiredStream: 'Science-PCB',
+                skills: ['Patient Care', 'Biology', 'Communication', 'Empathy'],
+                matchVector: { logic: 0.5, creativity: 0.25, technical: 0.6, social: 0.95 },
+                salary: { min: 280000, max: 1100000 },
+                roadmap: [
+                    { step: 'Complete 12th with PCB', duration: '2 years' },
+                    { step: 'ANM / GNM / B.Sc Nursing', duration: '2-4 years' },
+                    { step: 'Clinical internship and registration', duration: '6-12 months' },
+                    { step: 'Hospital / PHC nurse role', duration: 'Ongoing' },
+                ],
+                outcome: 'Staff Nurse, ICU Nurse, Community Health Nurse',
+            },
+            {
+                title: 'Digital Marketing Executive',
+                description: 'Grow business visibility through social media, SEO, ads, and digital campaigns.',
+                category: 'Media',
+                requiredStream: 'Any',
+                skills: ['Content', 'SEO', 'Analytics', 'Communication'],
+                matchVector: { logic: 0.55, creativity: 0.8, technical: 0.55, social: 0.7 },
+                salary: { min: 250000, max: 1200000 },
+                roadmap: [
+                    { step: 'Complete 12th / graduation', duration: '2-3 years' },
+                    { step: 'Digital marketing certification', duration: '3-6 months' },
+                    { step: 'Build portfolio with real campaigns', duration: '3-6 months' },
+                    { step: 'Agency or in-house marketing role', duration: 'Ongoing' },
+                ],
+                outcome: 'SEO Specialist, Performance Marketer, Growth Associate',
+            },
+            {
+                title: 'Police Officer',
+                description: 'Serve public safety through law enforcement, investigation, and community protection.',
+                category: 'Law',
+                requiredStream: 'Any',
+                skills: ['Discipline', 'Decision Making', 'Communication', 'Fitness'],
+                matchVector: { logic: 0.65, creativity: 0.25, technical: 0.35, social: 0.8 },
+                salary: { min: 350000, max: 1300000 },
+                roadmap: [
+                    { step: 'Complete 12th / graduation as required by post', duration: '2-3 years' },
+                    { step: 'Prepare for state/central police recruitment exams', duration: '6-12 months' },
+                    { step: 'Physical and medical qualification', duration: '3-6 months' },
+                    { step: 'Police training academy and posting', duration: 'Ongoing' },
+                ],
+                outcome: 'Sub-Inspector, Constable, IPS (through UPSC)',
+            },
+            {
+                title: 'Logistics and Supply Chain Coordinator',
+                description: 'Plan movement of goods, inventory, and transport operations for businesses.',
+                category: 'Business',
+                requiredStream: 'Commerce',
+                skills: ['Planning', 'Data Handling', 'Communication', 'Operations'],
+                matchVector: { logic: 0.75, creativity: 0.35, technical: 0.55, social: 0.6 },
+                salary: { min: 300000, max: 1400000 },
+                roadmap: [
+                    { step: 'Complete 12th / graduation', duration: '2-3 years' },
+                    { step: 'BBA / diploma in logistics', duration: '1-3 years' },
+                    { step: 'Internship in warehouse or transport ops', duration: '3-6 months' },
+                    { step: 'Coordinator to operations manager track', duration: 'Ongoing' },
+                ],
+                outcome: 'Supply Chain Analyst, Logistics Supervisor, Operations Manager',
+            },
+            {
+                title: 'Hotel and Hospitality Manager',
+                description: 'Manage guest services, operations, and business performance in hotels and tourism.',
+                category: 'Business',
+                requiredStream: 'Any',
+                skills: ['Customer Service', 'Team Management', 'Communication', 'Operations'],
+                matchVector: { logic: 0.45, creativity: 0.6, technical: 0.35, social: 0.88 },
+                salary: { min: 260000, max: 1300000 },
+                roadmap: [
+                    { step: 'Complete 12th', duration: '2 years' },
+                    { step: 'Diploma / degree in hotel management', duration: '1-4 years' },
+                    { step: 'Internship in hotels or tourism sector', duration: '6 months' },
+                    { step: 'Front office / operations management roles', duration: 'Ongoing' },
+                ],
+                outcome: 'Front Office Manager, F&B Manager, Hotel Operations Manager',
+            },
+            {
+                title: 'Solar PV Technician',
+                description: 'Install and maintain rooftop and utility-scale solar systems in homes and farms.',
+                category: 'Technology',
+                requiredStream: 'Vocational',
+                skills: ['Electrical Basics', 'Installation', 'Safety', 'Field Service'],
+                matchVector: { logic: 0.6, creativity: 0.35, technical: 0.82, social: 0.4 },
+                salary: { min: 240000, max: 900000 },
+                roadmap: [
+                    { step: 'Complete 10th/12th', duration: '1-2 years' },
+                    { step: 'Skill certification in solar installation', duration: '3-6 months' },
+                    { step: 'On-site apprenticeship', duration: '3-9 months' },
+                    { step: 'Solar installer or field engineer role', duration: 'Ongoing' },
+                ],
+                outcome: 'Solar Technician, Field Service Engineer, Renewable Energy Supervisor',
+            },
+            {
+                title: 'Government School Teacher',
+                description: 'Teach and mentor school students through public education systems and teacher eligibility pathways.',
+                category: 'Education',
+                requiredStream: 'Any',
+                skills: ['Subject Mastery', 'Communication', 'Empathy', 'Classroom Management'],
+                matchVector: { logic: 0.55, creativity: 0.6, technical: 0.25, social: 0.92 },
+                salary: { min: 300000, max: 1200000 },
+                roadmap: [
+                    { step: 'Complete graduation in relevant subject', duration: '3 years' },
+                    { step: 'B.Ed / D.El.Ed as required', duration: '2 years' },
+                    { step: 'Qualify TET/CTET or state eligibility', duration: '6-12 months' },
+                    { step: 'Apply through government recruitment', duration: 'Ongoing' },
+                ],
+                outcome: 'Primary Teacher, PGT/TGT Teacher, Academic Mentor',
             },
         ];
         await CareerPath.insertMany(careers);
