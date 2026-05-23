@@ -9,9 +9,16 @@ export default function Login() {
     const [form, setForm] = useState({ phone: '', password: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        if (name === 'phone') {
+            // Only allow digits, max 10
+            setForm({ ...form, phone: value.replace(/\D/g, '').slice(0, 10) });
+        } else {
+            setForm({ ...form, [name]: value });
+        }
         setError('');
     };
 
@@ -21,16 +28,38 @@ export default function Login() {
             setError('Please enter your phone number and password.');
             return;
         }
+        if (form.phone.length !== 10) {
+            setError('Enter a valid 10-digit phone number.');
+            return;
+        }
         setLoading(true);
         try {
             await loginUser(form);
             navigate('/dashboard');
         } catch (err: any) {
-            setError(err?.response?.data?.message || 'Login failed. Please check your credentials.');
+            const msg = err?.response?.data?.message;
+            setError(msg || 'Login failed. Check your phone number and password.');
         } finally {
             setLoading(false);
         }
     };
+
+    const EyeIcon = ({ show }: { show: boolean }) => (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {show ? (
+                <>
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                </>
+            ) : (
+                <>
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                </>
+            )}
+        </svg>
+    );
 
     return (
         <div className="min-h-screen flex animated-bg">
@@ -46,7 +75,7 @@ export default function Login() {
                     Your personalized career guidance is just a login away. Discover paths, explore colleges, and never lose your progress.
                 </p>
                 <div className="mt-10 grid grid-cols-2 gap-4">
-                    {['🧠 Aptitude Quiz', '🗺️ College Map', '🚀 Career Paths', '📶 Offline Mode'].map(f => (
+                    {['🧠 Aptitude Quiz', '🗺️ College Map', '🚀 Career Paths', '📊 Career Insights'].map(f => (
                         <div key={f} className="glass rounded-xl p-3 text-sm font-medium text-[#00D4FF]">{f}</div>
                     ))}
                 </div>
@@ -67,38 +96,75 @@ export default function Login() {
                     </div>
 
                     {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-6">
-                            {error}
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, y: -8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-6 flex items-start gap-2"
+                        >
+                            <span className="mt-0.5 shrink-0">⚠️</span>
+                            <span>{error}</span>
+                        </motion.div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                        {/* Phone */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number</label>
-                            <input
-                                name="phone"
-                                type="tel"
-                                value={form.phone}
-                                onChange={handleChange}
-                                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] transition"
-                            />
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium select-none">+91</span>
+                                <input
+                                    name="phone"
+                                    type="tel"
+                                    inputMode="numeric"
+                                    maxLength={10}
+                                    value={form.phone}
+                                    onChange={handleChange}
+                                    autoComplete="tel"
+                                    placeholder="10-digit mobile number"
+                                    className="w-full bg-white text-gray-900 border-2 border-gray-200 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-white transition"
+                                />
+                                {form.phone.length === 10 && (
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 text-sm">✓</span>
+                                )}
+                            </div>
                         </div>
+
+                        {/* Password */}
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
-                            <input
-                                name="password"
-                                type="password"
-                                value={form.password}
-                                onChange={handleChange}
-                                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00D4FF] transition"
-                            />
+                            <div className="flex justify-between items-center mb-1.5">
+                                <label className="text-sm font-semibold text-gray-700">Password</label>
+                            </div>
+                            <div className="relative">
+                                <input
+                                    name="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={form.password}
+                                    onChange={handleChange}
+                                    autoComplete="current-password"
+                                    placeholder="Your password"
+                                    className="w-full bg-white text-gray-900 border-2 border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-white transition"
+                                />
+                                <button
+                                    type="button"
+                                    onMouseDown={e => e.preventDefault()}
+                                    onClick={() => setShowPassword(p => !p)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition"
+                                    aria-label="Toggle password visibility"
+                                >
+                                    <EyeIcon show={showPassword} />
+                                </button>
+                            </div>
                         </div>
+
                         <button
                             type="submit"
                             disabled={loading}
                             className="w-full bg-[#0A2540] text-white py-3.5 rounded-xl font-bold text-sm hover:bg-[#1a3d66] transition disabled:opacity-60 flex items-center justify-center gap-2"
                         >
-                            {loading ? <><div className="spinner" style={{ width: 18, height: 18, borderWidth: 2 }}></div> Signing in...</> : 'Sign In →'}
+                            {loading
+                                ? <><div className="spinner" style={{ width: 18, height: 18, borderWidth: 2 }} /> Signing in...</>
+                                : 'Sign In →'
+                            }
                         </button>
                     </form>
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
+import type { LatLngBoundsExpression } from 'leaflet';
 
 interface College {
     name: string;
@@ -85,7 +86,7 @@ const CollegeMap = ({ colleges }: { colleges: College[] }) => {
             if (bounds.length === 1) {
                 map.setView(bounds[0], 12);
             } else if (bounds.length > 1) {
-                map.fitBounds(bounds as L.LatLngBoundsExpression, {
+                map.fitBounds(bounds as LatLngBoundsExpression, {
                     padding: [40, 40],
                 });
             }

@@ -13,9 +13,19 @@ const CollegeSchema = new mongoose.Schema({
     district: String,
     website: String,
     ranking: Number,
-    facilities: [String]
+    facilities: [String],
+    // ── Enrichment fields (for detailed college info) ──
+    cutoffs: {
+        type: Map,
+        of: String, // e.g. { "B.Tech CS": "JEE Main 95-98 percentile", "B.Sc Math": "60-70% in 12th" }
+    },
+    eligibility: String, // e.g. "12th with PCM, JEE Main qualified"
+    medium: { type: String, default: 'English' },
+    accreditation: String, // e.g. "NAAC A+", "NBA"
+    establishedYear: Number,
 });
 
 CollegeSchema.index({ location: "2dsphere" });
 
 module.exports = mongoose.model('College', CollegeSchema);
+

@@ -18,7 +18,7 @@ app.use(limiter);
 
 // CORS
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    origin: process.env.CORS_ORIGIN || '*',
     credentials: true,
 }));
 
@@ -31,6 +31,11 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/careers', require('./routes/careerRoutes'));
 app.use('/api/colleges', require('./routes/collegeRoutes'));
 app.use('/api/aptitude', require('./routes/aptitudeRoutes'));
+app.use('/api/jobs', require('./routes/jobRoutes'));
+app.use('/api/chat', require('./routes/chatRoutes'));
+app.use('/api/scholarships', require('./routes/scholarshipRoutes'));
+app.use('/api/resources', require('./routes/resourceRoutes'));
+app.use('/api/timeline', require('./routes/timelineRoutes'));
 
 // Root Route
 app.get('/', (req, res) => {

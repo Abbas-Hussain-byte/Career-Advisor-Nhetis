@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { OfflineProvider } from './context/OfflineContext';
+import { LanguageProvider } from './context/LanguageContext';
 
 // Pages
 import Home from './pages/Home';
@@ -11,6 +12,12 @@ import Dashboard from './pages/Dashboard';
 import CareerExplorer from './pages/CareerExplorer';
 import Colleges from './pages/Colleges';
 import Profile from './pages/Profile';
+import Insights from './pages/Insights';
+import Scholarships from './pages/Scholarships';
+import Resources from './pages/Resources';
+
+// Components
+import ChatWidget from './components/ChatWidget';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
@@ -33,10 +40,18 @@ const PublicRoute = ({ children }: { children: JSX.Element }) => {
   return user ? <Navigate to="/dashboard" replace /> : children;
 };
 
+// Chat widget wrapper — only shows when logged in and assessment taken
+const AuthenticatedChat = () => {
+  const { user } = useAuth();
+  const hasAssessment = !!(user?.assessment?.results?.length);
+  return user && hasAssessment ? <ChatWidget /> : null;
+};
+
 function App() {
   return (
     <AuthProvider>
-      <OfflineProvider>
+      <LanguageProvider>
+        <OfflineProvider>
         <Router>
           <Routes>
             {/* Public Routes */}
@@ -49,12 +64,17 @@ function App() {
             <Route path="/careers" element={<PrivateRoute><CareerExplorer /></PrivateRoute>} />
             <Route path="/colleges" element={<PrivateRoute><Colleges /></PrivateRoute>} />
             <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            <Route path="/insights" element={<PrivateRoute><Insights /></PrivateRoute>} />
+            <Route path="/scholarships" element={<PrivateRoute><Scholarships /></PrivateRoute>} />
+            <Route path="/resources" element={<PrivateRoute><Resources /></PrivateRoute>} />
 
             {/* Catch-all */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <AuthenticatedChat />
         </Router>
-      </OfflineProvider>
+        </OfflineProvider>
+      </LanguageProvider>
     </AuthProvider>
   );
 }

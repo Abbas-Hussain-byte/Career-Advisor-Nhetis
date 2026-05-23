@@ -13,25 +13,38 @@ const generateToken = (id) => {
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, phone, password, role, grade } = req.body;
+    const { name, phone, password, grade } = req.body;
+    // Treat empty email string as undefined so sparse index works
+    const email = req.body.email?.trim() || undefined;
 
-    if (!name || !phone || !password) {
+    if (!name?.trim() || !phone?.trim() || !password) {
         res.status(400);
         throw new Error('Name, phone, and password are required');
     }
 
-    const userExists = await User.findOne({ phone });
+    const cleanPhone = phone.trim().replace(/\D/g, ''); // strip non-digits
+    if (cleanPhone.length !== 10) {
+        res.status(400);
+        throw new Error('Phone number must be exactly 10 digits');
+    }
+
+    if (password.length < 6) {
+        res.status(400);
+        throw new Error('Password must be at least 6 characters');
+    }
+
+    const userExists = await User.findOne({ phone: cleanPhone });
     if (userExists) {
         res.status(400);
-        throw new Error('User with this phone number already exists');
+        throw new Error('An account with this phone number already exists. Please log in instead.');
     }
 
     const user = await User.create({
-        name,
+        name: name.trim(),
         email,
-        phone,
+        phone: cleanPhone,
         password,
-        role: role || 'student',
+        role: 'student',
         profile: { grade: grade || '12' },
     });
 
@@ -43,6 +56,8 @@ const registerUser = asyncHandler(async (req, res) => {
             email: user.email,
             role: user.role,
             profile: user.profile,
+            assessment: user.assessment,
+            preferredLanguage: user.preferredLanguage,
             token: generateToken(user._id),
         });
     } else {
@@ -62,7 +77,8 @@ const authUser = asyncHandler(async (req, res) => {
         throw new Error('Phone and password are required');
     }
 
-    const user = await User.findOne({ phone });
+    const cleanPhone = phone.trim().replace(/\D/g, ''); // strip non-digits
+    const user = await User.findOne({ phone: cleanPhone });
 
     if (user && (await user.matchPassword(password))) {
         res.json({
@@ -72,6 +88,8 @@ const authUser = asyncHandler(async (req, res) => {
             email: user.email,
             role: user.role,
             profile: user.profile,
+            assessment: user.assessment,
+            preferredLanguage: user.preferredLanguage,
             token: generateToken(user._id),
         });
     } else {
@@ -94,6 +112,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
             email: user.email,
             role: user.role,
             profile: user.profile,
+            assessment: user.assessment,
+            preferredLanguage: user.preferredLanguage,
         });
     } else {
         res.status(404);
@@ -108,6 +128,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
+        if (req.body.preferredLanguage) user.preferredLanguage = req.body.preferredLanguage;
         user.name = req.body.name || user.name;
         user.email = req.body.email || user.email;
 
@@ -117,6 +138,15 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         if (req.body.interests) user.profile.interests = req.body.interests;
         if (req.body.academicScore !== undefined) user.profile.academicScore = req.body.academicScore;
         if (req.body.location) user.profile.location = req.body.location;
+        if (req.body.longTermGoal !== undefined) user.profile.longTermGoal = req.body.longTermGoal;
+        if (req.body.aspirationTrack) user.profile.aspirationTrack = req.body.aspirationTrack;
+        if (req.body.coreValues) user.profile.coreValues = req.body.coreValues;
+        if (req.body.constraints) {
+            user.profile.constraints = {
+                ...(user.profile.constraints || {}),
+                ...req.body.constraints,
+            };
+        }
 
         if (req.body.password) {
             user.password = req.body.password;
@@ -130,6 +160,8 @@ const updateUserProfile = asyncHandler(async (req, res) => {
             email: updatedUser.email,
             role: updatedUser.role,
             profile: updatedUser.profile,
+            assessment: updatedUser.assessment,
+            preferredLanguage: updatedUser.preferredLanguage,
             token: generateToken(updatedUser._id),
         });
     } else {
@@ -138,4 +170,72 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { registerUser, authUser, getUserProfile, updateUserProfile };
+// @desc    Save assessment results (quiz vector + top career matches) to user profile
+// @route   PUT /api/users/assessment
+// @access  Private
+const saveAssessment = asyncHandler(async (req, res) => {
+    const { vector, results, recommendedStreams = [], studentSignals = {} } = req.body;
+    if (!vector || !results) {
+        res.status(400);
+        throw new Error('vector and results are required');
+    }
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        { assessment: { vector, results, recommendedStreams, studentSignals, takenAt: new Date() } },
+        { new: true }
+    );
+    if (!user) { res.status(404); throw new Error('User not found'); }
+    res.json({ message: 'Assessment saved', assessment: user.assessment });
+});
+
+// @desc    Update only language
+// @route   PUT /api/users/language
+// @access  Private
+const updateLanguage = asyncHandler(async (req, res) => {
+    const { language } = req.body;
+    if (!language || !['en', 'hi', 'te'].includes(language)) {
+        res.status(400);
+        throw new Error('Valid language required (en, hi, or te)');
+    }
+    const user = await User.findByIdAndUpdate(req.user._id, { preferredLanguage: language }, { returnDocument: 'after' });
+    if (!user) { res.status(404); throw new Error('User not found'); }
+    res.json({ message: 'Language updated', preferredLanguage: user.preferredLanguage });
+});
+
+// @desc    Update user password
+// @route   PUT /api/users/password
+// @access  Private
+const updateUserPassword = asyncHandler(async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+        res.status(400);
+        throw new Error('Current and new password are required');
+    }
+
+    if (newPassword.length < 6) {
+        res.status(400);
+        throw new Error('New password must be at least 6 characters');
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (user && (await user.matchPassword(currentPassword))) {
+        user.password = newPassword;
+        await user.save();
+        res.json({ message: 'Password updated successfully' });
+    } else {
+        res.status(401);
+        throw new Error('Invalid current password');
+    }
+});
+
+module.exports = {
+    registerUser,
+    authUser,
+    getUserProfile,
+    updateUserProfile,
+    saveAssessment,
+    updateLanguage,
+    updateUserPassword,
+};

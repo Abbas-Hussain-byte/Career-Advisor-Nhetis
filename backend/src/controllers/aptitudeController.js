@@ -1,10 +1,9 @@
 const questions = require('../data/questions.js');
 
 const getQuestions = (req, res) => {
-    // Randomly shuffle questions and return 10 to make quiz dynamic
+    // Return all 25 questions in a randomised order so every attempt feels fresh
     const shuffled = [...questions].sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, 10);
-    res.json(selected);
+    res.json(shuffled);
 };
 
 module.exports = { getQuestions };
