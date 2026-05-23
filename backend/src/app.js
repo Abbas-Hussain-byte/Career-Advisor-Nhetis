@@ -42,6 +42,11 @@ app.get('/', (req, res) => {
     res.json({ message: 'NHETIS API is running...', version: '1.0.0' });
 });
 
+// Health check endpoint for deployment platforms (like Render)
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
+
 // Error Handler
 app.use(errorHandler);
 
