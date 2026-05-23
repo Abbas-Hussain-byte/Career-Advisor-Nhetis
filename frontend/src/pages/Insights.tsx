@@ -340,7 +340,7 @@ export default function Insights() {
             skillsNeeded ? `Key Skills to Build: ${skillsNeeded}` : '',
             ``,
             `Discover your career path with NHETIS - India's AI Career Advisor for students.`,
-            `Take the free assessment at nhetis.vercel.app`,
+            `Take the free assessment at https://career-advisor-nhetis.vercel.app`,
         ].filter(Boolean).join('\n');
 
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
@@ -385,7 +385,7 @@ export default function Insights() {
                             title="Share your results on WhatsApp"
                             className="flex items-center gap-2 bg-[#25D366] text-white px-4 py-2.5 rounded-xl font-bold shadow hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm"
                         >
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
                             Share
                         </button>
                         <button
@@ -528,387 +528,387 @@ export default function Insights() {
 
                 {/* ── 1. YOUR APTITUDE PROFILE (RADAR) ─────────────── */}
                 <div ref={reportRef}>
-                <Section
-                    title={`🎯 ${t('insights.aptitudeTitle')}`}
-                    subtitle={hasAssessment
-                        ? t('insights.aptitudeSubtitle')
-                        : t('insights.aptitudeEstimated', { stream: profile.stream || 'not set' })}
-                >
-                    <div className="flex flex-col md:flex-row items-center gap-8">
-                        <div className="w-full md:w-1/2" style={{ height: 280 }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <RadarChart data={radarData}>
-                                    <PolarGrid stroke="#e2e8f0" />
-                                    <PolarAngleAxis dataKey="dim" tick={{ fontSize: 13, fontWeight: 600, fill: '#0A2540' }} />
-                                    <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10, fill: '#94a3b8' }} />
-                                    <Radar name={user?.name} dataKey="value"
-                                        stroke={hasAssessment ? '#635BFF' : '#00D4FF'}
-                                        fill={hasAssessment ? '#635BFF' : '#00D4FF'}
-                                        fillOpacity={0.35} strokeWidth={2} />
-                                    <Tooltip content={<CustomTooltip />} />
-                                </RadarChart>
-                            </ResponsiveContainer>
-                        </div>
-                        <div className="w-full md:w-1/2 space-y-3">
-                            <h3 className="font-bold text-[#0A2540]">{t('insights.whatThisMeans')}</h3>
-                            {radarData.map(d => (
-                                <div key={d.dim}>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-gray-600 font-medium">{d.dim}</span>
-                                        <span className="font-bold text-[#0A2540]">{d.value}%</span>
-                                    </div>
-                                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full rounded-full transition-all duration-700"
-                                            style={{
-                                                width: `${d.value}%`,
-                                                background: hasAssessment ? '#635BFF' : '#00D4FF'
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </Section>
-
-                {/* ── 2. CAREERS MATCHED TO YOU ─────────────────────── */}
-                <Section
-                    title={`⭐ ${t('insights.matchedTitle')}`}
-                    subtitle={hasAssessment
-                        ? t('insights.matchedSubtitleAssessment', { n: matchedCareers.length })
-                        : t('insights.matchedSubtitleStream', { stream: profile.stream || '' })}
-                >
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {matchedCareers.map((career, idx) => {
-                            const savedResult = (assessment?.results || []).find((r: any) => r.careerTitle === career.title);
-                            return (<div key={career._id || idx}
-                                className="border border-gray-100 rounded-xl p-4 hover:shadow-md transition"
-                                style={{ borderLeftColor: CATEGORY_COLORS[career.category] || '#00D4FF', borderLeftWidth: 4 }}>
-                                <div className="flex items-start justify-between mb-2">
-                                    <h4 className="font-bold text-[#0A2540] text-sm leading-snug">{career.title}</h4>
-                                    {savedResult && (
-                                        <span className="text-xs font-bold px-2 py-0.5 rounded-full text-white ml-2 shrink-0"
-                                            style={{ background: CATEGORY_COLORS[career.category] || '#635BFF' }}>
-                                            {savedResult.score}%
-                                        </span>
-                                    )}
-                                </div>
-                                <span className="text-xs text-gray-400">{career.category}</span>
-                                <p className="text-xs text-gray-500 mt-2 leading-relaxed line-clamp-2">{career.description}</p>
-                                <div className="flex flex-wrap gap-1 mt-3">
-                                    {(career.skills || []).slice(0, 3).map((s: string) => (
-                                        <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{s}</span>
-                                    ))}
-                                </div>
-                                {career.topRecruiters?.length > 0 && (
-                                    <p className="text-xs text-gray-400 mt-2">
-                                        🏢 {career.topRecruiters.slice(0, 3).join(', ')}
-                                    </p>
-                                )}
-                                {career.requiredExam && (
-                                    <p className="text-xs text-blue-500 mt-1">📋 {career.requiredExam}</p>
-                                )}
-                                <div className="flex items-center justify-between mt-3">
-                                    <p className="text-xs text-gray-400">
-                                        💰 ₹{Math.round((career.salary?.min || 0) / 100000)}L – ₹{Math.round((career.salary?.max || 0) / 100000)}L / yr
-                                    </p>
-                                    {career.growthRate && (
-                                        <span className="text-xs font-bold text-green-600">↑ {career.growthRate}% growth</span>
-                                    )}
-                                </div>
-                            </div>);
-                        })}
-                    </div>
-                    {matchedCareers.length === 0 && (
-                        <p className="text-center text-gray-400 py-8">
-                            {t('insights.noMatches')}
-                        </p>
-                    )}
-                </Section>
-
-                {/* ── 3. SKILLS GAP ANALYSIS ───────────────────────── */}
-                <Section
-                    title={`🛠️ ${t('insights.skillsGapTitle')}`}
-                    subtitle={t('insights.skillsGapSubtitle')}
-                >
-                    <div className="flex flex-wrap gap-3">
-                        {skillsGap.map(({ skill, count, have }) => (
-                            <div key={skill}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition ${have
-                                    ? 'bg-green-50 border-green-200 text-green-700'
-                                    : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
-                                <span>{have ? '✅' : '✨'}</span>
-                                <span>{skill}</span>
-                                <span className={`text-xs rounded-full px-1.5 ${have ? 'bg-green-200 text-green-800' : 'bg-amber-200 text-amber-800'}`}>
-                                    {count} career{count > 1 ? 's' : ''}
-                                </span>
-                            </div>
-                        ))}
-                        {skillsGap.length === 0 && (
-                            <p className="text-gray-400 text-sm">Add interests in your profile to see skill gap analysis.</p>
-                        )}
-                    </div>
-                    {skillsGap.some(s => !s.have) && (
-                        <div className="mt-4 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-600">
-                            💡 {t('insights.skillsNote')}
-                        </div>
-                    )}
-                </Section>
-
-                {/* ── 4. JOB DEMAND (YOUR MATCHED CAREERS) ─────────── */}
-                {demandData.length > 0 && (
                     <Section
-                        title={`📈 ${t('insights.demandTitle')}`}
-                        subtitle={t('insights.demandSubtitle')}
+                        title={`🎯 ${t('insights.aptitudeTitle')}`}
+                        subtitle={hasAssessment
+                            ? t('insights.aptitudeSubtitle')
+                            : t('insights.aptitudeEstimated', { stream: profile.stream || 'not set' })}
                     >
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={demandData} margin={{ top: 10, right: 20, left: 10, bottom: 60 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} angle={-35} textAnchor="end" interval={0} />
-                                <YAxis tickFormatter={v => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v}
-                                    tick={{ fontSize: 11, fill: '#64748b' }}
-                                    label={{ value: t('insights.openings'), angle: -90, position: 'insideLeft', fontSize: 11, fill: '#94a3b8', dx: -5 }} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Bar dataKey="openings" name={t('insights.openings')} radius={[6, 6, 0, 0]}>
-                                    {demandData.map((entry, idx) => (
-                                        <Cell key={idx} fill={CATEGORY_COLORS[entry.category] || COLORS[idx % COLORS.length]} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                        <p className="text-xs text-gray-400 mt-2 text-center">* Data sourced from NASSCOM, NAUKRI, LinkedIn India reports (2024)</p>
-                    </Section>
-                )}
-
-                {/* ── 5. SALARY COMPARISON (YOUR MATCHED CAREERS) ─── */}
-                {salaryData.length > 0 && (
-                    <Section
-                        title={`💰 ${t('insights.salaryTitle')}`}
-                        subtitle={t('insights.salarySubtitle')}
-                    >
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={salaryData} margin={{ top: 10, right: 20, left: 10, bottom: 60 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} angle={-35} textAnchor="end" interval={0} />
-                                <YAxis tickFormatter={v => `₹${v}L`} tick={{ fontSize: 11, fill: '#64748b' }}
-                                    label={{ value: '₹ Lakhs/yr', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#94a3b8', dx: -5 }} />
-                                <Tooltip content={<CustomTooltip />} formatter={(v: any) => `₹${v}L / yr`} />
-                                <Legend wrapperStyle={{ fontSize: 12 }} />
-                                <Bar dataKey="Min" name={t('insights.minSalary')} fill="#00D4FF" opacity={0.75} radius={[4, 4, 0, 0]} />
-                                <Bar dataKey="Max" name={t('insights.maxSalary')} fill="#635BFF" opacity={0.85} radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </Section>
-                )}
-                {/* ── 6. LIVE MARKET TRENDS (Real jobs from Remotive) ── */}
-                <Section
-                    title={`🌐 ${t('insights.liveTrendsTitle')}`}
-                    subtitle={t('insights.liveTrendsSubtitle')}
-                >
-                    {jobsLoading ? (
-                        <div className="flex items-center justify-center py-10 gap-3">
-                            <div className="spinner" />
-                            <p className="text-gray-400 text-sm">Fetching live job listings…</p>
-                        </div>
-                    ) : jobTrends ? (
-                        <div className="space-y-8">
-                            {/* Skill demand bar chart */}
-                            <div>
-                                <h3 className="font-bold text-[#0A2540] text-sm mb-4">🔥 {t('insights.liveSkillsTitle')}</h3>
-                                <ResponsiveContainer width="100%" height={240}>
-                                    <BarChart data={jobTrends.skills.slice(0, 12)} layout="vertical" margin={{ left: 80, right: 20 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                                        <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} />
-                                        <YAxis type="category" dataKey="skill" tick={{ fontSize: 11, fill: '#0A2540', fontWeight: 600 }} width={80} />
+                        <div className="flex flex-col md:flex-row items-center gap-8">
+                            <div className="w-full md:w-1/2" style={{ height: 280 }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <RadarChart data={radarData}>
+                                        <PolarGrid stroke="#e2e8f0" />
+                                        <PolarAngleAxis dataKey="dim" tick={{ fontSize: 13, fontWeight: 600, fill: '#0A2540' }} />
+                                        <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                        <Radar name={user?.name} dataKey="value"
+                                            stroke={hasAssessment ? '#635BFF' : '#00D4FF'}
+                                            fill={hasAssessment ? '#635BFF' : '#00D4FF'}
+                                            fillOpacity={0.35} strokeWidth={2} />
                                         <Tooltip content={<CustomTooltip />} />
-                                        <Bar dataKey="count" name="Job listings" radius={[0, 6, 6, 0]}>
-                                            {jobTrends.skills.slice(0, 12).map((_: any, idx: number) => (
-                                                <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
+                                    </RadarChart>
                                 </ResponsiveContainer>
                             </div>
-
-                            {/* Sector distribution */}
-                            <div>
-                                <h3 className="font-bold text-[#0A2540] text-sm mb-3">🏢 {t('insights.liveSectorsTitle')}</h3>
-                                <div className="flex flex-wrap gap-3">
-                                    {jobTrends.sectors.map((s: any, i: number) => (
-                                        <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-white"
-                                            style={{ background: COLORS[i % COLORS.length] }}>
-                                            <span>{s.sector}</span>
-                                            <span className="bg-white/25 rounded-full px-2 py-0.5 text-xs font-bold">{s.count}</span>
+                            <div className="w-full md:w-1/2 space-y-3">
+                                <h3 className="font-bold text-[#0A2540]">{t('insights.whatThisMeans')}</h3>
+                                {radarData.map(d => (
+                                    <div key={d.dim}>
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <span className="text-gray-600 font-medium">{d.dim}</span>
+                                            <span className="font-bold text-[#0A2540]">{d.value}%</span>
                                         </div>
-                                    ))}
-                                </div>
+                                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full rounded-full transition-all duration-700"
+                                                style={{
+                                                    width: `${d.value}%`,
+                                                    background: hasAssessment ? '#635BFF' : '#00D4FF'
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
+                        </div>
+                    </Section>
 
-                            {/* Top live job listings */}
-                            {jobTrends.topJobs?.length > 0 && (
-                                <div>
-                                    <h3 className="font-bold text-[#0A2540] text-sm mb-3">📋 {t('insights.liveJobsTitle')}</h3>
-                                    <div className="grid md:grid-cols-2 gap-3">
-                                        {jobTrends.topJobs.slice(0, 6).map((job: any, i: number) => (
-                                            <a key={i} href={job.url} target="_blank" rel="noopener noreferrer"
-                                                className="border border-gray-100 rounded-xl p-3 hover:border-[#00D4FF] hover:shadow-sm transition group">
-                                                <div className="flex justify-between items-start gap-2">
-                                                    <p className="font-semibold text-[#0A2540] text-sm leading-snug group-hover:text-[#635BFF] transition">{job.title}</p>
-                                                    <span className="text-[10px] bg-[#00D4FF]/10 text-[#0A5080] px-2 py-0.5 rounded shrink-0 font-medium">{job.source}</span>
-                                                </div>
-                                                <p className="text-xs text-gray-500 mt-1">{job.company} · {job.location}</p>
-                                                {job.salary && <p className="text-xs text-green-600 font-semibold mt-1">{job.salary}</p>}
-                                            </a>
+                    {/* ── 2. CAREERS MATCHED TO YOU ─────────────────────── */}
+                    <Section
+                        title={`⭐ ${t('insights.matchedTitle')}`}
+                        subtitle={hasAssessment
+                            ? t('insights.matchedSubtitleAssessment', { n: matchedCareers.length })
+                            : t('insights.matchedSubtitleStream', { stream: profile.stream || '' })}
+                    >
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {matchedCareers.map((career, idx) => {
+                                const savedResult = (assessment?.results || []).find((r: any) => r.careerTitle === career.title);
+                                return (<div key={career._id || idx}
+                                    className="border border-gray-100 rounded-xl p-4 hover:shadow-md transition"
+                                    style={{ borderLeftColor: CATEGORY_COLORS[career.category] || '#00D4FF', borderLeftWidth: 4 }}>
+                                    <div className="flex items-start justify-between mb-2">
+                                        <h4 className="font-bold text-[#0A2540] text-sm leading-snug">{career.title}</h4>
+                                        {savedResult && (
+                                            <span className="text-xs font-bold px-2 py-0.5 rounded-full text-white ml-2 shrink-0"
+                                                style={{ background: CATEGORY_COLORS[career.category] || '#635BFF' }}>
+                                                {savedResult.score}%
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className="text-xs text-gray-400">{career.category}</span>
+                                    <p className="text-xs text-gray-500 mt-2 leading-relaxed line-clamp-2">{career.description}</p>
+                                    <div className="flex flex-wrap gap-1 mt-3">
+                                        {(career.skills || []).slice(0, 3).map((s: string) => (
+                                            <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{s}</span>
                                         ))}
                                     </div>
-                                    <p className="text-xs text-gray-400 mt-3 text-center">
-                                        Live listings from Remotive · Click any card to view full job
-                                    </p>
-                                </div>
-                            )}
+                                    {career.topRecruiters?.length > 0 && (
+                                        <p className="text-xs text-gray-400 mt-2">
+                                            🏢 {career.topRecruiters.slice(0, 3).join(', ')}
+                                        </p>
+                                    )}
+                                    {career.requiredExam && (
+                                        <p className="text-xs text-blue-500 mt-1">📋 {career.requiredExam}</p>
+                                    )}
+                                    <div className="flex items-center justify-between mt-3">
+                                        <p className="text-xs text-gray-400">
+                                            💰 ₹{Math.round((career.salary?.min || 0) / 100000)}L – ₹{Math.round((career.salary?.max || 0) / 100000)}L / yr
+                                        </p>
+                                        {career.growthRate && (
+                                            <span className="text-xs font-bold text-green-600">↑ {career.growthRate}% growth</span>
+                                        )}
+                                    </div>
+                                </div>);
+                            })}
                         </div>
-                    ) : (
-                        <div className="text-center py-10">
-                            <p className="text-gray-400 text-sm">{t('insights.unavailable')}</p>
-                        </div>
-                    )}
-                </Section>
-
-                {/* ── 7. ADZUNA MARKET INTELLIGENCE (4 charts) ── */}
-                <Section
-                    title={`📊 ${t('insights.marketIntelTitle')}`}
-                    subtitle={t('insights.marketIntelSubtitle')}
-                >
-                    {/* Career selector pills */}
-                    <div className="flex flex-wrap items-center gap-3 mb-6">
-                        <span className="text-sm font-semibold text-gray-500">{t('insights.showingDataFor')}:</span>
-                        <div className="flex flex-wrap gap-2">
-                            {(matchedCareers.length > 0 ? matchedCareers : allCareers.slice(0, 5)).map((c: any) => (
-                                <button
-                                    key={c.title}
-                                    onClick={() => setSelectedCareer(c.title)}
-                                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition ${selectedCareer === c.title
-                                        ? 'bg-[#0A2540] text-white border-[#0A2540]'
-                                        : 'bg-white text-gray-600 border-gray-200 hover:border-[#00D4FF]'
-                                        }`}
-                                >
-                                    {c.title}
-                                </button>
-                            ))}
-                        </div>
-                        {marketData?.cached && (
-                            <span className="text-[10px] text-gray-400 ml-auto">Cached · refreshes in 6h</span>
-                        )}
-                    </div>
-
-                    {marketLoading ? (
-                        <div className="flex items-center justify-center py-12 gap-3">
-                            <div className="spinner" />
-                            <p className="text-gray-400 text-sm">Fetching Adzuna market data for “{selectedCareer}”…</p>
-                        </div>
-                    ) : !marketData ? (
-                        <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-8 text-center shadow-sm">
-                            <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">📊</div>
-                            <h4 className="text-lg font-bold text-[#0A2540] mb-2">{t('insights.marketIntelTitle')} — {t('insights.noDataAvailable')}</h4>
-                            <p className="text-gray-500 text-sm max-w-md mx-auto mb-6">
-                                {t('insights.noMarketDataDesc', { career: selectedCareer })}
+                        {matchedCareers.length === 0 && (
+                            <p className="text-center text-gray-400 py-8">
+                                {t('insights.noMatches')}
                             </p>
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                                <div className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm">
-                                    <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                                    <span className="text-xs text-gray-500">{t('insights.tryDifferentCareer')}</span>
+                        )}
+                    </Section>
+
+                    {/* ── 3. SKILLS GAP ANALYSIS ───────────────────────── */}
+                    <Section
+                        title={`🛠️ ${t('insights.skillsGapTitle')}`}
+                        subtitle={t('insights.skillsGapSubtitle')}
+                    >
+                        <div className="flex flex-wrap gap-3">
+                            {skillsGap.map(({ skill, count, have }) => (
+                                <div key={skill}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition ${have
+                                        ? 'bg-green-50 border-green-200 text-green-700'
+                                        : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
+                                    <span>{have ? '✅' : '✨'}</span>
+                                    <span>{skill}</span>
+                                    <span className={`text-xs rounded-full px-1.5 ${have ? 'bg-green-200 text-green-800' : 'bg-amber-200 text-amber-800'}`}>
+                                        {count} career{count > 1 ? 's' : ''}
+                                    </span>
                                 </div>
-                            </div>
+                            ))}
+                            {skillsGap.length === 0 && (
+                                <p className="text-gray-400 text-sm">Add interests in your profile to see skill gap analysis.</p>
+                            )}
                         </div>
-                    ) : (
-                        <div className="space-y-10">
+                        {skillsGap.some(s => !s.have) && (
+                            <div className="mt-4 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-600">
+                                💡 {t('insights.skillsNote')}
+                            </div>
+                        )}
+                    </Section>
 
-                            {/* Chart 1: Historical Demand Trend (Line chart) */}
-                            {marketData.history?.length > 0 && (
-                                <div>
-                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">📈 {t('insights.demandTrendTitle')}</h3>
-                                    <p className="text-xs text-gray-400 mb-4">{t('insights.demandTrendSubtitle', { career: selectedCareer })}</p>
-                                    <ResponsiveContainer width="100%" height={220}>
-                                        <LineChart data={marketData.history} margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                                            <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748b' }} />
-                                            <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={v => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v} />
-                                            <Tooltip content={<CustomTooltip />} />
-                                            <Line type="monotone" dataKey="count" name="Job postings" stroke="#635BFF" strokeWidth={2.5} dot={{ r: 3, fill: '#635BFF' }} activeDot={{ r: 5 }} />
-                                        </LineChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            )}
+                    {/* ── 4. JOB DEMAND (YOUR MATCHED CAREERS) ─────────── */}
+                    {demandData.length > 0 && (
+                        <Section
+                            title={`📈 ${t('insights.demandTitle')}`}
+                            subtitle={t('insights.demandSubtitle')}
+                        >
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={demandData} margin={{ top: 10, right: 20, left: 10, bottom: 60 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} angle={-35} textAnchor="end" interval={0} />
+                                    <YAxis tickFormatter={v => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v}
+                                        tick={{ fontSize: 11, fill: '#64748b' }}
+                                        label={{ value: t('insights.openings'), angle: -90, position: 'insideLeft', fontSize: 11, fill: '#94a3b8', dx: -5 }} />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Bar dataKey="openings" name={t('insights.openings')} radius={[6, 6, 0, 0]}>
+                                        {demandData.map((entry, idx) => (
+                                            <Cell key={idx} fill={CATEGORY_COLORS[entry.category] || COLORS[idx % COLORS.length]} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                            <p className="text-xs text-gray-400 mt-2 text-center">* Data sourced from NASSCOM, NAUKRI, LinkedIn India reports (2024)</p>
+                        </Section>
+                    )}
 
-                            {/* Chart 2: Salary Histogram (Bar chart) */}
-                            {marketData.histogram?.length > 0 && (
+                    {/* ── 5. SALARY COMPARISON (YOUR MATCHED CAREERS) ─── */}
+                    {salaryData.length > 0 && (
+                        <Section
+                            title={`💰 ${t('insights.salaryTitle')}`}
+                            subtitle={t('insights.salarySubtitle')}
+                        >
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={salaryData} margin={{ top: 10, right: 20, left: 10, bottom: 60 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} angle={-35} textAnchor="end" interval={0} />
+                                    <YAxis tickFormatter={v => `₹${v}L`} tick={{ fontSize: 11, fill: '#64748b' }}
+                                        label={{ value: '₹ Lakhs/yr', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#94a3b8', dx: -5 }} />
+                                    <Tooltip content={<CustomTooltip />} formatter={(v: any) => `₹${v}L / yr`} />
+                                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                                    <Bar dataKey="Min" name={t('insights.minSalary')} fill="#00D4FF" opacity={0.75} radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="Max" name={t('insights.maxSalary')} fill="#635BFF" opacity={0.85} radius={[4, 4, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </Section>
+                    )}
+                    {/* ── 6. LIVE MARKET TRENDS (Real jobs from Remotive) ── */}
+                    <Section
+                        title={`🌐 ${t('insights.liveTrendsTitle')}`}
+                        subtitle={t('insights.liveTrendsSubtitle')}
+                    >
+                        {jobsLoading ? (
+                            <div className="flex items-center justify-center py-10 gap-3">
+                                <div className="spinner" />
+                                <p className="text-gray-400 text-sm">Fetching live job listings…</p>
+                            </div>
+                        ) : jobTrends ? (
+                            <div className="space-y-8">
+                                {/* Skill demand bar chart */}
                                 <div>
-                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">💰 {t('insights.salaryDistTitle')}</h3>
-                                    <p className="text-xs text-gray-400 mb-4">{t('insights.salaryDistSubtitle')}</p>
-                                    <ResponsiveContainer width="100%" height={220}>
-                                        <BarChart data={marketData.histogram} margin={{ left: 10, right: 20, bottom: 30 }}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                                            <XAxis dataKey="range" tick={{ fontSize: 10, fill: '#64748b' }} angle={-30} textAnchor="end" interval={0} />
-                                            <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
-                                            <Tooltip content={<CustomTooltip />} />
-                                            <Bar dataKey="count" name="Job listings" radius={[4, 4, 0, 0]}>
-                                                {marketData.histogram.map((_: any, i: number) => (
-                                                    <Cell key={i} fill={`hsl(${220 + i * 12}, 75%, ${55 + i * 2}%)`} />
-                                                ))}
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            )}
-
-                            {/* Chart 3: Regional / Top Cities (Horizontal bar) */}
-                            {marketData.regional?.length > 0 && (
-                                <div>
-                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">🇮🇳 {t('insights.topCitiesTitle')}</h3>
-                                    <p className="text-xs text-gray-400 mb-4">{t('insights.topCitiesSubtitle', { career: selectedCareer })}</p>
-                                    <ResponsiveContainer width="100%" height={280}>
-                                        <BarChart data={marketData.regional} layout="vertical" margin={{ left: 100, right: 30 }}>
+                                    <h3 className="font-bold text-[#0A2540] text-sm mb-4">🔥 {t('insights.liveSkillsTitle')}</h3>
+                                    <ResponsiveContainer width="100%" height={240}>
+                                        <BarChart data={jobTrends.skills.slice(0, 12)} layout="vertical" margin={{ left: 80, right: 20 }}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
                                             <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} />
-                                            <YAxis type="category" dataKey="city" tick={{ fontSize: 11, fill: '#0A2540', fontWeight: 600 }} width={100} />
+                                            <YAxis type="category" dataKey="skill" tick={{ fontSize: 11, fill: '#0A2540', fontWeight: 600 }} width={80} />
                                             <Tooltip content={<CustomTooltip />} />
-                                            <Bar dataKey="count" name="Job postings" radius={[0, 6, 6, 0]}>
-                                                {marketData.regional.map((_: any, i: number) => (
-                                                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                                            <Bar dataKey="count" name="Job listings" radius={[0, 6, 6, 0]}>
+                                                {jobTrends.skills.slice(0, 12).map((_: any, idx: number) => (
+                                                    <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
                                                 ))}
                                             </Bar>
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>
-                            )}
 
-                            {/* Chart 4: Top Companies (Grid of company pills) */}
-                            {marketData.topCompanies?.length > 0 && (
+                                {/* Sector distribution */}
                                 <div>
-                                    <h3 className="font-bold text-[#0A2540] text-sm mb-1">🏢 {t('insights.topCompaniesTitle')}</h3>
-                                    <p className="text-xs text-gray-400 mb-4">{t('insights.topCompaniesSubtitle', { career: selectedCareer })}</p>
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                                        {marketData.topCompanies.map((co: any, i: number) => (
-                                            <div key={i}
-                                                className="flex flex-col items-center text-center p-3 rounded-xl border border-gray-100 hover:border-[#635BFF] hover:shadow-sm transition"
-                                                style={{ borderLeftColor: COLORS[i % COLORS.length], borderLeftWidth: 3 }}
-                                            >
-                                                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold mb-2"
-                                                    style={{ background: COLORS[i % COLORS.length] }}>
-                                                    {co.name?.charAt(0) || '?'}
-                                                </div>
-                                                <p className="text-xs font-bold text-[#0A2540] leading-tight">{co.name}</p>
-                                                <p className="text-[10px] text-gray-400 mt-0.5">{co.count} postings</p>
+                                    <h3 className="font-bold text-[#0A2540] text-sm mb-3">🏢 {t('insights.liveSectorsTitle')}</h3>
+                                    <div className="flex flex-wrap gap-3">
+                                        {jobTrends.sectors.map((s: any, i: number) => (
+                                            <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-white"
+                                                style={{ background: COLORS[i % COLORS.length] }}>
+                                                <span>{s.sector}</span>
+                                                <span className="bg-white/25 rounded-full px-2 py-0.5 text-xs font-bold">{s.count}</span>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
-                            )}
 
+                                {/* Top live job listings */}
+                                {jobTrends.topJobs?.length > 0 && (
+                                    <div>
+                                        <h3 className="font-bold text-[#0A2540] text-sm mb-3">📋 {t('insights.liveJobsTitle')}</h3>
+                                        <div className="grid md:grid-cols-2 gap-3">
+                                            {jobTrends.topJobs.slice(0, 6).map((job: any, i: number) => (
+                                                <a key={i} href={job.url} target="_blank" rel="noopener noreferrer"
+                                                    className="border border-gray-100 rounded-xl p-3 hover:border-[#00D4FF] hover:shadow-sm transition group">
+                                                    <div className="flex justify-between items-start gap-2">
+                                                        <p className="font-semibold text-[#0A2540] text-sm leading-snug group-hover:text-[#635BFF] transition">{job.title}</p>
+                                                        <span className="text-[10px] bg-[#00D4FF]/10 text-[#0A5080] px-2 py-0.5 rounded shrink-0 font-medium">{job.source}</span>
+                                                    </div>
+                                                    <p className="text-xs text-gray-500 mt-1">{job.company} · {job.location}</p>
+                                                    {job.salary && <p className="text-xs text-green-600 font-semibold mt-1">{job.salary}</p>}
+                                                </a>
+                                            ))}
+                                        </div>
+                                        <p className="text-xs text-gray-400 mt-3 text-center">
+                                            Live listings from Remotive · Click any card to view full job
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="text-center py-10">
+                                <p className="text-gray-400 text-sm">{t('insights.unavailable')}</p>
+                            </div>
+                        )}
+                    </Section>
+
+                    {/* ── 7. ADZUNA MARKET INTELLIGENCE (4 charts) ── */}
+                    <Section
+                        title={`📊 ${t('insights.marketIntelTitle')}`}
+                        subtitle={t('insights.marketIntelSubtitle')}
+                    >
+                        {/* Career selector pills */}
+                        <div className="flex flex-wrap items-center gap-3 mb-6">
+                            <span className="text-sm font-semibold text-gray-500">{t('insights.showingDataFor')}:</span>
+                            <div className="flex flex-wrap gap-2">
+                                {(matchedCareers.length > 0 ? matchedCareers : allCareers.slice(0, 5)).map((c: any) => (
+                                    <button
+                                        key={c.title}
+                                        onClick={() => setSelectedCareer(c.title)}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition ${selectedCareer === c.title
+                                            ? 'bg-[#0A2540] text-white border-[#0A2540]'
+                                            : 'bg-white text-gray-600 border-gray-200 hover:border-[#00D4FF]'
+                                            }`}
+                                    >
+                                        {c.title}
+                                    </button>
+                                ))}
+                            </div>
+                            {marketData?.cached && (
+                                <span className="text-[10px] text-gray-400 ml-auto">Cached · refreshes in 6h</span>
+                            )}
                         </div>
-                    )}
-                </Section>
+
+                        {marketLoading ? (
+                            <div className="flex items-center justify-center py-12 gap-3">
+                                <div className="spinner" />
+                                <p className="text-gray-400 text-sm">Fetching Adzuna market data for “{selectedCareer}”…</p>
+                            </div>
+                        ) : !marketData ? (
+                            <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-8 text-center shadow-sm">
+                                <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">📊</div>
+                                <h4 className="text-lg font-bold text-[#0A2540] mb-2">{t('insights.marketIntelTitle')} — {t('insights.noDataAvailable')}</h4>
+                                <p className="text-gray-500 text-sm max-w-md mx-auto mb-6">
+                                    {t('insights.noMarketDataDesc', { career: selectedCareer })}
+                                </p>
+                                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                                    <div className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm">
+                                        <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                                        <span className="text-xs text-gray-500">{t('insights.tryDifferentCareer')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-10">
+
+                                {/* Chart 1: Historical Demand Trend (Line chart) */}
+                                {marketData.history?.length > 0 && (
+                                    <div>
+                                        <h3 className="font-bold text-[#0A2540] text-sm mb-1">📈 {t('insights.demandTrendTitle')}</h3>
+                                        <p className="text-xs text-gray-400 mb-4">{t('insights.demandTrendSubtitle', { career: selectedCareer })}</p>
+                                        <ResponsiveContainer width="100%" height={220}>
+                                            <LineChart data={marketData.history} margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                                                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748b' }} />
+                                                <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={v => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v} />
+                                                <Tooltip content={<CustomTooltip />} />
+                                                <Line type="monotone" dataKey="count" name="Job postings" stroke="#635BFF" strokeWidth={2.5} dot={{ r: 3, fill: '#635BFF' }} activeDot={{ r: 5 }} />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+
+                                {/* Chart 2: Salary Histogram (Bar chart) */}
+                                {marketData.histogram?.length > 0 && (
+                                    <div>
+                                        <h3 className="font-bold text-[#0A2540] text-sm mb-1">💰 {t('insights.salaryDistTitle')}</h3>
+                                        <p className="text-xs text-gray-400 mb-4">{t('insights.salaryDistSubtitle')}</p>
+                                        <ResponsiveContainer width="100%" height={220}>
+                                            <BarChart data={marketData.histogram} margin={{ left: 10, right: 20, bottom: 30 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                                                <XAxis dataKey="range" tick={{ fontSize: 10, fill: '#64748b' }} angle={-30} textAnchor="end" interval={0} />
+                                                <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+                                                <Tooltip content={<CustomTooltip />} />
+                                                <Bar dataKey="count" name="Job listings" radius={[4, 4, 0, 0]}>
+                                                    {marketData.histogram.map((_: any, i: number) => (
+                                                        <Cell key={i} fill={`hsl(${220 + i * 12}, 75%, ${55 + i * 2}%)`} />
+                                                    ))}
+                                                </Bar>
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+
+                                {/* Chart 3: Regional / Top Cities (Horizontal bar) */}
+                                {marketData.regional?.length > 0 && (
+                                    <div>
+                                        <h3 className="font-bold text-[#0A2540] text-sm mb-1">🇮🇳 {t('insights.topCitiesTitle')}</h3>
+                                        <p className="text-xs text-gray-400 mb-4">{t('insights.topCitiesSubtitle', { career: selectedCareer })}</p>
+                                        <ResponsiveContainer width="100%" height={280}>
+                                            <BarChart data={marketData.regional} layout="vertical" margin={{ left: 100, right: 30 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                                                <XAxis type="number" tick={{ fontSize: 11, fill: '#64748b' }} />
+                                                <YAxis type="category" dataKey="city" tick={{ fontSize: 11, fill: '#0A2540', fontWeight: 600 }} width={100} />
+                                                <Tooltip content={<CustomTooltip />} />
+                                                <Bar dataKey="count" name="Job postings" radius={[0, 6, 6, 0]}>
+                                                    {marketData.regional.map((_: any, i: number) => (
+                                                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                                                    ))}
+                                                </Bar>
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+
+                                {/* Chart 4: Top Companies (Grid of company pills) */}
+                                {marketData.topCompanies?.length > 0 && (
+                                    <div>
+                                        <h3 className="font-bold text-[#0A2540] text-sm mb-1">🏢 {t('insights.topCompaniesTitle')}</h3>
+                                        <p className="text-xs text-gray-400 mb-4">{t('insights.topCompaniesSubtitle', { career: selectedCareer })}</p>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                            {marketData.topCompanies.map((co: any, i: number) => (
+                                                <div key={i}
+                                                    className="flex flex-col items-center text-center p-3 rounded-xl border border-gray-100 hover:border-[#635BFF] hover:shadow-sm transition"
+                                                    style={{ borderLeftColor: COLORS[i % COLORS.length], borderLeftWidth: 3 }}
+                                                >
+                                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold mb-2"
+                                                        style={{ background: COLORS[i % COLORS.length] }}>
+                                                        {co.name?.charAt(0) || '?'}
+                                                    </div>
+                                                    <p className="text-xs font-bold text-[#0A2540] leading-tight">{co.name}</p>
+                                                    <p className="text-[10px] text-gray-400 mt-0.5">{co.count} postings</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                            </div>
+                        )}
+                    </Section>
                 </div>{/* end reportRef */}
 
             </main>

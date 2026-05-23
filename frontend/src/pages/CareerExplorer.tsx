@@ -294,7 +294,7 @@ export default function CareerExplorer() {
                         placeholder={t('career.searchPlaceholder')}
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition flex-1"
+                        className="border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition flex-1 bg-white text-gray-900"
                     />
                     <div className="flex flex-wrap gap-2">
                         {CATEGORIES.map(cat => (
