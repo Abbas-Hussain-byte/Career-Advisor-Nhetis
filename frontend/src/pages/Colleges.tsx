@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import API from '../api';
 import CollegeMap from '../components/CollegeMap';
 import SharedNavbar from '../components/SharedNavbar';
+import { useLanguage } from '../context/LanguageContext';
 
 // ── Career category → relevant college programs mapping ──────────────────────
 const CATEGORY_PROGRAMS_MAP: Record<string, string[]> = {
@@ -42,6 +43,7 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 
 export default function Colleges() {
     const { user } = useAuth();
+    const { t } = useLanguage();
     const userStream = user?.profile?.stream || '';
     const userAssessment = user?.assessment;
     const hasAssessment = !!(userAssessment?.results?.length);
@@ -75,10 +77,6 @@ export default function Colleges() {
         ).length;
     };
 
-    const handleLogout = () => {
-        logoutUser();
-        navigate('/');
-    };
     const [colleges, setColleges] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
@@ -207,13 +205,13 @@ export default function Colleges() {
                             onClick={handleSearch}
                             className="bg-[#0A2540] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-[#1a3d66] transition"
                         >
-                            Search
+                            {t('common.search')}
                         </button>
                         <button
                             onClick={handleReset}
                             className="border-2 border-gray-200 text-gray-600 px-6 py-2.5 rounded-xl text-sm font-medium hover:border-gray-400 transition"
                         >
-                            Reset
+                            {t('common.reset')}
                         </button>
                     </div>
                     <button
@@ -223,7 +221,7 @@ export default function Colleges() {
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                     >
-                        📍 {useLocation ? 'Using your location (100km radius)' : 'Use My Location'}
+                        📍 {useLocation ? t('common.usingLocation') : t('common.useLocation')}
                     </button>
                 </div>
 
@@ -320,7 +318,7 @@ export default function Colleges() {
                                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {sorted.length === 0 ? (
                                         <div className="col-span-3 text-center py-12 text-gray-400">
-                                            No colleges found. Try different filters.
+                                            {t('common.noResults')}
                                         </div>
                                     ) : (
                                         sorted.map((college, i) => {

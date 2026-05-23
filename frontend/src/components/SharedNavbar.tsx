@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -12,6 +12,7 @@ const SharedNavbar: React.FC<SharedNavbarProps> = ({ activePage }) => {
     const { user, logoutUser } = useAuth();
     const { t, language, setLanguage } = useLanguage();
     const navigate = useNavigate();
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     const handleLogout = () => {
         logoutUser();
@@ -35,6 +36,7 @@ const SharedNavbar: React.FC<SharedNavbarProps> = ({ activePage }) => {
                     <span className="text-[#00D4FF]">N</span>HETIS
                 </Link>
 
+                {/* Desktop nav */}
                 <div className="hidden md:flex items-center gap-6 text-sm">
                     {navLinks.map((link) => (
                         <Link 
@@ -60,12 +62,58 @@ const SharedNavbar: React.FC<SharedNavbarProps> = ({ activePage }) => {
                     
                     <button
                         onClick={handleLogout}
-                        className="bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-white/20 transition"
+                        className="hidden md:block bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-white/20 transition"
                     >
                         {t('nav.logout')}
                     </button>
+
+                    {/* Mobile hamburger button */}
+                    <button
+                        onClick={() => setMobileOpen(!mobileOpen)}
+                        className="md:hidden p-1.5 rounded-lg hover:bg-white/10 transition"
+                        aria-label="Toggle menu"
+                    >
+                        {mobileOpen ? (
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        ) : (
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        )}
+                    </button>
                 </div>
             </div>
+
+            {/* Mobile menu drawer */}
+            {mobileOpen && (
+                <div className="md:hidden mt-4 pb-2 border-t border-white/10 pt-4 space-y-1 animate-[fadeIn_0.15s_ease-out]">
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.path}
+                            to={link.path}
+                            onClick={() => setMobileOpen(false)}
+                            className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition ${
+                                activePage === link.id
+                                    ? 'bg-[#00D4FF]/15 text-[#00D4FF]'
+                                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                            }`}
+                        >
+                            {link.name}
+                        </Link>
+                    ))}
+                    <div className="border-t border-white/10 mt-2 pt-3 px-4 flex items-center justify-between">
+                        <span className="text-sm text-gray-400">{user?.name?.split(' ')[0]}</span>
+                        <button
+                            onClick={() => { handleLogout(); setMobileOpen(false); }}
+                            className="bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-white/20 transition"
+                        >
+                            {t('nav.logout')}
+                        </button>
+                    </div>
+                </div>
+            )}
         </nav>
     );
 };

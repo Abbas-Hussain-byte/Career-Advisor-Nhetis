@@ -12,7 +12,7 @@ const jobCacheSchema = new mongoose.Schema({
     query: { type: String },
 });
 
-// TTL index: MongoDB auto-deletes documents after 6 hours
-jobCacheSchema.index({ fetchedAt: 1 }, { expireAfterSeconds: 21600 });
+// TTL index: MongoDB auto-deletes documents after 24 hours
+jobCacheSchema.index({ fetchedAt: 1 }, { expireAfterSeconds: 86400 });
 
 module.exports = mongoose.model('JobCache', jobCacheSchema);

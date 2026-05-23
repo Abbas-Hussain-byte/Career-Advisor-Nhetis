@@ -378,4 +378,15 @@ function mapCareerToRemotiveCategory(career) {
     return 'software-dev';
 }
 
-module.exports = { getJobs, getTrendingSkills, getMarketData };
+module.exports = { 
+    getJobs, 
+    getTrendingSkills, 
+    getMarketData,
+    fetchAdzuna,
+    fetchAdzunaHistory,
+    fetchAdzunaHistogram,
+    fetchAdzunaRegional,
+    fetchAdzunaTopCompanies,
+    fetchRemotive,
+    mapCareerToRemotiveCategory
+};

@@ -3,7 +3,6 @@ import API from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ── Career categories used for weight mapping ────────────────────────────────
-// ── Career categories used for weight mapping ────────────────────────────────
 const CAREER_CATEGORIES = [
     'Technology', 'Engineering', 'Medical', 'Agriculture',
     'Commerce', 'Business', 'Arts & Design', 'Media', 'Education', 'Law',

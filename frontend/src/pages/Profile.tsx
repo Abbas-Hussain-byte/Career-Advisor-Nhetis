@@ -22,7 +22,6 @@ export default function Profile() {
     const { t } = useLanguage();
     const [form, setForm] = useState({
         name: user?.name || '',
-        email: user?.email || '',
         grade: user?.profile?.grade || '12',
         stream: user?.profile?.stream || '',
         board: user?.profile?.board || '',
@@ -39,6 +38,10 @@ export default function Profile() {
     const [saving, setSaving] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
+    const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '' });
+    const [passwordSaving, setPasswordSaving] = useState(false);
+    const [passwordSuccess, setPasswordSuccess] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
 
     const toggleInterest = (interest: string) => {
         setForm(prev => ({
@@ -66,7 +69,6 @@ export default function Profile() {
         try {
             await API.put('/users/profile', {
                 name: form.name,
-                email: form.email,
                 grade: form.grade,
                 stream: form.stream,
                 board: form.board,
@@ -89,6 +91,26 @@ export default function Profile() {
             setError(err?.response?.data?.message || t('profile.saveError'));
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handlePasswordUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (passwordForm.newPassword.length < 6) {
+            setPasswordError(t('auth.passwordTooShort') || 'Password too short');
+            return;
+        }
+        setPasswordSaving(true);
+        setPasswordError('');
+        setPasswordSuccess(false);
+        try {
+            await API.put('/users/password', passwordForm);
+            setPasswordSuccess(true);
+            setPasswordForm({ currentPassword: '', newPassword: '' });
+        } catch (err: any) {
+            setPasswordError(err?.response?.data?.message || t('profile.passwordError'));
+        } finally {
+            setPasswordSaving(false);
         }
     };
 
@@ -143,17 +165,64 @@ export default function Profile() {
                                     type="text"
                                     value={form.name}
                                     onChange={e => setForm({ ...form, name: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t('profile.email')}</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number</label>
                                 <input
-                                    type="email"
-                                    value={form.email}
-                                    onChange={e => setForm({ ...form, email: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    type="number"
+                                    value={user?.phone || ''}
+                                    disabled
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-gray-500 cursor-not-allowed"
                                 />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Change Password Section */}
+                    <div className="glass rounded-2xl p-6 mb-6">
+                        <h3 className="text-lg font-bold text-[#0A2540] mb-5">{t('profile.changePassword')}</h3>
+                        
+                        {passwordSuccess && (
+                            <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm mb-4">
+                                ✅ {t('profile.passwordSuccess')}
+                            </div>
+                        )}
+                        {passwordError && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-4">
+                                ❌ {passwordError}
+                            </div>
+                        )}
+
+                        <div className="grid md:grid-cols-2 gap-4 items-end">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t('profile.currentPassword')}</label>
+                                <input
+                                    type="password"
+                                    value={passwordForm.currentPassword}
+                                    onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t('profile.newPassword')}</label>
+                                <input
+                                    type="password"
+                                    value={passwordForm.newPassword}
+                                    onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <button
+                                    type="button"
+                                    onClick={handlePasswordUpdate}
+                                    disabled={passwordSaving || !passwordForm.currentPassword || !passwordForm.newPassword}
+                                    className="bg-[#635BFF] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-[#5249f0] transition disabled:opacity-50"
+                                >
+                                    {passwordSaving ? t('profile.saving') : t('profile.updatePasswordBtn')}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -167,7 +236,7 @@ export default function Profile() {
                                 <select
                                     value={form.grade}
                                     onChange={e => setForm({ ...form, grade: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
                                 >
                                     <option value="10">{t('profile.options.grade10')}</option>
                                     <option value="12">{t('profile.options.grade12')}</option>
@@ -178,7 +247,7 @@ export default function Profile() {
                                 <select
                                     value={form.stream}
                                     onChange={e => setForm({ ...form, stream: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
                                 >
                                     <option value="">{t('profile.options.notSelected')}</option>
                                     {STREAM_OPTIONS.map(s => (
@@ -192,7 +261,7 @@ export default function Profile() {
                                     type="text"
                                     value={form.board}
                                     onChange={e => setForm({ ...form, board: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
                                 />
                             </div>
                             <div>
@@ -203,7 +272,7 @@ export default function Profile() {
                                     onChange={e => setForm({ ...form, academicScore: e.target.value })}
                                     min="0"
                                     max="100"
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
                                 />
                             </div>
                         </div>
@@ -218,7 +287,7 @@ export default function Profile() {
                                 <select
                                     value={form.aspirationTrack}
                                     onChange={e => setForm({ ...form, aspirationTrack: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
                                 >
                                     {ASPIRATION_TRACKS.map(tr => (
                                         <option key={tr} value={tr}>{t(`profile.tracks.${tr}`)}</option>
@@ -232,7 +301,7 @@ export default function Profile() {
                                     value={form.longTermGoal}
                                     onChange={e => setForm({ ...form, longTermGoal: e.target.value })}
                                     placeholder={t('profile.goalPlaceholder')}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
                                 />
                             </div>
                             <div>
@@ -240,7 +309,7 @@ export default function Profile() {
                                 <select
                                     value={form.budgetLevel}
                                     onChange={e => setForm({ ...form, budgetLevel: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
                                 >
                                     <option value="high-support-needed">{t('profile.options.budgetHigh')}</option>
                                     <option value="moderate">{t('profile.options.budgetModerate')}</option>
@@ -252,7 +321,7 @@ export default function Profile() {
                                 <select
                                     value={form.mobility}
                                     onChange={e => setForm({ ...form, mobility: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
                                 >
                                     <option value="near-home">{t('profile.options.mobilityNear')}</option>
                                     <option value="within-state">{t('profile.options.mobilityState')}</option>
@@ -264,7 +333,7 @@ export default function Profile() {
                                 <select
                                     value={form.preferredLearningMode}
                                     onChange={e => setForm({ ...form, preferredLearningMode: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
                                 >
                                     <option value="offline">{t('profile.options.modeOffline')}</option>
                                     <option value="online">{t('profile.options.modeOnline')}</option>
@@ -278,7 +347,7 @@ export default function Profile() {
                                     value={form.languageComfort}
                                     onChange={e => setForm({ ...form, languageComfort: e.target.value })}
                                     placeholder={t('profile.langPlaceholder')}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] transition bg-white text-gray-900"
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00D4FF] focus:bg-[#F0F8FF] focus:ring-4 focus:ring-[#00D4FF]/20 focus:text-[#0A2540] transition-all duration-300 bg-white text-gray-800 placeholder-gray-400 font-medium"
                                 />
                             </div>
                         </div>

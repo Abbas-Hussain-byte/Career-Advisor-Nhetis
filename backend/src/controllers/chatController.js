@@ -11,7 +11,7 @@ function buildSystemPrompt(user, sessionLanguage = 'English') {
 
     // Top 3 career matches
     const topCareers = results.slice(0, 3).map(r =>
-        `${r.careerTitle} (match score: ${Math.round((r.score || 0) * 100)}%)`
+        `${r.careerTitle} (match score: ${Math.round(r.score || 0)}%)`
     ).join(', ') || 'Not yet assessed';
 
     // Skill ratings from self-rating stage
@@ -91,6 +91,11 @@ function getModel(systemPrompt) {
 const chat = asyncHandler(async (req, res) => {
     const { message, history = [], language = 'English' } = req.body;
     const user = req.user;
+
+    if (!user || !user.assessment?.results?.length) {
+        res.status(403);
+        throw new Error('Please complete the career assessment before starting the chat.');
+    }
 
     if (!message?.trim()) {
         res.status(400);

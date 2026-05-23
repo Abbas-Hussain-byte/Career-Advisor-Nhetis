@@ -77,7 +77,8 @@ const authUser = asyncHandler(async (req, res) => {
         throw new Error('Phone and password are required');
     }
 
-    const user = await User.findOne({ phone });
+    const cleanPhone = phone.trim().replace(/\D/g, ''); // strip non-digits
+    const user = await User.findOne({ phone: cleanPhone });
 
     if (user && (await user.matchPassword(password))) {
         res.json({
@@ -181,7 +182,7 @@ const saveAssessment = asyncHandler(async (req, res) => {
     const user = await User.findByIdAndUpdate(
         req.user._id,
         { assessment: { vector, results, recommendedStreams, studentSignals, takenAt: new Date() } },
-        { returnDocument: 'after' }
+        { new: true }
     );
     if (!user) { res.status(404); throw new Error('User not found'); }
     res.json({ message: 'Assessment saved', assessment: user.assessment });
@@ -201,4 +202,40 @@ const updateLanguage = asyncHandler(async (req, res) => {
     res.json({ message: 'Language updated', preferredLanguage: user.preferredLanguage });
 });
 
-module.exports = { registerUser, authUser, getUserProfile, updateUserProfile, saveAssessment, updateLanguage };
+// @desc    Update user password
+// @route   PUT /api/users/password
+// @access  Private
+const updateUserPassword = asyncHandler(async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+        res.status(400);
+        throw new Error('Current and new password are required');
+    }
+
+    if (newPassword.length < 6) {
+        res.status(400);
+        throw new Error('New password must be at least 6 characters');
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (user && (await user.matchPassword(currentPassword))) {
+        user.password = newPassword;
+        await user.save();
+        res.json({ message: 'Password updated successfully' });
+    } else {
+        res.status(401);
+        throw new Error('Invalid current password');
+    }
+});
+
+module.exports = {
+    registerUser,
+    authUser,
+    getUserProfile,
+    updateUserProfile,
+    saveAssessment,
+    updateLanguage,
+    updateUserPassword,
+};

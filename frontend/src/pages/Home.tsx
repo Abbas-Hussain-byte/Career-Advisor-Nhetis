@@ -3,36 +3,6 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSelector from '../components/LanguageSelector';
 
-const features = [
-    {
-        icon: '🧠',
-        title: 'AI Aptitude Assessment',
-        desc: 'Take our 10-question psychometric quiz to discover your strengths across logic, creativity, technical, and social dimensions.',
-    },
-    {
-        icon: '🗺️',
-        title: 'College Locator Map',
-        desc: 'Find government colleges near you on an interactive map. Filter by state, program, and facilities.',
-    },
-    {
-        icon: '🚀',
-        title: 'Career Path Explorer',
-        desc: 'Explore 10+ career paths with step-by-step roadmaps, salary ranges, and required skills.',
-    },
-    {
-        icon: '📶',
-        title: 'Works Offline',
-        desc: 'Take quizzes and browse career paths even without internet. Your responses sync when you reconnect.',
-    },
-];
-
-const stats = [
-    { value: '10+', label: 'Career Paths' },
-    { value: '8', label: 'Gov. Colleges' },
-    { value: '10', label: 'Quiz Questions' },
-    { value: '100%', label: 'Free to Use' },
-];
-
 const fadeUp = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },

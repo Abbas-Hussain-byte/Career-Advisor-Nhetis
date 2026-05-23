@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { OfflineProvider } from './context/OfflineContext';
+import { LanguageProvider } from './context/LanguageContext';
 
 // Pages
 import Home from './pages/Home';
@@ -39,13 +40,12 @@ const PublicRoute = ({ children }: { children: JSX.Element }) => {
   return user ? <Navigate to="/dashboard" replace /> : children;
 };
 
-// Chat widget wrapper — only shows when logged in
+// Chat widget wrapper — only shows when logged in and assessment taken
 const AuthenticatedChat = () => {
   const { user } = useAuth();
-  return user ? <ChatWidget /> : null;
+  const hasAssessment = !!(user?.assessment?.results?.length);
+  return user && hasAssessment ? <ChatWidget /> : null;
 };
-
-import { LanguageProvider } from './context/LanguageContext';
 
 function App() {
   return (

@@ -24,7 +24,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     const updateLanguage = async (lang: Language) => {
         if (!user) return;
         try {
-            await API.patch('/users/language', { preferredLanguage: lang });
+            await API.put('/users/language', { preferredLanguage: lang });
         } catch (err) {
             console.error('Failed to sync language to backend', err);
         }

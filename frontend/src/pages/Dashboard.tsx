@@ -251,11 +251,11 @@ export default function Dashboard() {
                             <p className="font-bold text-[#0A2540]">{user.profile.stream || t('dashboard.notSet')}</p>
                         </div>
                         <div>
-                            <p className="text-gray-500 text-xs">Phone</p>
+                            <p className="text-gray-500 text-xs">{t('dashboard.phone')}</p>
                             <p className="font-bold text-[#0A2540]">{user.phone}</p>
                         </div>
                         <div>
-                            <p className="text-gray-500 text-xs">Role</p>
+                            <p className="text-gray-500 text-xs">{t('dashboard.role')}</p>
                             <p className="font-bold text-[#0A2540] capitalize">{user.role}</p>
                         </div>
                     </div>
@@ -320,12 +320,20 @@ export default function Dashboard() {
                     <h2 className="text-3xl font-extrabold text-[#0A2540]">{t('dashboard.resultsTitle')}</h2>
                     <p className="text-gray-500 text-sm mt-1">{t('dashboard.resultsSubtitle')}</p>
                 </div>
-                <button
-                    onClick={() => setView('home')}
-                    className="border-2 border-[#0A2540] text-[#0A2540] px-5 py-2 rounded-xl text-sm font-semibold hover:bg-[#0A2540] hover:text-white transition"
-                >
-                    {t('dashboard.newAssessment')}
-                </button>
+                <div className="flex gap-3">
+                    <Link
+                        to="/insights"
+                        className="bg-gradient-to-r from-[#635BFF] to-[#00D4FF] text-white px-5 py-2 rounded-xl text-sm font-bold hover:shadow-lg transition"
+                    >
+                        🔍 {t('dashboard.viewInsights')}
+                    </Link>
+                    <button
+                        onClick={() => setView('home')}
+                        className="border-2 border-[#0A2540] text-[#0A2540] px-5 py-2 rounded-xl text-sm font-semibold hover:bg-[#0A2540] hover:text-white transition"
+                    >
+                        {t('dashboard.newAssessment')}
+                    </button>
+                </div>
             </div>
 
             {/* ══════ STREAM RECOMMENDATION (Most prominent for Class 10) ══════ */}
@@ -488,7 +496,7 @@ export default function Dashboard() {
                             <div className="border-t pt-3">
                                 <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Salary Range</p>
                                 <p className="text-green-600 font-bold text-sm mt-0.5">
-                                    ₹{(career.salary?.min / 100000).toFixed(1)}L – ₹{(career.salary?.max / 100000).toFixed(1)}L /yr
+                                    ₹{((career.salary?.min || 0) / 100000).toFixed(1)}L – ₹{((career.salary?.max || 0) / 100000).toFixed(1)}L /yr
                                 </p>
                             </div>
                         </motion.div>

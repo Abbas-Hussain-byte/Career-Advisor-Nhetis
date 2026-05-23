@@ -6,7 +6,7 @@ import API from '../api';
 import { useLanguage } from '../context/LanguageContext';
 import SharedNavbar from '../components/SharedNavbar';
 
-const CATEGORIES = ['All', 'Technology', 'Medical', 'Engineering', 'Commerce', 'Arts & Design', 'Education', 'Agriculture', 'Business', 'Media'];
+const CATEGORIES = ['All', 'Technology', 'Medical', 'Engineering', 'Commerce', 'Arts & Design', 'Education', 'Agriculture', 'Business', 'Media', 'Law'];
 
 const streamColors: Record<string, string> = {
     Technology: 'bg-blue-100 text-blue-800',
@@ -18,6 +18,7 @@ const streamColors: Record<string, string> = {
     Agriculture: 'bg-lime-100 text-lime-800',
     Business: 'bg-indigo-100 text-indigo-800',
     Media: 'bg-red-100 text-red-800',
+    Law: 'bg-cyan-100 text-cyan-800',
 };
 
 export default function CareerExplorer() {
@@ -27,10 +28,6 @@ export default function CareerExplorer() {
     const profile = user?.profile || {};
     const assessment = user?.assessment;
 
-    const handleLogout = () => {
-        logoutUser();
-        navigate('/');
-    };
     const [careers, setCareers] = useState<any[]>([]);
     const [filtered, setFiltered] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -39,6 +36,7 @@ export default function CareerExplorer() {
     const [selected, setSelected] = useState<any | null>(null);
     const [compareList, setCompareList] = useState<any[]>([]);
     const [showCompare, setShowCompare] = useState(false);
+    const [showAssessment, setShowAssessment] = useState(false);
 
     const toggleCompare = (career: any) => {
         setCompareList(prev => {
@@ -52,14 +50,35 @@ export default function CareerExplorer() {
     // ── Personalised recommendations for this student ──
     const recommended = useMemo(() => {
         if (!careers.length) return [];
-        // If quiz taken, use those results
+
+        // PRIORITY 1: If quiz taken, match saved assessment results by title
         if (assessment?.results?.length) {
-            // Case-insensitive matching to handle DB variations
             const resultTitles = (assessment.results || []).map((r: any) => r.careerTitle.toLowerCase().trim());
             const matched = careers.filter(c => resultTitles.includes(c.title.toLowerCase().trim()));
-            if (matched.length > 0) return matched.slice(0, 4);
+
+            // If we got good matches by title, use those (with score order preserved)
+            if (matched.length > 0) {
+                // Sort matched careers by their assessment score (highest first)
+                matched.sort((a, b) => {
+                    const scoreA = (assessment.results || []).find((r: any) => r.careerTitle.toLowerCase().trim() === a.title.toLowerCase().trim())?.score || 0;
+                    const scoreB = (assessment.results || []).find((r: any) => r.careerTitle.toLowerCase().trim() === b.title.toLowerCase().trim())?.score || 0;
+                    return scoreB - scoreA;
+                });
+                return matched.slice(0, 4);
+            }
+
+            // PRIORITY 2: Title match failed — use assessment CATEGORIES to find similar careers
+            // This is the key fix: use assessment category data, NOT profile stream/interests
+            const assessmentCategories = new Set<string>(
+                (assessment.results || []).map((r: any) => r.category).filter(Boolean)
+            );
+            if (assessmentCategories.size > 0) {
+                const categoryMatched = careers.filter(c => assessmentCategories.has(c.category));
+                return categoryMatched.slice(0, 4);
+            }
         }
-        // Else filter by stream + interests (Fallback only if NO assessment or NO matches in DB)
+
+        // PRIORITY 3 (LAST RESORT): No assessment at all — filter by stream + interests
         const streamMap: Record<string, string[]> = {
             'Science-PCM': ['Technology', 'Engineering'],
             'Science-PCB': ['Medical', 'Agriculture'],
@@ -120,6 +139,95 @@ export default function CareerExplorer() {
                     <h1 className="text-4xl font-extrabold text-[#0A2540]">{t('career.title')}</h1>
                     <p className="text-gray-500 mt-2">{t('career.subtitle', { n: careers.length })}</p>
                 </div>
+
+                {/* ══ Assessment Bookmark — collapsible summary ══ */}
+                {assessment?.recommendedStreams?.length > 0 && (() => {
+                    const STREAM_COLORS: Record<string, string> = {
+                        'Science-PCM': '#3b82f6', 'Science-PCB': '#10b981',
+                        'Commerce': '#8b5cf6', 'Arts / Humanities': '#f59e0b',
+                        'Diploma / Polytechnic': '#f97316', 'ITI / Skill Training': '#ef4444',
+                        'Paramedical / Nursing Diploma': '#06b6d4',
+                    };
+                    return (
+                        <div className="mb-6 relative">
+                            {/* Bookmark button — always visible */}
+                            <button
+                                onClick={() => setShowAssessment(prev => !prev)}
+                                className="flex items-center gap-2.5 bg-gradient-to-r from-[#0A2540] to-[#1a3d66] text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                            >
+                                <span>🎯</span>
+                                <span>Your Assessment Results</span>
+                                <span className="text-[10px] bg-[#00D4FF] text-[#0A2540] font-bold px-2 py-0.5 rounded-full">
+                                    ✅ {assessment.recommendedStreams[0]?.stream}
+                                </span>
+                                <span className={`text-xs transition-transform duration-200 ${showAssessment ? 'rotate-180' : ''}`}>▼</span>
+                            </button>
+
+                            {/* Expandable panel */}
+                            <AnimatePresence>
+                                {showAssessment && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -8, height: 0 }}
+                                        animate={{ opacity: 1, y: 0, height: 'auto' }}
+                                        exit={{ opacity: 0, y: -8, height: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="overflow-hidden"
+                                    >
+                                        <div className="mt-2 bg-gradient-to-r from-[#0A2540] to-[#1a3d66] text-white rounded-2xl p-5 shadow-xl">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <p className="text-xs text-gray-300">
+                                                    {assessment.takenAt
+                                                        ? `Assessment taken on ${new Date(assessment.takenAt).toLocaleDateString()}`
+                                                        : 'Based on your aptitude assessment'}
+                                                </p>
+                                                <Link
+                                                    to="/dashboard"
+                                                    className="shrink-0 bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition"
+                                                >
+                                                    🔄 Retake
+                                                </Link>
+                                            </div>
+
+                                            {/* Stream chips */}
+                                            <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-2">Recommended Streams</p>
+                                            <div className="flex flex-wrap gap-2 mb-3">
+                                                {assessment.recommendedStreams.slice(0, 4).map((s: any, idx: number) => {
+                                                    const color = STREAM_COLORS[s.stream] || '#635BFF';
+                                                    return (
+                                                        <div key={s.stream}
+                                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+                                                            style={{ background: `${color}30`, borderColor: `${color}60`, borderWidth: 1 }}
+                                                        >
+                                                            {idx === 0 && <span className="text-[10px]">⭐</span>}
+                                                            <span>{s.stream}</span>
+                                                            <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-bold">{s.confidence}%</span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            {/* Top career matches */}
+                                            {assessment.results?.length > 0 && (
+                                                <>
+                                                    <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-2">Top Career Matches</p>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {assessment.results.slice(0, 3).map((r: any) => (
+                                                            <span key={r.careerTitle}
+                                                                className="text-xs px-2.5 py-1 rounded-full bg-white/10 text-white font-medium"
+                                                            >
+                                                                {r.careerTitle} · {r.score}%
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    );
+                })()}
 
                 {/* Recommended for You */}
                 {recommended.length > 0 && (

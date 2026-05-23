@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { jsPDF } from 'jspdf';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import API from '../api';
@@ -7,12 +8,13 @@ import { useAuth } from '../context/AuthContext';
 interface Message {
     role: 'user' | 'assistant';
     content: string;
+    isWelcome?: boolean;
 }
 
 import { useLanguage } from '../context/LanguageContext';
 
 export default function ChatWidget() {
-    const { user } = useAuth();
+    const { user, refreshUser } = useAuth();
     const { language, setLanguage, t } = useLanguage();
     const [open, setOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -47,6 +49,7 @@ export default function ChatWidget() {
             setMessages([{
                 role: 'assistant',
                 content: t('chat.welcome', { name: user?.name?.split(' ')[0] || 'there' }),
+                isWelcome: true,
             }]);
         }
     }, [user?._id, open, language, t]);
@@ -58,6 +61,11 @@ export default function ChatWidget() {
         }
     }, [messages, user?._id]);
 
+    const hasAssessment = !!(user?.assessment?.results?.length);
+    if (!user || !hasAssessment) {
+        return null;
+    }
+
     const clearChat = () => {
         if (user?._id) {
             localStorage.removeItem(`chat_history_${user._id}`);
@@ -65,7 +73,103 @@ export default function ChatWidget() {
         setMessages([{
             role: 'assistant',
             content: t('chat.welcome', { name: user?.name?.split(' ')[0] || 'there' }),
+            isWelcome: true,
         }]);
+    };
+
+    // Strip markdown for clean PDF text output
+    const stripMarkdown = (text: string) =>
+        text
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/\*(.*?)\*/g, '$1')
+            .replace(/#{1,6}\s/g, '')
+            .replace(/`{1,3}(.*?)`{1,3}/g, '$1')
+            .replace(/^[-*+]\s/gm, '- ')
+            .replace(/\|\|UPDATE_GOAL:.*?\|\|/g, '')
+            .trim();
+
+    const handleExportChatPDF = () => {
+        if (messages.length <= 1) return; // Only welcome message, nothing to export
+
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const margin = 14;
+        const maxW = pageW - margin * 2;
+        let y = margin;
+
+        const addText = (text: string, size: number, color: [number, number, number], bold = false) => {
+            pdf.setFontSize(size);
+            pdf.setTextColor(...color);
+            const lines = pdf.splitTextToSize(text, maxW);
+            if (y + lines.length * (size * 0.4) > pageH - margin) {
+                pdf.addPage();
+                y = margin;
+            }
+            pdf.text(lines, margin, y);
+            y += lines.length * (size * 0.4) + 2;
+        };
+
+        // ── Header ──────────────────────────────────────────────────
+        pdf.setFillColor(10, 37, 64);
+        pdf.rect(0, 0, pageW, 28, 'F');
+        pdf.setFontSize(16);
+        pdf.setTextColor(255, 255, 255);
+        pdf.text('NHETIS AI Career Guidance Report', margin, 12);
+        pdf.setFontSize(9);
+        pdf.setTextColor(160, 210, 255);
+        pdf.text(`Student: ${user?.name || 'Student'}  |  Generated: ${new Date().toLocaleDateString('en-IN')}`, margin, 21);
+        y = 35;
+
+        // ── Student Profile ──────────────────────────────────────────
+        const profile = user?.profile || {};
+        const assessment = user?.assessment;
+        if (profile.stream || assessment?.results?.length) {
+            addText('STUDENT PROFILE', 10, [99, 91, 255]);
+            if (profile.stream) addText(`Stream: ${profile.stream}${profile.grade ? '  |  Grade: ' + profile.grade : ''}`, 9, [60, 80, 100]);
+            if (assessment?.results?.length) {
+                const top3 = assessment.results.slice(0, 3).map((r: any) => `${r.careerTitle} (${r.score}%)`).join('  |  ');
+                addText(`Top Career Matches: ${top3}`, 9, [60, 80, 100]);
+            }
+            y += 4;
+            pdf.setDrawColor(220, 225, 235);
+            pdf.line(margin, y, pageW - margin, y);
+            y += 6;
+        }
+
+        // ── Chat Conversation ────────────────────────────────────────
+        addText('AI CAREER GUIDANCE SESSION', 10, [99, 91, 255]);
+        y += 2;
+
+        const conversationMessages = messages.filter(m => !m.isWelcome);
+
+        conversationMessages.forEach((msg, idx) => {
+            const isUser = msg.role === 'user';
+            const label = isUser ? `You:` : 'NHETIS Advisor:';
+            const labelColor: [number, number, number] = isUser ? [10, 37, 64] : [0, 140, 200];
+            const textColor: [number, number, number] = isUser ? [40, 60, 80] : [30, 50, 70];
+
+            // Add spacing between messages
+            if (idx > 0) y += 3;
+
+            // Check page break
+            if (y > pageH - 30) { pdf.addPage(); y = margin; }
+
+            addText(label, 9, labelColor);
+            addText(stripMarkdown(msg.content), 9, textColor);
+        });
+
+        // ── Footer ──────────────────────────────────────────────────
+        const totalPages = (pdf as any).internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            pdf.setPage(i);
+            pdf.setFontSize(8);
+            pdf.setTextColor(150, 160, 175);
+            pdf.text('NHETIS - AI Career Advisor for Indian Students', margin, pageH - 6);
+            pdf.text(`Page ${i} of ${totalPages}`, pageW - margin - 20, pageH - 6);
+        }
+
+        pdf.save(`NHETIS_Career_Guidance_${user?.name?.replace(/\s+/g, '_') || 'Student'}.pdf`);
     };
 
     const sendMessage = async () => {
@@ -94,8 +198,12 @@ export default function ChatWidget() {
             if (data.profileUpdated) {
                 try {
                     await refreshUser();
-                    // Force a reload of the component tree to fetch new careers for Insights/Explorer
-                    window.location.reload();
+                    // Show a soft in-chat notification — no page reload needed,
+                    // refreshUser() already updates the global AuthContext.
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: `✅ *Your career profile has been updated!* Navigate to the Dashboard or Insights page to see your new recommendations.`,
+                    }]);
                 } catch (e) {
                     console.error("Failed to refresh user profile", e);
                 }
@@ -176,6 +284,16 @@ export default function ChatWidget() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
+                                <button
+                                    onClick={handleExportChatPDF}
+                                    title="Export this chat as a PDF career guidance report"
+                                    disabled={messages.length <= 1}
+                                    className="p-1 text-gray-400 hover:text-green-400 transition disabled:opacity-30"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </button>
                                 <button
                                     onClick={() => setIsExpanded(!isExpanded)}
                                     title={isExpanded ? "Collapse" : "Expand"}

@@ -1883,19 +1883,74 @@ const getStreamRecommendation = asyncHandler(async (req, res) => {
     // Normalize career-category scores to 0-1
     const maxCatScore = Math.max(...Object.values(catScores).map(v => Number(v) || 0), 1);
 
+    // ═══ Fetch and rank top careers for stream boosting ═══
+    const allCareers = await CareerPath.find({});
+    const boostedCategories = new Set();
+    interests.forEach(interest => {
+        const cats = INTEREST_CATEGORY_MAP[interest] || [];
+        cats.forEach(c => boostedCategories.add(c));
+    });
+
+    const scoredCareers = allCareers.map(career => {
+        let score = 0;
+        const categoryWeight = Number(catScores[career.category]) || 0;
+        const normalizedCatWeight = (categoryWeight / maxCatScore) * 50;
+        score += normalizedCatWeight;
+
+        const similarity = cosineSimilarity(aptVec, career.matchVector || {});
+        score += similarity * 20;
+
+        if (boostedCategories.has(career.category)) {
+            score += 20;
+        }
+
+        return {
+            requiredStream: career.requiredStream,
+            score,
+        };
+    });
+
+    scoredCareers.sort((a, b) => b.score - a.score);
+    const top3Careers = scoredCareers.slice(0, 3);
+
+    const streamBoosts = {
+        'Science-PCM': 0,
+        'Science-PCB': 0,
+        'Commerce': 0,
+        'Arts / Humanities': 0,
+        'Diploma / Polytechnic': 0,
+        'ITI / Skill Training': 0,
+        'Paramedical / Nursing Diploma': 0,
+    };
+
+    top3Careers.forEach((c, idx) => {
+        const boostVal = (3 - idx) * 15; // 45, 30, 15
+        if (c.requiredStream === 'Science-PCM') {
+            streamBoosts['Science-PCM'] += boostVal;
+        } else if (c.requiredStream === 'Science-PCB') {
+            streamBoosts['Science-PCB'] += boostVal;
+            streamBoosts['Paramedical / Nursing Diploma'] += boostVal * 0.7;
+        } else if (c.requiredStream === 'Commerce') {
+            streamBoosts['Commerce'] += boostVal;
+        } else if (c.requiredStream === 'Arts / Humanities') {
+            streamBoosts['Arts / Humanities'] += boostVal;
+        } else if (c.requiredStream === 'Vocational') {
+            streamBoosts['Diploma / Polytechnic'] += boostVal;
+            streamBoosts['ITI / Skill Training'] += boostVal * 0.8;
+        }
+    });
+
     const streamScores = {};
 
     for (const [stream, catWeights] of Object.entries(STREAM_TO_CATEGORIES)) {
         let score = 0;
 
         // ═══ SIGNAL 1: Career-category alignment (50%) ═══
-        // How well do the student's quiz-derived career-category scores match this stream?
         let catSignal = 0;
         for (const [cat, weight] of Object.entries(catWeights)) {
             const studentCatScore = (Number(catScores[cat]) || 0) / maxCatScore;
             catSignal += studentCatScore * weight;
         }
-        // Normalize by max possible (sum of weights)
         const maxWeight = Object.values(catWeights).reduce((a, b) => a + b, 0);
         score += (catSignal / (maxWeight || 1)) * 50;
 
@@ -1908,11 +1963,6 @@ const getStreamRecommendation = asyncHandler(async (req, res) => {
         score += aptSignal * 30;
 
         // ═══ SIGNAL 3: Interest alignment (20%) ═══
-        const boostedCategories = new Set();
-        interests.forEach(interest => {
-            const cats = INTEREST_CATEGORY_MAP[interest] || [];
-            cats.forEach(c => boostedCategories.add(c));
-        });
         let interestMatches = 0;
         for (const [cat, weight] of Object.entries(catWeights)) {
             if (weight > 1 && boostedCategories.has(cat)) interestMatches++;
@@ -1920,7 +1970,9 @@ const getStreamRecommendation = asyncHandler(async (req, res) => {
         const highWeightCats = Object.values(catWeights).filter(w => w > 1).length;
         score += (interestMatches / (highWeightCats || 1)) * 20;
 
-        streamScores[stream] = Math.min(100, Math.round(score));
+        // Apply stream boosts from top career requirements
+        const finalScore = score + (streamBoosts[stream] || 0);
+        streamScores[stream] = Math.min(100, Math.round(finalScore));
     }
 
     // Sort by score and build reasoning
