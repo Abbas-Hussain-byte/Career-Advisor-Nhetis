@@ -117,6 +117,7 @@ export const translations = {
                 Business: 'Business',
                 Media: 'Media',
                 Law: 'Law',
+                law: 'Law',
             }
         },
         profile: {
@@ -454,6 +455,7 @@ export const translations = {
                 Business: 'व्यवसाय',
                 Media: 'मीडिया',
                 Law: 'कानून',
+                law: 'कानून',
             }
         },
         profile: {
@@ -791,6 +793,7 @@ export const translations = {
                 Business: 'వ్యాపారం',
                 Media: 'మీడియా',
                 Law: 'చట్టం',
+                law: 'చట్టం',
             }
         },
         profile: {
