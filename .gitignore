@@ -1,1 +1,22 @@
-node_modules
+# Dependency directories
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+**/dist/
+build/
+**/build/
+
+# Local env files (prevent secret leakage)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+**/.env
+**/.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
