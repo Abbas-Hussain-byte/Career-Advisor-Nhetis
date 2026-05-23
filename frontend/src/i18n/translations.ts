@@ -116,6 +116,7 @@ export const translations = {
                 Agriculture: 'Agriculture',
                 Business: 'Business',
                 Media: 'Media',
+                Law: 'Law',
             }
         },
         profile: {
@@ -452,6 +453,7 @@ export const translations = {
                 Agriculture: 'कृषि',
                 Business: 'व्यवसाय',
                 Media: 'मीडिया',
+                Law: 'कानून',
             }
         },
         profile: {
@@ -788,6 +790,7 @@ export const translations = {
                 Agriculture: 'వ్యవసాయం',
                 Business: 'వ్యాపారం',
                 Media: 'మీడియా',
+                Law: 'చట్టం',
             }
         },
         profile: {
